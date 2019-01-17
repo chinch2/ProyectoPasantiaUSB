@@ -5,8 +5,8 @@ int rele = 8;
 
 void setup()
 {
-  pinMode(button_1, INPUT_PULLUP);
-  pinMode(button_2, INPUT_PULLUP);
+  pinMode(button_1, INPUT);
+  pinMode(button_2, INPUT);
   pinMode(rele, OUTPUT);
 }
 //Las señales provenientes de los pines se leen y se les hace un and
