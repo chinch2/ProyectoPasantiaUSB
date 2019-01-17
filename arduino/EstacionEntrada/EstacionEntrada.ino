@@ -1,5 +1,5 @@
 // El numero de los pines:
-int button_1 = 13;
+int button_1 = 12;
 int button_2 = 7;
 int rele = 8;
 
