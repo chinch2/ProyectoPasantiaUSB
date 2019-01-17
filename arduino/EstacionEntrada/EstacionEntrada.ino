@@ -2,7 +2,7 @@
 #include <LiquidCrystal_I2C.h>
 
 //Crear el objeto lcd  dirección  0x3F y 16 columnas x 2 filas
-LiquidCrystal_I2C lcd(0x3F,16,2);
+LiquidCrystal_I2C lcd(0x27,20,4);
 
 // El numero de los pines (constantes siempre):
 const int button_1 = 12;
@@ -45,8 +45,8 @@ void loop()
   
   // Escribimos el Mensaje en el LCD.
   lcd.setCursor(10, 0);
-  lcd.print("Bienvenido");
-  lcd.setCursor(4, 1);
+  lcd.print("Bienvenido!");
+  lcd.setCursor(5, 1);
   lcd.print("Tome su ticket");
    //desplazamos una posición a la izquierda
   lcd.scrollDisplayLeft(); 
