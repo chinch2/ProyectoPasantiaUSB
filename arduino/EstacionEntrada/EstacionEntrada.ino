@@ -1,3 +1,5 @@
+#include <SoftwareSerial.h>
+
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 
@@ -27,7 +29,9 @@ void setup()
   //lcd.begin(16, 2);
   //Limpiar la pantalla
   lcd.clear();
-  
+  //Empiezo a hablar con el ESP8266
+  delay(5000);
+  Serial.begin(115200);
 }
 //Las señales provenientes de los pines se leen y se les hace un and
 //De tal manera que si ambos pulsadores estan bajos, se activa el relé
@@ -73,17 +77,20 @@ void loop()
   } if (boton1==HIGH && boton2==HIGH) {
     lcd.clear();
     lcd.setCursor(0, 0);
-  lcd.print("Desarrol");
-  lcd.setCursor(0, 1);
-  lcd.print("los PNP");
-  delay(1000);
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Dash Tex");
-  lcd.setCursor(0, 1);
-  lcd.print("t");
-  delay(1000);
+    lcd.print("Desarrol");
+    lcd.setCursor(0, 1);
+    lcd.print("los PNP");
+    delay(1000);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Dash Tex");
+    lcd.setCursor(0, 1);
+    lcd.print("t");
+    delay(1000);
   }
-    
-  
+
+    //Leo el analogico de rele
+    int PtoSerial = analogRead(rele);
+    // print out the value you read:
+    Serial.println(PtoSerial);
 }
