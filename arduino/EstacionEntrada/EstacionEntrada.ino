@@ -1,9 +1,8 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 
-//Crear el objeto lcd  dirección  0x3F y 16 columnas x 2 filas
-LiquidCrystal_I2C lcd(0x27,20,4);
-
+//Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
+LiquidCrystal_I2C lcd(0x3f,16,2);
 // El numero de los pines (constantes siempre):
 const int button_1 = 12;
 const int button_2 = 7;
@@ -24,8 +23,10 @@ void setup()
   
   // Inicializar el LCD
   lcd.init();
-  
-  
+  // Indicar a la libreria que tenemos conectada una pantalla de 16x2
+  //lcd.begin(16, 2);
+  //Limpiar la pantalla
+  lcd.clear();
   
 }
 //Las señales provenientes de los pines se leen y se les hace un and
@@ -44,28 +45,44 @@ void loop()
      //lcd.clear();
    //Encender la luz de fondo.
   lcd.backlight();
+  lcd.clear();
+  // Mover el cursor a la primera posición de la pantalla (0, 0)
+  lcd.setCursor(0, 0);
+  lcd.print("Bienveni");
+  lcd.setCursor(0, 1);
+  lcd.print("do!");
+  delay(1000);
+  lcd.setCursor(0, 0);
+  lcd.print("Pulse 1 ");
+  lcd.setCursor(0, 1);
+  lcd.print("Segundo");
+  delay(1000);
+  lcd.clear();
   
-  // Escribimos el Mensaje en el LCD.
-  lcd.setCursor(1, 0);
-  lcd.print("Bienvenido!");
-  lcd.setCursor(1, 1);
-  lcd.print("Tome su ticket");
-   //desplazamos una posición a la izquierda
-  //lcd.scrollDisplayLeft(); 
-  //delay(1000);
     
   } if (boton1==LOW && boton2==LOW) {
     //ENTRÓ ALGUIEN!
-    lcd.setCursor(1, 0);
-    lcd.print("Imprimiendo");
+    lcd.setCursor(0, 0);
+    lcd.print("Imprimie");
+    lcd.setCursor(0, 1);
+    lcd.print("ndo...");
     digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
     delay(4000);
     digitalWrite(LED_BUILTIN, LOW);    // turn the LED off (LOW is the voltage level)
     
   } if (boton1==HIGH && boton2==HIGH) {
     lcd.clear();
-    lcd.noBacklight();
-
+    lcd.setCursor(0, 0);
+  lcd.print("Desarrol");
+  lcd.setCursor(0, 1);
+  lcd.print("los PNP");
+  delay(1000);
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Dash Tex");
+  lcd.setCursor(0, 1);
+  lcd.print("t");
+  delay(1000);
   }
     
   
