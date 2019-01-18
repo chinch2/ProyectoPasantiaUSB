@@ -38,31 +38,35 @@ void loop()
   boton1 = digitalRead(button_1);
   boton2 = digitalRead(button_2);
 
-  if (boton1==LOW) {//Está el carro, no se ha presionado el botón
+  if (boton1==LOW && boton2==HIGH) {//Está el carro, no se ha presionado el botón
     //----------------LCD DISPLAY--------------------------
+    //Limpiar el display
+     //lcd.clear();
    //Encender la luz de fondo.
   lcd.backlight();
   
   // Escribimos el Mensaje en el LCD.
-  lcd.setCursor(10, 0);
+  lcd.setCursor(1, 0);
   lcd.print("Bienvenido!");
-  lcd.setCursor(5, 1);
+  lcd.setCursor(1, 1);
   lcd.print("Tome su ticket");
    //desplazamos una posición a la izquierda
-  lcd.scrollDisplayLeft(); 
-  delay(1000);
+  //lcd.scrollDisplayLeft(); 
+  //delay(1000);
     
-  } else {
+  } if (boton1==LOW && boton2==LOW) {
+    //ENTRÓ ALGUIEN!
+    lcd.setCursor(1, 0);
+    lcd.print("Imprimiendo");
+    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+    delay(4000);
+    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off (LOW is the voltage level)
+    
+  } if (boton1==HIGH && boton2==HIGH) {
     lcd.clear();
     lcd.noBacklight();
 
   }
     
-  if (boton1==LOW && boton2==LOW) {
-    //ENTRÓ ALGUIEN!
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-    delay(1000);
-    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off (LOW is the voltage level)
-    
-  } 
+  
 }
