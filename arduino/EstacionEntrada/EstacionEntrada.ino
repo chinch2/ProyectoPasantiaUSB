@@ -4,15 +4,15 @@
 #define SSID "PNP"  //Red a la que se conectará el ESP826
 #define PASS "PNPSISTEMAS"  //Contraseña de la red
 #define DST_IP "146.227.57.195" //Dirección del servidor Web
-//#define LED 13    //Buscar qué pin del Teensy es el led
+#define LED 11    //Buscar qué pin del Teensy es el led
 //#define RESET 12  //Buscar un pin del Teensy que no esté en uso para resetear
 
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
 // El numero de los pines (constantes siempre):
-const int button_1 = 12;
-const int button_2 = 7;
-const int rele = 8;
+const int button_1 = 1;
+const int button_2 = 2;
+const int rele = 3;
 
 //Variables que cambian:
 int boton1 = 0; //Variables para leer el estatus de los botones
@@ -189,14 +189,14 @@ void loop()
 /*------------------Funciones para el weblclient con el ESP8266-------------------------
   boolean connectWiFi()
 {
-  String cmd="AT+CWJAP=\"";  //form eg: AT+CWJAP="dynamode","55555555555555555555555555"
+  String cmd="AT+CWJAP=\"";  //form eg: AT+CWJAP="PNP","PNPSISTEMAS"
   cmd+=SSID;
   cmd+="\",\"";
   cmd+=PASS;
   cmd+="\"";
   Serial1.println(cmd);
-  delay(5000); //give it time - my access point can be very slow sometimes
-  if(Serial1.find("OK"))  //healthy response
+  delay(5000); //tiempo de conexión
+  if(Serial1.find("OK"))  //respuesta esperada
   {
     Serial.println("Connected to WiFi...");
     return true;
@@ -232,7 +232,7 @@ void reset()
 }
 //------------------------------------------------------------------------------
 boolean cwmode3()
-// Odd one. CWMODE=3 means configure the device as access point & station. This function can't fail?
+// Odd one. CWMODE=3 means configure the device as access point & station.
 
 {
   Serial1.println("AT+CWMODE=3");
