@@ -4,15 +4,16 @@
 #define SSID "PNP"  //Red a la que se conectará el ESP826
 #define PASS "PNPSISTEMAS"  //Contraseña de la red
 #define DST_IP "146.227.57.195" //Dirección del servidor Web
-#define LED 11    //Buscar qué pin del Teensy es el led
-//#define RESET 12  //Buscar un pin del Teensy que no esté en uso para resetear
 
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
 // El numero de los pines (constantes siempre):
+
 const int button_1 = 1;
 const int button_2 = 2;
 const int rele = 3;
+const int LED = 11;
+const int RESET = 12; //Hardware reset para el ESP8266
 
 //Variables que cambian:
 int boton1 = 0; //Variables para leer el estatus de los botones
@@ -28,9 +29,9 @@ void setup()
   pinMode(rele, OUTPUT);
   //pinMode(RESET,OUTPUT); //Teensy
   //reset();               //Teensy
-  //pinMode(LED,OUTPUT);   //Teensy
+  pinMode(LED,OUTPUT);   //Teensy
   
-  digitalWrite(LED_BUILTIN, LOW);
+  //digitalWrite(LED_BUILTIN, LOW);
 
   // Inicializar el LCD
   lcd.init();
@@ -146,12 +147,12 @@ void loop()
     lcd.print("Bienveni");
     lcd.setCursor(0, 1);
     lcd.print("do!");
-    delay(1000);
+    delay(1500);
     lcd.setCursor(0, 0);
     lcd.print("Pulse 1 ");
     lcd.setCursor(0, 1);
     lcd.print("Segundo");
-    delay(1000);
+    delay(1500);
     lcd.clear();
 
 
@@ -161,9 +162,9 @@ void loop()
     lcd.print("Imprimie");
     lcd.setCursor(0, 1);
     lcd.print("ndo...");
-    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+    digitalWrite(LED, HIGH);   // turn the LED on (HIGH is the voltage level)
     delay(4000);
-    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off (LOW is the voltage level)
+    digitalWrite(LED, LOW);    // turn the LED off (LOW is the voltage level)
 
   } if (boton1 == HIGH && boton2 == HIGH) {
     lcd.clear();
