@@ -180,10 +180,10 @@ void loop()
     delay(1000);
   }
 
-  //Leo el analogico de rele
+  /*Leo el analogico de rele
   int PtoSerial = analogRead(rele);
   // print out the value you read:
-  Serial.println(PtoSerial);
+  Serial.println(PtoSerial);*/
 }
 
 /*------------------Funciones para el weblclient con el ESP8266-------------------------
