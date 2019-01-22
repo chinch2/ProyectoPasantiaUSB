@@ -21,27 +21,29 @@ int relay = 0;
 int loops = 0;  //Contador de Pruebas
 
 void setup()
-{
+{ /*----------------------FUNCIONES  QUE DEBEN SER DECLARADAS-------------------------
+  boolean connectWiFi();
+  */
   //Inicializando los pines de entrada y salida
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
   pinMode(rele, OUTPUT);
-  pinMode(RESET,OUTPUT); //Teensy
-  //reset();               //Teensy
+  /*pinMode(RESET,OUTPUT); //Teensy con ESP8266
+  reset();               //Teensy con ESP8266*/
   pinMode(LED,OUTPUT);   //Teensy
   
   //digitalWrite(LED_BUILTIN, LOW);
 
   // Inicializar el LCD
   lcd.init();
-  // Indicar a la libreria que tenemos conectada una pantalla de 16x2
-  //lcd.begin(16, 2);
   //Limpiar la pantalla
   lcd.clear();
+  
   //Empiezo a hablar con el ESP8266 (Teensy 2.0)
-  //Serial1.begin(115200);    //Serial físico conectado al ESP8266
+  //Serial1.begin(115200);    //Serial físico conectado al ESP8266boolean connectWiFi()
   Serial.begin(115200); //Serial conectado a la PC
   delay(4000);    //Esperar que se setee el pto serial y se prenda el dispositivo
+  
   /*if(!cwmode3()) Serial.println("cwmode3 failed");
   boolean wifi_connected=false;  //no me he podido conectar a la red Wifi
   for(int i=0;i<5;i++)    //5 intentos para conectarme al wifi
@@ -66,7 +68,7 @@ void loop()
 {
   /*-----------------------------------Teensy con ESP8266-----------------------------
    reset();  //De esta forma funciona.
-  delay(5000);  //Tiempo para que el ESP8266 se resetee
+  //delay(5000);  //Tiempo para que el ESP8266 se resetee
   //Serial.print("loops = ");  //Chequea para conexión exitosa al servidor
   //Serial.println(loops); 
   loops++;
@@ -136,8 +138,7 @@ void loop()
 
   if (boton1 == LOW && boton2 == HIGH) { //Está el carro, no se ha presionado el botón
     //----------------LCD DISPLAY--------------------------
-    //Limpiar el display
-    //lcd.clear();
+
     //Encender la luz de fondo.
     lcd.backlight();
     lcd.clear();
@@ -162,9 +163,10 @@ void loop()
     lcd.setCursor(0, 1);
     lcd.print("ndo...");
     digitalWrite(LED, HIGH);   // turn the LED on (HIGH is the voltage level)
+    digitalWrite(rele,HIGH);
     delay(4000);
     digitalWrite(LED, LOW);    // turn the LED off (LOW is the voltage level)
-
+    digitalWrite(rele,LOW); 
   } if (boton1 == HIGH && boton2 == HIGH) {
     lcd.clear();
     lcd.setCursor(0, 0);
@@ -179,14 +181,9 @@ void loop()
     lcd.print("t");
     delay(1000);
   }
-
-  /*Leo el analogico de rele
-  int PtoSerial = analogRead(rele);
-  // print out the value you read:
-  Serial.println(PtoSerial);*/
 }
 
-/*------------------Funciones para el weblclient con el ESP8266-------------------------
+/*//------------------Funciones para el weblclient con el ESP8266-------------------------
   boolean connectWiFi()
 {
   String cmd="AT+CWJAP=\"";  //form eg: AT+CWJAP="PNP","PNPSISTEMAS"
@@ -290,6 +287,4 @@ void hangreset (String error_String)    //for debugging
   Serial.print(error_String);
   Serial.println(" - resetting");
   reset();
-}
-
- */
+}*/
