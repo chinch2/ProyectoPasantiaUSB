@@ -4,7 +4,7 @@
 #define SSID "PNP"  //Red a la que se conectará el ESP826
 #define PASS "PNPSISTEMAS"  //Contraseña de la red
 #define DST_IP "146.227.57.195" //Dirección del servidor Web
-
+#define LED A10 //led del teensy 2.0
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
 // El numero de los pines (constantes siempre):
@@ -12,7 +12,6 @@ LiquidCrystal_I2C lcd(0x3f, 16, 2);
 const int button_1 = 1;
 const int button_2 = 2;
 const int rele = 3;
-const int LED = 11;
 const int RESET = 12; //Hardware reset para el ESP8266
 
 //Variables que cambian:
@@ -27,7 +26,7 @@ void setup()
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
   pinMode(rele, OUTPUT);
-  //pinMode(RESET,OUTPUT); //Teensy
+  pinMode(RESET,OUTPUT); //Teensy
   //reset();               //Teensy
   pinMode(LED,OUTPUT);   //Teensy
   
