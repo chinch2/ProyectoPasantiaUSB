@@ -3,7 +3,7 @@
 #include <LiquidCrystal_I2C.h>
 #define SSID "PNP"  //Red a la que se conectará el ESP826
 #define PASS "PNPSISTEMAS"  //Contraseña de la red
-#define DST_IP "146.227.57.195" //Dirección del servidor Web
+#define DST_IP "10.20.184.10" //Dirección del servidor Web
 #define LED 11 //led del teensy 2.0
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
@@ -21,15 +21,14 @@ int relay = 0;
 int loops = 0;  //Contador de Pruebas
 
 void setup()
-{ /*----------------------FUNCIONES  QUE DEBEN SER DECLARADAS-------------------------
-  boolean connectWiFi();
-  */
+{ //----------------------FUNCIONES  QUE DEBEN SER DECLARADAS-------------------------
+  //boolean connectWiFi();
   //Inicializando los pines de entrada y salida
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
   pinMode(rele, OUTPUT);
-  /*pinMode(RESET,OUTPUT); //Teensy con ESP8266
-  reset();               //Teensy con ESP8266*/
+  pinMode(RESET,OUTPUT); //Teensy con ESP8266
+  reset();               //Teensy con ESP8266
   pinMode(LED,OUTPUT);   //Teensy
   
   //digitalWrite(LED_BUILTIN, LOW);
@@ -40,11 +39,11 @@ void setup()
   lcd.clear();
   
   //Empiezo a hablar con el ESP8266 (Teensy 2.0)
-  //Serial1.begin(115200);    //Serial físico conectado al ESP8266boolean connectWiFi()
+  Serial1.begin(115200);    //Serial físico conectado al ESP8266boolean connectWiFi()
   Serial.begin(115200); //Serial conectado a la PC
   delay(4000);    //Esperar que se setee el pto serial y se prenda el dispositivo
   
-  /*if(!cwmode3()) Serial.println("cwmode3 failed");
+  if(!cwmode3()) Serial.println("cwmode3 failed");
   boolean wifi_connected=false;  //no me he podido conectar a la red Wifi
   for(int i=0;i<5;i++)    //5 intentos para conectarme al wifi
   {
@@ -59,44 +58,45 @@ void setup()
   if(!cipmux0()) hang("cipmux0 failed");
   delay(250);
   if(!cipmode0()) hang("cipmode0 failed");
-  delay(250);*/
+  delay(250);
 }
 //Las señales provenientes de los pines se leen y se les hace un and
 //De tal manera que si ambos pulsadores estan bajos, se activa el relé
 
 void loop()
 {
-  /*-----------------------------------Teensy con ESP8266-----------------------------
-   reset();  //De esta forma funciona.
-  //delay(5000);  //Tiempo para que el ESP8266 se resetee
+  //-----------------------------------Teensy con ESP8266-----------------------------
+  reset();  //De esta forma funciona.
+  delay(5000);  //Tiempo para que el ESP8266 se resetee
   //Serial.print("loops = ");  //Chequea para conexión exitosa al servidor
   //Serial.println(loops); 
   loops++;
-  String cmd = "AT+CIPSTART=\"TCP\",\"";  //Hago este comando: AT+CPISTART="TCP","146.227.57.195",80
+  //-----------Mandar comando al ESP8266 por serial----------------------
+  String cmd = "AT+CIPSTART=\"TCP\",\"";  //Hago este comando: AT+CIPSTART="TCP","10.20.184.10",80
   cmd += DST_IP; //IP de destino
   cmd += "\",80"; //Puerto destino (HTTP)
 
   Serial1.println(cmd);  //Mando el comando al ESP8266
-
+  
   delay(2000);  //Esperar un poco para obtener respuesta de forma exitosa.
-  if(Serial1.find("Linked"))  //El mensaje se devuelve cuando se establece conexión (PUNTO DEBIL, SUELE NO FUNCIONAR)
+  if(Serial1.find("OK"))  //El mensaje se devuelve cuando se establece conexión (PUNTO DEBIL, SUELE NO FUNCIONAR)
   {
-   // Serial.print("Connected to server at ");  //debug message
-   // Serial.println(DST_IP);
+    Serial.print("Connected to server at ");  //debug message
+    Serial.println(DST_IP);
   }
-  else
+  else                      //HAZ QUE FUNCIONE ESTO!
   {
-  //  Serial.println("'Linked' response not received");  //weak spot!
+    Serial.println("'OK' response not received");  //weak spot!
   }
 
-  cmd =  "GET /~sexton/test.txt HTTP/1.0\r\n";  //construct http GET request
-  cmd += "Host: cse.dmu.ac.uk\r\n\r\n";        //test file on my web
-  Serial1.print("AT+CIPSEND=");                //www.cse.dmu.ac.uk/~sexton/test.txt
+  cmd =  "GET /juan.php HTTP/1.0\r\n\r\n";  //construct http GET request
+  //cmd += "Host: cse.dmu.ac.uk\r\n\r\n";        //test file on my web
+  Serial1.print("AT+CIPSEND=");
   Serial1.println(cmd.length());  //esp8266 needs to know message length of incoming message - .length provides this
 
   if(Serial1.find(">"))    //prompt offered by esp8266
   {
-   // Serial.println("found > prompt - issuing GET request");  //a debug message
+    Serial.println("found > prompt - issuing GET request");  //a debug message
     Serial1.println(cmd);  //this is our http GET request
   }
   else
@@ -107,9 +107,9 @@ void loop()
 
   //Analizo el header & web page. Ejemplo una fecha actual
 
-  if (Serial1.find("Date: ")) //get the date line from the http header (for example)
+  if (Serial1.find("HOLA")) //get the date line from the http header (for example)
   {
-    for (int i=0;i<31;i++)  //this should capture the 'Date: ' line from the header
+    for (int i=0;i<66;i++)  //this should capture the 'Date: ' line from the header
     {
       if (Serial1.available())  //new cahracters received?
       {
@@ -122,15 +122,16 @@ void loop()
 
   Serial1.println("AT+CIPCLOSE");  
 
-  if(Serial1.find("Unlink"))  //rarely seems to find Unlink? :(
+  delay(2000);
+  if(Serial1.find("OK"))  //rarely seems to find Unlink? :(
   {
     Serial.println("Connection Closed Ok...");
   }
   else
   {
-    //Serial.println("connection close failure");
+    Serial.println("connection close failure");
   }
-   */
+  
   //veo el estado de botones que son entradas digitales
 
   boton1 = digitalRead(button_1);
@@ -183,7 +184,7 @@ void loop()
   }
 }
 
-/*//------------------Funciones para el weblclient con el ESP8266-------------------------
+//------------------Funciones para el weblclient con el ESP8266-------------------------
   boolean connectWiFi()
 {
   String cmd="AT+CWJAP=\"";  //form eg: AT+CWJAP="PNP","PNPSISTEMAS"
@@ -287,4 +288,4 @@ void hangreset (String error_String)    //for debugging
   Serial.print(error_String);
   Serial.println(" - resetting");
   reset();
-}*/
+}
