@@ -109,7 +109,7 @@ void loop()
 
   if (Serial1.find("HOLA")) //get the date line from the http header (for example)
   {
-    for (int i=0;i<66;i++)  //this should capture the 'Date: ' line from the header
+    for (int i=0;i<63;i++)  //this should capture the 'Date: ' line from the header
     {
       if (Serial1.available())  //new cahracters received?
       {
