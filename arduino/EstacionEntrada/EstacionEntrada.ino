@@ -71,8 +71,8 @@ void loop()
   //Serial.print("loops = ");  //Chequea para conexión exitosa al servidor
   //Serial.println(loops); 
   loops++;
-  //-----------Mandar comando al ESP8266 por serial----------------------
-  String cmd = "AT+CIPSTART=\"TCP\",\"";  //Hago este comando: AT+CIPSTART="TCP","10.20.184.10",80
+  //-----------ME CONECTO AL SERVIDOR POR EL PUERTO 80----------------------
+  String cmd = "AT+CIPSTART=\"TCP\",\"";  //Hago este comando: AT+CIPSTART="TCP","IP DESTINO",80
   cmd += DST_IP; //IP de destino
   cmd += "\",80"; //Puerto destino (HTTP)
 
@@ -84,11 +84,18 @@ void loop()
     Serial.print("Connected to server at ");  //debug message
     Serial.println(DST_IP);
   }
-  else                      //HAZ QUE FUNCIONE ESTO!
+  else
   {
     Serial.println("'OK' response not received");  //weak spot!
   }
+  
+  //veo el estado de botones que son entradas digitales
 
+  boton1 = digitalRead(button_1);
+  boton2 = digitalRead(button_2);
+
+  if (boton1 == LOW && boton2 == HIGH) { //Está el carro, no se ha presionado el botón
+    //-----------------------------------GET REQUEST 1-------------------------------------------------------------
   cmd =  "GET /juan.php HTTP/1.0\r\n\r\n";  //construct http GET request
   //cmd += "Host: cse.dmu.ac.uk\r\n\r\n";        //test file on my web
   Serial1.print("AT+CIPSEND=");
@@ -109,18 +116,130 @@ void loop()
 
   if (Serial1.find("HOLA")) //get the date line from the http header (for example)
   {
-    for (int i=0;i<63;i++)  //this should capture the 'Date: ' line from the header
-    {
-      if (Serial1.available())  //new cahracters received?
-      {
-        char c=Serial1.read();  //print to console
-        Serial.write(c);
-      }
-      else i--;  //if not, keep going round loop until we've got all the characters
-    }
+    //char comma = 44;
+    //char dot = 46;
+    String msg1 = Serial.readStringUntil(44);
+    String msg2 = Serial.readStringUntil(46);
+    
+       //----------------LCD DISPLAY--------------------------
+
+    //Encender la luz de fondo.
+    lcd.backlight();
+    lcd.clear();
+    // Mover el cursor a la primera posición de la pantalla (0, 0)
+    lcd.setCursor(0, 0);
+    lcd.print(msg1);
+    lcd.setCursor(0, 1);
+    lcd.print(msg2);
+    delay(1500);
+    /*lcd.setCursor(0, 0);
+    lcd.print("Pulse 1 ");    Otras palabras. Tiene que ir de 8 en 8 por e display.
+    lcd.setCursor(0, 1);
+    lcd.print("Segundo");
+    delay(1500);*/
+    lcd.clear();
+
+  }
+ 
+
+  } if (boton1 == LOW && boton2 == LOW) {
+    //ENTRÓ ALGUIEN!
+    //-----------------------------------GET REQUEST 2-------------------------------------------------------------
+  cmd =  "GET /juan.php HTTP/1.0\r\n\r\n";  //construct http GET request
+  //cmd += "Host: cse.dmu.ac.uk\r\n\r\n";        //test file on my web
+  Serial1.print("AT+CIPSEND=");
+  Serial1.println(cmd.length());  //esp8266 needs to know message length of incoming message - .length provides this
+
+  if(Serial1.find(">"))    //prompt offered by esp8266
+  {
+    Serial.println("found > prompt - issuing GET request");  //a debug message
+    Serial1.println(cmd);  //this is our http GET request
+  }
+  else
+  {
+    Serial1.println("AT+CIPCLOSE");  //doesn't seem to work here?
+    Serial.println("No '>' prompt received after AT+CPISEND");
   }
 
-  Serial1.println("AT+CIPCLOSE");  
+  //Analizo el header & web page. Ejemplo una fecha actual
+
+  if (Serial1.find("HOLA")) //get the date line from the http header (for example)
+  {
+    //char comma = 44;
+    //char dot = 46;
+    String msg1 = Serial.readStringUntil(44);
+    String msg2 = Serial.readStringUntil(46);
+    
+       //----------------LCD DISPLAY--------------------------
+
+    //Encender la luz de fondo.
+    lcd.backlight();
+    lcd.clear();
+    // Mover el cursor a la primera posición de la pantalla (0, 0)
+    lcd.setCursor(0, 0);
+    lcd.print(msg1);
+    lcd.setCursor(0, 1);
+    lcd.print(msg2);
+    delay(1500);
+    /*lcd.setCursor(0, 0);
+    lcd.print("Pulse 1 ");    Otras palabras. Tiene que ir de 8 en 8 por e display.
+    lcd.setCursor(0, 1);
+    lcd.print("Segundo");
+    delay(1500);*/
+    lcd.clear();
+
+  }
+    
+  } if (boton1 == HIGH && boton2 == HIGH) {  //No hay nadie...
+    //-----------------------------------GET REQUEST 3-------------------------------------------------------------
+  cmd =  "GET /juan.php HTTP/1.0\r\n\r\n";  //construct http GET request
+  //cmd += "Host: cse.dmu.ac.uk\r\n\r\n";        //test file on my web
+  Serial1.print("AT+CIPSEND=");
+  Serial1.println(cmd.length());  //esp8266 needs to know message length of incoming message - .length provides this
+
+  if(Serial1.find(">"))    //prompt offered by esp8266
+  {
+    Serial.println("found > prompt - issuing GET request");  //a debug message
+    Serial1.println(cmd);  //this is our http GET request
+  }
+  else
+  {
+    Serial1.println("AT+CIPCLOSE");  //doesn't seem to work here?
+    Serial.println("No '>' prompt received after AT+CPISEND");
+  }
+
+  //Analizo el header & web page. Ejemplo una fecha actual
+
+  if (Serial1.find("HOLA")) //get the date line from the http header (for example)
+  {
+    //char comma = 44;
+    //char dot = 46;
+    String msg1 = Serial.readStringUntil(44);
+    String msg2 = Serial.readStringUntil(46);
+    
+       //----------------LCD DISPLAY--------------------------
+
+    //Encender la luz de fondo.
+    lcd.backlight();
+    lcd.clear();
+    // Mover el cursor a la primera posición de la pantalla (0, 0)
+    lcd.setCursor(0, 0);
+    lcd.print(msg1);
+    lcd.setCursor(0, 1);
+    lcd.print(msg2);
+    delay(1500);
+    /*lcd.setCursor(0, 0);
+    lcd.print("Pulse 1 ");    Otras palabras. Tiene que ir de 8 en 8 por e display.
+    lcd.setCursor(0, 1);
+    lcd.print("Segundo");
+    delay(1500);*/
+    lcd.clear();
+
+  }
+
+  }
+
+   Serial1.println("AT+CIPCLOSE");  
 
   delay(2000);
   if(Serial1.find("OK"))  //rarely seems to find Unlink? :(
@@ -132,56 +251,6 @@ void loop()
     Serial.println("connection close failure");
   }
   
-  //veo el estado de botones que son entradas digitales
-
-  boton1 = digitalRead(button_1);
-  boton2 = digitalRead(button_2);
-
-  if (boton1 == LOW && boton2 == HIGH) { //Está el carro, no se ha presionado el botón
-    //----------------LCD DISPLAY--------------------------
-
-    //Encender la luz de fondo.
-    lcd.backlight();
-    lcd.clear();
-    // Mover el cursor a la primera posición de la pantalla (0, 0)
-    lcd.setCursor(0, 0);
-    lcd.print("Bienveni");
-    lcd.setCursor(0, 1);
-    lcd.print("do!");
-    delay(1500);
-    lcd.setCursor(0, 0);
-    lcd.print("Pulse 1 ");
-    lcd.setCursor(0, 1);
-    lcd.print("Segundo");
-    delay(1500);
-    lcd.clear();
-
-
-  } if (boton1 == LOW && boton2 == LOW) {
-    //ENTRÓ ALGUIEN!
-    lcd.setCursor(0, 0);
-    lcd.print("Imprimie");
-    lcd.setCursor(0, 1);
-    lcd.print("ndo...");
-    digitalWrite(LED, HIGH);   // turn the LED on (HIGH is the voltage level)
-    digitalWrite(rele,HIGH);
-    delay(4000);
-    digitalWrite(LED, LOW);    // turn the LED off (LOW is the voltage level)
-    digitalWrite(rele,LOW); 
-  } if (boton1 == HIGH && boton2 == HIGH) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Desarrol");
-    lcd.setCursor(0, 1);
-    lcd.print("los PNP");
-    delay(1000);
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Dash Tex");
-    lcd.setCursor(0, 1);
-    lcd.print("t");
-    delay(1000);
-  }
 }
 
 //------------------Funciones para el weblclient con el ESP8266-------------------------
