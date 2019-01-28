@@ -3,7 +3,7 @@
 #include <LiquidCrystal_I2C.h>
 #define SSID "PNP"  //Red a la que se conectará el ESP826
 #define PASS "PNPSISTEMAS"  //Contraseña de la red
-#define DST_IP "10.20.184.10" //Dirección del servidor Web
+#define DST_IP "10.20.184.242" //Dirección del servidor Web
 #define LED 11 //led del teensy 2.0
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
@@ -18,7 +18,6 @@ const int RESET = 12; //Hardware reset para el ESP8266
 int boton1 = 0; //Variables para leer el estatus de los botones
 int boton2 = 0;
 int relay = 0;
-int loops = 0;  //Contador de Pruebas
 
 void setup()
 { //----------------------FUNCIONES  QUE DEBEN SER DECLARADAS-------------------------
@@ -37,11 +36,13 @@ void setup()
   lcd.init();
   //Limpiar la pantalla
   lcd.clear();
+
   
   //Empiezo a hablar con el ESP8266 (Teensy 2.0)
   Serial1.begin(115200);    //Serial físico conectado al ESP8266boolean connectWiFi()
   Serial.begin(115200); //Serial conectado a la PC
   delay(4000);    //Esperar que se setee el pto serial y se prenda el dispositivo
+  //Seteando el ESP como se quiere
   
   if(!cwmode3()) Serial.println("cwmode3 failed");
   boolean wifi_connected=false;  //no me he podido conectar a la red Wifi
@@ -66,19 +67,15 @@ void setup()
 void loop()
 {
   //-----------------------------------Teensy con ESP8266-----------------------------
-  reset();  //De esta forma funciona.
-  delay(5000);  //Tiempo para que el ESP8266 se resetee
-  //Serial.print("loops = ");  //Chequea para conexión exitosa al servidor
-  //Serial.println(loops); 
-  loops++;
+  //reset();  //De esta forma funciona.
+  //delay(5000);  //Tiempo para que el ESP8266 se resetee
   //-----------ME CONECTO AL SERVIDOR POR EL PUERTO 80----------------------
   String cmd = "AT+CIPSTART=\"TCP\",\"";  //Hago este comando: AT+CIPSTART="TCP","IP DESTINO",80
   cmd += DST_IP; //IP de destino
   cmd += "\",80"; //Puerto destino (HTTP)
-
+  
   Serial1.println(cmd);  //Mando el comando al ESP8266
   
-  delay(2000);  //Esperar un poco para obtener respuesta de forma exitosa.
   if(Serial1.find("OK"))  //El mensaje se devuelve cuando se establece conexión (PUNTO DEBIL, SUELE NO FUNCIONAR)
   {
     Serial.print("Connected to server at ");  //debug message
@@ -96,11 +93,11 @@ void loop()
 
   if (boton1 == LOW && boton2 == HIGH) { //Está el carro, no se ha presionado el botón
     //-----------------------------------GET REQUEST 1-------------------------------------------------------------
-  cmd =  "GET /juan.php HTTP/1.0\r\n\r\n";  //construct http GET request
-  //cmd += "Host: cse.dmu.ac.uk\r\n\r\n";        //test file on my web
+    Serial.println("Está el carro, no se ha presionado el botón");
+  cmd =  "GET /Haycarro.php HTTP/1.0\r\n\r\n";  //construct http GET request
   Serial1.print("AT+CIPSEND=");
   Serial1.println(cmd.length());  //esp8266 needs to know message length of incoming message - .length provides this
-
+  
   if(Serial1.find(">"))    //prompt offered by esp8266
   {
     Serial.println("found > prompt - issuing GET request");  //a debug message
@@ -114,12 +111,14 @@ void loop()
 
   //Analizo el header & web page. Ejemplo una fecha actual
 
-  if (Serial1.find("HOLA")) //get the date line from the http header (for example)
+  if (Serial1.find("-8\r\n\r\n")) //get the date line from the http header (for example)
   {
     //char comma = 44;
     //char dot = 46;
-    String msg1 = Serial.readStringUntil(44);
-    String msg2 = Serial.readStringUntil(46);
+    String msg1 = Serial1.readStringUntil(',');
+    String msg2 = Serial1.readStringUntil('.');
+    String msg3 = Serial1.readStringUntil(',');
+    String msg4 = Serial1.readStringUntil(';');
     
        //----------------LCD DISPLAY--------------------------
 
@@ -132,20 +131,24 @@ void loop()
     lcd.setCursor(0, 1);
     lcd.print(msg2);
     delay(1500);
-    /*lcd.setCursor(0, 0);
-    lcd.print("Pulse 1 ");    Otras palabras. Tiene que ir de 8 en 8 por e display.
-    lcd.setCursor(0, 1);
-    lcd.print("Segundo");
-    delay(1500);*/
     lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(msg3);    //Otras palabras. Tiene que ir de 8 en 8 por e display.
+    lcd.setCursor(0, 1);
+    lcd.print(msg4);
+    delay(1500);
 
+  }else
+  {
+    Serial1.println("AT+CIPCLOSE");  //doesn't seem to work here?
+    Serial.println("HTTP GET FAILURE");
   }
- 
 
   } if (boton1 == LOW && boton2 == LOW) {
     //ENTRÓ ALGUIEN!
     //-----------------------------------GET REQUEST 2-------------------------------------------------------------
-  cmd =  "GET /juan.php HTTP/1.0\r\n\r\n";  //construct http GET request
+    Serial.println("ENTRÓ ALGUIEN!");
+  cmd =  "GET /ticket.php HTTP/1.0\r\n\r\n";  //construct http GET request
   //cmd += "Host: cse.dmu.ac.uk\r\n\r\n";        //test file on my web
   Serial1.print("AT+CIPSEND=");
   Serial1.println(cmd.length());  //esp8266 needs to know message length of incoming message - .length provides this
@@ -163,12 +166,12 @@ void loop()
 
   //Analizo el header & web page. Ejemplo una fecha actual
 
-  if (Serial1.find("HOLA")) //get the date line from the http header (for example)
+  if (Serial1.find("-8\r\n\r\n")) //get the date line from the http header (for example)
   {
     //char comma = 44;
     //char dot = 46;
-    String msg1 = Serial.readStringUntil(44);
-    String msg2 = Serial.readStringUntil(46);
+    String msg1 = Serial1.readStringUntil(',');
+    String msg2 = Serial1.readStringUntil(';');
     
        //----------------LCD DISPLAY--------------------------
 
@@ -180,19 +183,26 @@ void loop()
     lcd.print(msg1);
     lcd.setCursor(0, 1);
     lcd.print(msg2);
-    delay(1500);
+    digitalWrite(LED,HIGH);
+    delay(3000);
+    digitalWrite(LED,LOW);
+    lcd.clear();
     /*lcd.setCursor(0, 0);
     lcd.print("Pulse 1 ");    Otras palabras. Tiene que ir de 8 en 8 por e display.
     lcd.setCursor(0, 1);
     lcd.print("Segundo");
     delay(1500);*/
-    lcd.clear();
 
+  }else
+  {
+    Serial1.println("AT+CIPCLOSE");  //doesn't seem to work here?
+    Serial.println("HTTP GET FAILURE");
   }
     
   } if (boton1 == HIGH && boton2 == HIGH) {  //No hay nadie...
     //-----------------------------------GET REQUEST 3-------------------------------------------------------------
-  cmd =  "GET /juan.php HTTP/1.0\r\n\r\n";  //construct http GET request
+    Serial.println("No hay nadie...");
+  cmd =  "GET /standby.php HTTP/1.0\r\n\r\n";  //construct http GET request
   //cmd += "Host: cse.dmu.ac.uk\r\n\r\n";        //test file on my web
   Serial1.print("AT+CIPSEND=");
   Serial1.println(cmd.length());  //esp8266 needs to know message length of incoming message - .length provides this
@@ -210,12 +220,14 @@ void loop()
 
   //Analizo el header & web page. Ejemplo una fecha actual
 
-  if (Serial1.find("HOLA")) //get the date line from the http header (for example)
+  if (Serial1.find("-8\r\n\r\n")) //get the date line from the http header (for example)
   {
     //char comma = 44;
     //char dot = 46;
-    String msg1 = Serial.readStringUntil(44);
-    String msg2 = Serial.readStringUntil(46);
+    String msg1 = Serial1.readStringUntil(',');
+    String msg2 = Serial1.readStringUntil('.');
+    String msg3 = Serial1.readStringUntil(',');
+    String msg4 = Serial1.readStringUntil(';');
     
        //----------------LCD DISPLAY--------------------------
 
@@ -227,21 +239,24 @@ void loop()
     lcd.print(msg1);
     lcd.setCursor(0, 1);
     lcd.print(msg2);
-    delay(1500);
-    /*lcd.setCursor(0, 0);
-    lcd.print("Pulse 1 ");    Otras palabras. Tiene que ir de 8 en 8 por e display.
-    lcd.setCursor(0, 1);
-    lcd.print("Segundo");
-    delay(1500);*/
+    delay(2000);
     lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(msg3);
+    lcd.setCursor(0,1);
+    lcd.print(msg4);
+    delay(2000);
 
+  }else
+  {
+    Serial1.println("AT+CIPCLOSE");  //doesn't seem to work here?
+    Serial.println("HTTP GET FAILURE");
   }
 
   }
 
    Serial1.println("AT+CIPCLOSE");  
 
-  delay(2000);
   if(Serial1.find("OK"))  //rarely seems to find Unlink? :(
   {
     Serial.println("Connection Closed Ok...");
@@ -303,7 +318,7 @@ boolean cwmode3()
 
 {
   Serial1.println("AT+CWMODE=3");
-  if (Serial1.find("no change"))  //only works if CWMODE was 3 previously
+  if (Serial1.find("OK"))
   {
     return true;
   }
@@ -357,4 +372,10 @@ void hangreset (String error_String)    //for debugging
   Serial.print(error_String);
   Serial.println(" - resetting");
   reset();
+}
+//----------------------------------------------------------------------------
+void printResponse() { //What's ESP doing right now?
+  while (Serial1.available()) {
+    Serial.println(Serial1.readStringUntil('\n')); 
+  }
 }
