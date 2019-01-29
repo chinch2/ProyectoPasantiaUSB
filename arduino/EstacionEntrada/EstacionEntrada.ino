@@ -3,7 +3,7 @@
 #include <LiquidCrystal_I2C.h>
 #define SSID "PNP"  //Red a la que se conectará el ESP826
 #define PASS "PNPSISTEMAS"  //Contraseña de la red
-#define DST_IP "10.20.184.242" //Dirección del servidor Web
+#define DST_IP "10.20.184.175" //Dirección del servidor Web
 #define LED 11 //led del teensy 2.0
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
@@ -166,12 +166,14 @@ void loop()
 
   //Analizo el header & web page. Ejemplo una fecha actual
 
-  if (Serial1.find("-8\r\n\r\n")) //get the date line from the http header (for example)
+  if (Serial1.find("-7\r\n\r\n")) //get the date line from the http header (for example)
   {
     //char comma = 44;
     //char dot = 46;
     String msg1 = Serial1.readStringUntil(',');
-    String msg2 = Serial1.readStringUntil(';');
+    String msg2 = Serial1.readStringUntil('.');
+    String msg3 = Serial1.readStringUntil(':');
+    String msg4 = Serial1.readStringUntil(';');
     
        //----------------LCD DISPLAY--------------------------
 
@@ -184,14 +186,14 @@ void loop()
     lcd.setCursor(0, 1);
     lcd.print(msg2);
     digitalWrite(LED,HIGH);
+    delay(1500);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(msg3);    //Otras palabras. Tiene que ir de 8 en 8 por e display.
+    lcd.setCursor(0, 1);
+    lcd.print(msg4);
     delay(3000);
     digitalWrite(LED,LOW);
-    lcd.clear();
-    /*lcd.setCursor(0, 0);
-    lcd.print("Pulse 1 ");    Otras palabras. Tiene que ir de 8 en 8 por e display.
-    lcd.setCursor(0, 1);
-    lcd.print("Segundo");
-    delay(1500);*/
 
   }else
   {
