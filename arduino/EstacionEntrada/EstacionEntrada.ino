@@ -3,7 +3,7 @@
 #include <LiquidCrystal_I2C.h>
 #define SSID "PNP"  //Red a la que se conectará el ESP826
 #define PASS "PNPSISTEMAS"  //Contraseña de la red
-#define DST_IP "10.20.184.175" //Dirección del servidor Web
+#define DST_IP "10.20.184.158" //Dirección del servidor Web
 #define LED 11 //led del teensy 2.0
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
