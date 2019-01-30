@@ -1,12 +1,22 @@
 #include <SoftwareSerial.h>
+//#include <NewSoftSerial.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #define SSID "PNP"  //Red a la que se conectará el ESP826
 #define PASS "PNPSISTEMAS"  //Contraseña de la red
 #define DST_IP "10.20.184.158" //Dirección del servidor Web
 #define LED 11 //led del teensy 2.0
+#define rxPin 14  //serial que va a la impresora
+#define txPin 13 //serial que va a la impresora
+
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
+
+//Crear la nueva interfaz serial para la impresora
+//NewSoftSerial mySerial(14, 13);// Rx  Tx  por ahora no sirve
+SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
+
+
 // El numero de los pines (constantes siempre):
 
 const int button_1 = 1;
@@ -29,6 +39,8 @@ void setup()
   pinMode(RESET,OUTPUT); //Teensy con ESP8266
   reset();               //Teensy con ESP8266
   pinMode(LED,OUTPUT);   //Teensy
+  pinMode(rxPin, INPUT);
+  pinMode(txPin, OUTPUT);
   
   //digitalWrite(LED_BUILTIN, LOW);
 
@@ -40,7 +52,9 @@ void setup()
   
   //Empiezo a hablar con el ESP8266 (Teensy 2.0)
   Serial1.begin(115200);    //Serial físico conectado al ESP8266boolean connectWiFi()
-  Serial.begin(115200); //Serial conectado a la PC
+  Serial.begin(115200);//Serial conectado a la PC
+  //mySerial.begin(115200); //Serial del teensy que va a la impresora
+  mySerial.begin(9600);
   delay(4000);    //Esperar que se setee el pto serial y se prenda el dispositivo
   //Seteando el ESP como se quiere
   
@@ -148,7 +162,7 @@ void loop()
     //ENTRÓ ALGUIEN!
     //-----------------------------------GET REQUEST 2-------------------------------------------------------------
     Serial.println("ENTRÓ ALGUIEN!");
-  cmd =  "GET /ticket.php HTTP/1.0\r\n\r\n";  //construct http GET request
+  cmd =  "GET /ticket.php?estacion=1 HTTP/1.0\r\n\r\n";  //construct http GET request
   //cmd += "Host: cse.dmu.ac.uk\r\n\r\n";        //test file on my web
   Serial1.print("AT+CIPSEND=");
   Serial1.println(cmd.length());  //esp8266 needs to know message length of incoming message - .length provides this
@@ -174,6 +188,12 @@ void loop()
     String msg2 = Serial1.readStringUntil('.');
     String msg3 = Serial1.readStringUntil(':');
     String msg4 = Serial1.readStringUntil(';');
+
+    if (Serial1.find("-6\r\n\r\n")) { //Imprimo la fecha de entrada. msg4 es el ID y msg5 la fecha de entrada
+
+      String msg5 = Serial1.readStringUntil(';');
+      Serial.println(msg5);
+    }
     
        //----------------LCD DISPLAY--------------------------
 
