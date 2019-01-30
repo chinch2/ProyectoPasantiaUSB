@@ -1,5 +1,5 @@
+#include <Adafruit_Thermal.h>
 #include <SoftwareSerial.h>
-//#include <NewSoftSerial.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #define SSID "PNP"  //Red a la que se conectará el ESP826
@@ -15,6 +15,7 @@ LiquidCrystal_I2C lcd(0x3f, 16, 2);
 //Crear la nueva interfaz serial para la impresora
 //NewSoftSerial mySerial(14, 13);// Rx  Tx  por ahora no sirve
 SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
+Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
 
 
 // El numero de los pines (constantes siempre):
@@ -193,7 +194,7 @@ void loop()
 
       String msg5 = Serial1.readStringUntil(';');
       Serial.println(msg5);
-    }
+    
     
        //----------------LCD DISPLAY--------------------------
 
@@ -212,9 +213,34 @@ void loop()
     lcd.print(msg3);    //Otras palabras. Tiene que ir de 8 en 8 por e display.
     lcd.setCursor(0, 1);
     lcd.print(msg4);
+//IMPRIMIENDO----------------------------------------------------------------------
+    printer.begin();        // Init printer (same regardless of serial type)
+    printer.justify('L');
+    printer.println("***  MY ENGINEERING STUFFS  ***\n");
+    printer.justify('C');
+    printer.setSize('L');        // Set type size, accepts 'S', 'M', 'L'
+    printer.println("TICKET NUMERO: ");
+    printer.println(msg4);
+    printer.boldOn();
+    printer.setSize('L');
+    printer.println("001\n");
+    printer.println("Fecha:");
+    printer.println(msg5);
+    printer.boldOff();
+    printer.justify('C');
+    printer.setSize('S');
+    printer.println("***  HAVE A NICE DAY  ***");
+    printer.justify('C');
+    printer.print("DATE:24/01/2018\t");
+    printer.println("TIME: 00:07");
+    printer.println("TODAY: WEDNESDAY");   
+    printer.write(10);
+    printer.write(10);
+    printer.write(10);
     delay(3000);
     digitalWrite(LED,LOW);
 
+    }
   }else
   {
     Serial1.println("AT+CIPCLOSE");  //doesn't seem to work here?
