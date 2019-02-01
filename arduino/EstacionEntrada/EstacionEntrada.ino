@@ -20,9 +20,9 @@ Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
 
 // El numero de los pines (constantes siempre):
 
-const int button_1 = 1;
-const int button_2 = 2;
-const int rele = 3;
+const int button_1 = 21;
+const int button_2 = 20;
+const int rele = 19;
 const int RESET = 12; //Hardware reset para el ESP8266
 
 //Variables que cambian:
