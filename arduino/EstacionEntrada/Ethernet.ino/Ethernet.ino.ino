@@ -1,40 +1,87 @@
-#include <UIPEthernet.h>
+/*
+  Web client
+ 
+ This sketch connects to a website (http://www.google.com)
+ using an Arduino Wiznet Ethernet shield. 
+ 
+ Circuit:
+ * Ethernet shield attached to pins 10, 11, 12, 13
+ 
+ created 18 Dec 2009
+ by David A. Mellis
+ modified 9 Apr 2012
+ by Tom Igoe, based on work by Adrian McEwen
+ 
+ */
+
 #include <SPI.h>
+#include <Ethernet.h>
 
-uint8_t myIP[] = { 10, 20, 184, 127 };
-uint8_t sndIP[] = { 8, 8, 8, 8 };
-uint8_t myMAC[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
+// Enter a MAC address for your controller below.
+// Newer Ethernet shields have a MAC address printed on a sticker on the shield
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+// if you don't want to use DNS (and reduce your sketch size)
+// use the numeric IP instead of the name for the server:
+//IPAddress server(74,125,232,128);  // numeric IP for Google (no DNS)
+char server[] = "10.20.184.70";    // name address for Google (using DNS)
 
-uint16_t rcvPort = 27000;
-uint16_t sndPort = 27000;
+// Set the static IP address to use if the DHCP fails to assign
+IPAddress ip(10,20,184,177);
 
-byte sndBuffer[256];
-byte rcvBuffer[256];
+// Initialize the Ethernet client library
+// with the IP address and port of the server 
+// that you want to connect to (port 80 is default for HTTP):
+EthernetClient client;
 
-EthernetUDP udp;
+void setup() {
+ // Open serial communications and wait for port to open:
+  Serial.begin(9600);
+   while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
 
-void setup()
-{
-    Serial.begin(115200);
-    Ethernet.begin(myMAC, IPAddress(myIP));
-    udp.begin(rcvPort);
+  // start the Ethernet connection:
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+    // no point in carrying on, so do nothing forevermore:
+    // try to congifure using IP address instead of DHCP:
+    Ethernet.begin(mac, ip);
+  }
+  // give the Ethernet shield a second to initialize:
+  delay(1000);
+  Serial.println("connecting...");
 
-    for(int i=0; i<sizeof(sndBuffer); i++)
-    {
-        sndBuffer[i] = i;        // just to see something in Wireshark;
-    }
+  // if you get a connection, report back via serial:
+  if (client.connect(server, 80)) {
+    Serial.println("connected");
+    // Make a HTTP request:
+    client.println("GET /standby.php HTTP/1.0");
+    //client.println("Host: www.google.com");
+    client.println("Connection: close");
+    client.println();
+  } 
+  else {
+    // kf you didn't get a connection to the server:
+    Serial.println("connection failed");
+  }
 }
 
 void loop()
 {
-    udp.beginPacket(IPAddress(sndIP), sndPort);
-    udp.write((byte *)sndBuffer, sizeof(sndBuffer));
-    udp.endPacket();
+  // if there are incoming bytes available 
+  // from the server, read them and print them:
+  if (client.available()) {
+    char c = client.read();
+    Serial.print(c);
+  }
 
-    Serial.println("Packet Sent");
+  // if the server's disconnected, stop the client:
+  if (!client.connected()) {
+    Serial.println();
+    Serial.println("disconnecting.");
+    client.stop();
 
-   int packetSize = udp.parsePacket();
-
-   if(packetSize > 0)
-       Serial.println("Something Received");
+    // do nothing forevermore:
+    while(true);
+  }
 }
