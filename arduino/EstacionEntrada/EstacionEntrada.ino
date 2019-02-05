@@ -14,9 +14,19 @@ byte Ethernet::buffer[700];
 static uint32_t timer;
 const char website[] PROGMEM = "10.20.184.70";
 
+// called when the client request is complete
+static void my_callback (byte status, word off, word len) {
+  Serial.println(">>>");
+  Ethernet::buffer[off+300] = 0;
+  Serial.print((const char*) Ethernet::buffer + off);
+  Serial.println("...");
+}
+//-------------------------Display---------------------
+
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
 
+//----------------------Impresora------------------------
 //Crear la nueva interfaz serial para la impresora
 //NewSoftSerial mySerial(14, 13);// Rx  Tx  por ahora no sirve
 SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
@@ -37,32 +47,20 @@ int relay = 0;
 
 void setup()
 { //----------------------FUNCIONES  QUE DEBEN SER DECLARADAS-------------------------
-  //boolean connectWiFi();
-  //Inicializando los pines de entrada y salida
-  pinMode(button_1, INPUT_PULLUP);
-  pinMode(button_2, INPUT_PULLUP);
-  pinMode(rele, OUTPUT);
-  pinMode(RESET,OUTPUT); //Teensy con ESP8266
-  reset();               //Teensy con ESP8266
-  delay(2000);
-  pinMode(LED,OUTPUT);   //Teensy
-  pinMode(rxPin, INPUT);
-  pinMode(txPin, OUTPUT);
-  
-  //digitalWrite(LED_BUILTIN, LOW);
-
-  // Inicializar el LCD
-  lcd.init();
-  //Limpiar la pantalla
-  lcd.clear();
-
-  
   Serial.begin(57600);
   Serial.println(F("\n[webClient]"));
+  Serial.print("MAC: ");
+  for (byte i = 0; i < 6; ++i) {
+    Serial.print(mymac[i], HEX);
+    if (i < 5)
+      Serial.print(':');
+  }
 
+  Serial.println("\nProceding to access Ethernet Controller\r\n");
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
   if (ether.begin(sizeof Ethernet::buffer, mymac, 8) == 0)
     Serial.println(F("Failed to access Ethernet controller"));
+      Serial.println("\r\nDHCP...\r\n\r\n");
   if (!ether.dhcpSetup())
     Serial.println(F("DHCP failed"));
 
@@ -78,6 +76,24 @@ void setup()
   ether.hisip[3] = 70;
 
   ether.printIp("SRV: ", ether.hisip);
+
+  //Inicializando los pines de entrada y salida
+  pinMode(button_1, INPUT_PULLUP);
+  pinMode(button_2, INPUT_PULLUP);
+  pinMode(rele, OUTPUT);
+  pinMode(RESET,OUTPUT); //Teensy con ESP8266
+  reset();               //Teensy con ESP8266
+  //delay(3000);
+  pinMode(LED,OUTPUT);   //Teensy
+  pinMode(rxPin, INPUT);
+  pinMode(txPin, OUTPUT);
+  
+  //digitalWrite(LED_BUILTIN, LOW);
+  // Inicializar el LCD
+  lcd.init();
+  //Limpiar la pantalla
+  lcd.clear();
+  
   mySerial.begin(9600);
   delay(4000);    //Esperar que se setee el pto serial y se prenda el dispositivo
 }
@@ -97,18 +113,19 @@ void loop()
 
   if (millis() > timer) {
     timer = millis() + 1000;
-    ether.browseUrl(PSTR("/standby.php"), "", website, my_callback);
-    Serial.println("Sending a request...");
+    Serial.println();
+    Serial.print("<<< REQ ");
+    ether.browseUrl(PSTR("/Haycarro.php"), "", website, my_callback);
   }
 
   //Analizo el header & web page. Ejemplo una fecha actual
-  
+  if(Serial.find("-8\r\n\r\n")){
     //char comma = 44;
     //char dot = 46;
-    String msg1 = Serial1.readStringUntil(',');
-    String msg2 = Serial1.readStringUntil('.');
-    String msg3 = Serial1.readStringUntil(',');
-    String msg4 = Serial1.readStringUntil(';');
+    String msg1 = Serial.readStringUntil(',');
+    String msg2 = Serial.readStringUntil('.');
+    String msg3 = Serial.readStringUntil(',');
+    String msg4 = Serial.readStringUntil(';');
     
        //----------------LCD DISPLAY--------------------------
 
@@ -127,6 +144,9 @@ void loop()
     lcd.setCursor(0, 1);
     lcd.print(msg4);
     delay(1500);
+  }else{
+    Serial.println("HTTP GET FAILURE");
+  }
 
   } if (boton1 == LOW && boton2 == LOW) {
     //ENTRÓ ALGUIEN!
@@ -137,22 +157,23 @@ void loop()
 
   if (millis() > timer) {
     timer = millis() + 1000;
-    ether.browseUrl(PSTR("/ticket.php"), "?estacion=1", website, my_callback);
-    Serial.println("Sending a request...");
+    Serial.println();
+    Serial.print("<<< REQ ");
+    ether.browseUrl(PSTR("/ticket.php"), "estacion=1", website, my_callback);
   }
 
   //Analizo el header & web page. Ejemplo una fecha actual
-
+if(Serial.find("-7\r\n\r\n")){
     //char comma = 44;
     //char dot = 46;
-    String msg1 = Serial1.readStringUntil(',');
-    String msg2 = Serial1.readStringUntil('.');
-    String msg3 = Serial1.readStringUntil(':');
-    String msg4 = Serial1.readStringUntil(';');
-
-      String msg5 = Serial1.readStringUntil(';');
+    String msg1 = Serial.readStringUntil(',');
+    String msg2 = Serial.readStringUntil('.');
+    String msg3 = Serial.readStringUntil(':');
+    String msg4 = Serial.readStringUntil(';');
+if(Serial.find("-6\r\n\r\n")){
+      String msg5 = Serial.readStringUntil(';');
       Serial.println(msg5);
-    
+
     
        //----------------LCD DISPLAY--------------------------
 
@@ -197,6 +218,11 @@ void loop()
     printer.write(10);
     delay(3000);
     digitalWrite(LED,LOW);
+      }
+    }
+    else{
+    Serial.println("HTTP GET FAILURE");
+    }
     
   } if (boton1 == HIGH && boton2 == HIGH) {  //No hay nadie...
     //-----------------------------------GET REQUEST 3-------------------------------------------------------------
@@ -206,18 +232,20 @@ void loop()
 
   if (millis() > timer) {
     timer = millis() + 1000;
+    Serial.println();
+    Serial.print("<<< REQ ");
     ether.browseUrl(PSTR("/standby.php"), "", website, my_callback);
-    Serial.println("Sending a request...");
+    
   }
 
   //Analizo el header & web page. Ejemplo una fecha actual
-
+if (Serial.find("-8\r\n\r\n")){
     //char comma = 44;
     //char dot = 46;
-    String msg1 = Serial1.readStringUntil(',');
-    String msg2 = Serial1.readStringUntil('.');
-    String msg3 = Serial1.readStringUntil(',');
-    String msg4 = Serial1.readStringUntil(';');
+    String msg1 = Serial.readStringUntil(',');
+    String msg2 = Serial.readStringUntil('.');
+    String msg3 = Serial.readStringUntil(',');
+    String msg4 = Serial.readStringUntil(';');
     
        //----------------LCD DISPLAY--------------------------
 
@@ -237,18 +265,15 @@ void loop()
     lcd.print(msg4);
     delay(2000);
 
+  }else{
+    Serial.println("HTTP GET FAILURE");
   }
   
 }
 
-//------------------Funciones para el weblclient-------------------------
-// called when the client request is complete
-static void my_callback (byte status, word off, word len) {
-  Serial.println(">>>");
-  Ethernet::buffer[off+300] = 0;
-  Serial.print((const char*) Ethernet::buffer + off);
-  Serial.println("...");
 }
+
+//------------------Funciones para el weblclient-------------------------
 void reset()
 {
   digitalWrite(RESET,LOW);
