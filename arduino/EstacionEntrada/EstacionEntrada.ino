@@ -14,13 +14,6 @@ byte Ethernet::buffer[700];
 static uint32_t timer;
 const char website[] PROGMEM = "10.20.184.70";
 
-// called when the client request is complete
-static void my_callback (byte status, word off, word len) {
-  Serial.println(">>>");
-  Ethernet::buffer[off+300] = 0;
-  Serial.print((const char*) Ethernet::buffer + off);
-  Serial.println("...");
-}
 //-------------------------Display---------------------
 
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
@@ -47,7 +40,7 @@ int relay = 0;
 
 void setup()
 { //----------------------FUNCIONES  QUE DEBEN SER DECLARADAS-------------------------
-  Serial.begin(57600);
+  Serial.begin(9600);
   Serial.println(F("\n[webClient]"));
   Serial.print("MAC: ");
   for (byte i = 0; i < 6; ++i) {
@@ -75,15 +68,13 @@ void setup()
   ether.hisip[2] = 184;
   ether.hisip[3] = 70;
 
-  ether.printIp("SRV: ", ether.hisip);
+  ether.printIp("Server: ", ether.hisip);
 
   //Inicializando los pines de entrada y salida
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
   pinMode(rele, OUTPUT);
   pinMode(RESET,OUTPUT); //Teensy con ESP8266
-  reset();               //Teensy con ESP8266
-  //delay(3000);
   pinMode(LED,OUTPUT);   //Teensy
   pinMode(rxPin, INPUT);
   pinMode(txPin, OUTPUT);
@@ -101,7 +92,7 @@ void setup()
 //De tal manera que si ambos pulsadores estan bajos, se activa el relé
 
 void loop()
-{
+{delay(1000);
   boton1 = digitalRead(button_1);
   boton2 = digitalRead(button_2);
 
@@ -115,37 +106,7 @@ void loop()
     timer = millis() + 1000;
     Serial.println();
     Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/Haycarro.php"), "", website, my_callback);
-  }
-
-  //Analizo el header & web page. Ejemplo una fecha actual
-  if(Serial.find("-8\r\n\r\n")){
-    //char comma = 44;
-    //char dot = 46;
-    String msg1 = Serial.readStringUntil(',');
-    String msg2 = Serial.readStringUntil('.');
-    String msg3 = Serial.readStringUntil(',');
-    String msg4 = Serial.readStringUntil(';');
-    
-       //----------------LCD DISPLAY--------------------------
-
-    //Encender la luz de fondo.
-    lcd.backlight();
-    lcd.clear();
-    // Mover el cursor a la primera posición de la pantalla (0, 0)
-    lcd.setCursor(0, 0);
-    lcd.print(msg1);
-    lcd.setCursor(0, 1);
-    lcd.print(msg2);
-    delay(1500);
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(msg3);    //Otras palabras. Tiene que ir de 8 en 8 por e display.
-    lcd.setCursor(0, 1);
-    lcd.print(msg4);
-    delay(1500);
-  }else{
-    Serial.println("HTTP GET FAILURE");
+    ether.browseUrl(PSTR("/standby.php"), "?carro=1", website, my_callback);
   }
 
   } if (boton1 == LOW && boton2 == LOW) {
@@ -159,52 +120,89 @@ void loop()
     timer = millis() + 1000;
     Serial.println();
     Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/ticket.php"), "estacion=1", website, my_callback);
+    ether.browseUrl(PSTR("/ticket.php"), "?estacion=1", website, my_callback);
+  }
+    
+  } if (boton1 == HIGH && boton2 == HIGH) {  //No hay nadie...
+    //-----------------------------------GET REQUEST 3-------------------------------------------------------------
+    Serial.println("No hay nadie...");
+    
+  ether.packetLoop(ether.packetReceive());
+
+  if (millis() > timer) {
+    timer = millis() + 1000;
+    Serial.println();
+    Serial.print("<<< REQ ");
+    ether.browseUrl(PSTR("/standby.php?carro=0"), "", website, my_callback);
+  }
+  
+}
+
+}
+
+// called when the client request is complete
+static void my_callback (byte status, word off, word len) {
+  Serial.println(">>>");
+  Ethernet::buffer[off+len] = 0;
+  Serial.print((const char*) Ethernet::buffer + off);
+  String salida = (const char*) Ethernet::buffer + off;
+  int pos =   salida.indexOf("\r\n\r\n")+4;
+  String salida1 = salida.substring(pos);
+  while(salida1.length() > 0){
+    int fin=salida1.indexOf("-end");
+    if (fin==0) salida1="";
+    comando(salida1.substring(0,fin));
+    Serial.println();
+    Serial.print(salida1);
+    salida1 = salida1.substring(fin+4);
+    }
+    
   }
 
-  //Analizo el header & web page. Ejemplo una fecha actual
-if(Serial.find("-7\r\n\r\n")){
-    //char comma = 44;
-    //char dot = 46;
-    String msg1 = Serial.readStringUntil(',');
-    String msg2 = Serial.readStringUntil('.');
-    String msg3 = Serial.readStringUntil(':');
-    String msg4 = Serial.readStringUntil(';');
-if(Serial.find("-6\r\n\r\n")){
-      String msg5 = Serial.readStringUntil(';');
-      Serial.println(msg5);
-
-    
-       //----------------LCD DISPLAY--------------------------
+void comando(String cmd){
+  String cmd1 = cmd.substring(0,5);
+  Serial.print("\r\ncmd1: ");
+  Serial.println(cmd1);
+  if (cmd1 == "-disp") Pantalla(cmd);
+  if(cmd1 == "-barre") Serial.print("\r\nHabriendo barrera");
+  if(cmd1 == "-print") Imprimir();
+}
+//---------Imprimir en Display-----------------
+void Pantalla(String salida1){
+//----------------LCD DISPLAY--------------------------
 
     //Encender la luz de fondo.
     lcd.backlight();
     lcd.clear();
-    // Mover el cursor a la primera posición de la pantalla (0, 0)
     lcd.setCursor(0, 0);
-    lcd.print(msg1);
+    lcd.print(salida1.substring(5, 13));
     lcd.setCursor(0, 1);
-    lcd.print(msg2);
-    digitalWrite(LED,HIGH);
+    lcd.print(salida1.substring(13, 21));
     delay(1500);
     lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(msg3);    //Otras palabras. Tiene que ir de 8 en 8 por e display.
+    lcd.setCursor(0,0);
+    lcd.print(salida1.substring(21, 29));
     lcd.setCursor(0, 1);
-    lcd.print(msg4);
-//IMPRIMIENDO----------------------------------------------------------------------
+    lcd.print(salida1.substring(29, 37));
+    delay(1500);
+}
+
+void Imprimir() {
+    Serial.print("\r\nImprimiendo...");
+    //IMPRIMIENDO----------------------------------------------------------------------
+    digitalWrite(LED,HIGH);
     printer.begin();        // Init printer (same regardless of serial type)
     printer.justify('L');
     printer.println("***  MY ENGINEERING STUFFS  ***\n");
     printer.justify('C');
     printer.setSize('L');        // Set type size, accepts 'S', 'M', 'L'
     printer.println("TICKET NUMERO: ");
-    printer.println(msg4);
+    //printer.println(msg4);
     printer.boldOn();
     printer.setSize('L');
     printer.println("001\n");
     printer.println("Fecha:");
-    printer.println(msg5);
+    //printer.println(msg5);
     printer.boldOff();
     printer.justify('C');
     printer.setSize('S');
@@ -218,67 +216,4 @@ if(Serial.find("-6\r\n\r\n")){
     printer.write(10);
     delay(3000);
     digitalWrite(LED,LOW);
-      }
-    }
-    else{
-    Serial.println("HTTP GET FAILURE");
-    }
-    
-  } if (boton1 == HIGH && boton2 == HIGH) {  //No hay nadie...
-    //-----------------------------------GET REQUEST 3-------------------------------------------------------------
-    Serial.println("No hay nadie...");
-    
-  ether.packetLoop(ether.packetReceive());
-
-  if (millis() > timer) {
-    timer = millis() + 1000;
-    Serial.println();
-    Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/standby.php"), "", website, my_callback);
-    
-  }
-
-  //Analizo el header & web page. Ejemplo una fecha actual
-if (Serial.find("-8\r\n\r\n")){
-    //char comma = 44;
-    //char dot = 46;
-    String msg1 = Serial.readStringUntil(',');
-    String msg2 = Serial.readStringUntil('.');
-    String msg3 = Serial.readStringUntil(',');
-    String msg4 = Serial.readStringUntil(';');
-    
-       //----------------LCD DISPLAY--------------------------
-
-    //Encender la luz de fondo.
-    lcd.backlight();
-    lcd.clear();
-    // Mover el cursor a la primera posición de la pantalla (0, 0)
-    lcd.setCursor(0, 0);
-    lcd.print(msg1);
-    lcd.setCursor(0, 1);
-    lcd.print(msg2);
-    delay(2000);
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(msg3);
-    lcd.setCursor(0,1);
-    lcd.print(msg4);
-    delay(2000);
-
-  }else{
-    Serial.println("HTTP GET FAILURE");
-  }
-  
-}
-
-}
-
-//------------------Funciones para el weblclient-------------------------
-void reset()
-{
-  digitalWrite(RESET,LOW);
-  digitalWrite(LED,HIGH);
-  delay(100);
-  digitalWrite(RESET,HIGH);
-  digitalWrite(LED,LOW);
 }
