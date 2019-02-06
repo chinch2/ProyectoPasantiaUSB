@@ -71,7 +71,6 @@ void setup()
   //Inicializando los pines de entrada y salida
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
-  pinMode(rele, OUTPUT);
   pinMode(RESET,OUTPUT); //Teensy con ESP8266
   pinMode(LED,OUTPUT);   //Teensy
   pinMode(rxPin, INPUT);
