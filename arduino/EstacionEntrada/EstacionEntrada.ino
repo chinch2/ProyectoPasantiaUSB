@@ -35,7 +35,6 @@ const int RESET = 12; //Hardware reset para el ESP8266
 //Variables que cambian:
 int boton1 = 0; //Variables para leer el estatus de los botones
 int boton2 = 0;
-int relay = 0;
 
 void setup()
 { //----------------------FUNCIONES  QUE DEBEN SER DECLARADAS-------------------------
