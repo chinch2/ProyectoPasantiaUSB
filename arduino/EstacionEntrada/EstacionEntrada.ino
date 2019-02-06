@@ -89,14 +89,11 @@ void setup()
 //De tal manera que si ambos pulsadores estan bajos, se activa el relé
 
 void loop()
-{delay(1000);
+{
   boton1 = digitalRead(button_1);
   boton2 = digitalRead(button_2);
-
   if (boton1 == LOW && boton2 == HIGH) { //Está el carro, no se ha presionado el botón
-    //-----------------------------------GET REQUEST 1-------------------------------------------------------------
-    Serial.println("Está el carro, no se ha presionado el botón");
-    
+    //-----------------------------------GET REQUEST 1-------------------------------------------------------------    
     ether.packetLoop(ether.packetReceive());
 
   if (millis() > timer) {
@@ -108,9 +105,7 @@ void loop()
 
   } if (boton1 == LOW && boton2 == LOW) {
     //ENTRÓ ALGUIEN!
-    //-----------------------------------GET REQUEST 2-------------------------------------------------------------
-    Serial.println("ENTRÓ ALGUIEN!");
-    
+    //-----------------------------------GET REQUEST 2-------------------------------------------------------------    
   ether.packetLoop(ether.packetReceive());
 
   if (millis() > timer) {
@@ -121,16 +116,14 @@ void loop()
   }
     
   } if (boton1 == HIGH && boton2 == HIGH) {  //No hay nadie...
-    //-----------------------------------GET REQUEST 3-------------------------------------------------------------
-    Serial.println("No hay nadie...");
-    
+    //-----------------------------------GET REQUEST 3-------------------------------------------------------------    
   ether.packetLoop(ether.packetReceive());
 
   if (millis() > timer) {
     timer = millis() + 1000;
     Serial.println();
     Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/standby.php?carro=0"), "", website, my_callback);
+    ether.browseUrl(PSTR("/standby.php"), "?carro=0", website, my_callback);
   }
   
 }
