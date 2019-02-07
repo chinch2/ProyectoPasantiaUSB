@@ -92,10 +92,10 @@ void loop()
 {
   boton1 = digitalRead(button_1);
   boton2 = digitalRead(button_2);
-  delay(1000);
+  //delay(1000);
   //Serial.print(boton1);
   //Serial.print(boton2);
-  delay(1000);
+  //delay(1000);
   if (boton1 == LOW && boton2 == HIGH) { //Está el carro, no se ha presionado el botón
     //-----------------------------------GET REQUEST 1-------------------------------------------------------------    
     ether.packetLoop(ether.packetReceive());
@@ -158,8 +158,8 @@ void comando(String cmd){
   Serial.print("\r\ncmd1: ");
   Serial.println(cmd1);
   if (cmd1 == "-disp") Pantalla(cmd);
-  if(cmd1 == "-barre") Serial.print("\r\nHabriendo barrera");
-  if(cmd1 == "-print") Imprimir();
+  if(cmd1 == "-barr") Serial.print("\r\nHabriendo barrera");
+  if(cmd1 == "-prin") Imprimir();
 }
 //---------Imprimir en Display-----------------
 void Pantalla(String salida1){
