@@ -159,7 +159,7 @@ void comando(String cmd){
   Serial.println(cmd1);
   if (cmd1 == "-disp") Pantalla(cmd);
   if(cmd1 == "-barr") Serial.print("\r\nHabriendo barrera");
-  if(cmd1 == "-prin") Imprimir();
+  if(cmd1 == "-prin") Imprimir(cmd);
 }
 //---------Imprimir en Display-----------------
 void Pantalla(String salida1){
@@ -181,30 +181,29 @@ void Pantalla(String salida1){
     delay(1500);
 }
 
-void Imprimir() {
+void Imprimir(String printed) {
     Serial.print("\r\nImprimiendo...");
+    String Imprime = printed.substring(5);
     //IMPRIMIENDO----------------------------------------------------------------------
     digitalWrite(LED,HIGH);
     printer.begin();        // Init printer (same regardless of serial type)
-    printer.justify('L');
+    /*printer.justify('L');
     printer.println("***  MY ENGINEERING STUFFS  ***\n");
     printer.justify('C');
-    printer.setSize('L');        // Set type size, accepts 'S', 'M', 'L'
-    printer.println("TICKET NUMERO: ");
-    //printer.println(msg4);
-    printer.boldOn();
+    printer.setSize('S');        // Set type size, accepts 'S', 'M', 'L'*/
+    printer.println(Imprime);
+    String codificado = Imprime.substring(38);
+    printer.println(codificado);
+  // ITF: 2-254 digits (# digits always multiple of 2)
+  printer.print(F("ITF:"));
+  printer.printBarcode("1234567890", ITF);
+    /*printer.boldOn();
     printer.setSize('L');
-    printer.println("001\n");
-    printer.println("Fecha:");
-    //printer.println(msg5);
     printer.boldOff();
     printer.justify('C');
     printer.setSize('S');
     printer.println("***  HAVE A NICE DAY  ***");
-    printer.justify('C');
-    printer.print("DATE:24/01/2018\t");
-    printer.println("TIME: 00:07");
-    printer.println("TODAY: WEDNESDAY");   
+    printer.justify('C');*/
     printer.write(10);
     printer.write(10);
     printer.write(10);
