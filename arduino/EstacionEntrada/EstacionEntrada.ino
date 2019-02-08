@@ -75,13 +75,13 @@ void setup()
   pinMode(LED,OUTPUT);   //Teensy
   pinMode(rxPin, INPUT);
   pinMode(txPin, OUTPUT);
-  
+  Serial.println("Botones inicializados");
   //digitalWrite(LED_BUILTIN, LOW);
   // Inicializar el LCD
   lcd.init();
   //Limpiar la pantalla
   lcd.clear();
-  
+  Serial.println("Pantalla inicializada");
   mySerial.begin(9600);
   delay(4000);    //Esperar que se setee el pto serial y se prenda el dispositivo
 }
@@ -194,9 +194,9 @@ void Imprimir(String printed) {
     printer.println(Imprime);
     String codificado = Imprime.substring(38);
     printer.println(codificado);
-  // ITF: 2-254 digits (# digits always multiple of 2)
-  printer.print(F("ITF:"));
-  printer.printBarcode("1234567890", ITF);
+    // ITF: 2-254 digits (# digits always multiple of 2)
+    printer.print(F("ITF:"));
+    printer.printBarcode("1234567890", ITF);
     /*printer.boldOn();
     printer.setSize('L');
     printer.boldOff();
@@ -204,8 +204,6 @@ void Imprimir(String printed) {
     printer.setSize('S');
     printer.println("***  HAVE A NICE DAY  ***");
     printer.justify('C');*/
-    printer.write(10);
-    printer.write(10);
     printer.write(10);
     delay(3000);
     digitalWrite(LED,LOW);

@@ -22,9 +22,12 @@ void loop()
       //mySerial.print("\x1B\x40\x1B\x28\x42\x10\x00\x05\x02\x00\x0A\x00\x00");//opcion 1
       //mySerial.print("ABCDERGHJK\r\n");//opcion 1
       //chr(29).'h'.chr(50).chr(29).'k'.chr(4).trim(substr($row_tbimp->ref,7,5)).chr(0).chr(10) opcion 2
-      //mySerial.print("\x1D\x68\x32\x1D\x6B\x04");
+      mySerial.write("\x0a");
+      mySerial.write("\x1d\x6b\x08\x7b\x42\x43\x6f\x64\x65\x20\x31\x32\x38\x00");
+      mySerial.write("\x1d\x6b\x49\x0f");
       //mySerial.print("12345\x00\x0A");//opcion 2
   //  mySerial.print("ABCDERGHJK\r\n");
+  mySerial.print("");
     delay(500);
     //Serial1.print("\r");  
     mySerial.print("\r");  
@@ -40,7 +43,6 @@ void loop()
    //char ch2 = Serial1.read();
    char ch2 = mySerial.read();
     Serial.print(ch2);
-    
   }
 
 }
