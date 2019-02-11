@@ -14,7 +14,7 @@ byte Ethernet::buffer[700];
 static uint32_t timer;
 const char website[] PROGMEM = "10.20.184.70";
 
-//-------------------------Display---------------------
+//-------------------------Display-----------                                                                                                                                                                                                                      ----------
 
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
@@ -127,7 +127,7 @@ void loop()
     timer = millis() + 1000;
     Serial.println();
     Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/standby.php"), "?carro=0", website, my_callback);
+    ether.browseUrl(PSTR("/standby.php"), "?carro=0&estacion=1", website, my_callback);
   }
   
 }
