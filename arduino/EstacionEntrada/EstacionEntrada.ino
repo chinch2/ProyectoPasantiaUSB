@@ -1,5 +1,6 @@
 #include <EtherCard.h>
-#include <Adafruit_Thermal.h>
+//#include <Adafruit_Thermal.h>
+#include "thermalprinter.h"
 #include <SoftwareSerial.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
@@ -13,6 +14,7 @@ static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
 byte Ethernet::buffer[700];
 static uint32_t timer;
 const char website[] PROGMEM = "10.20.184.70";
+int printStatus = 0;
 
 //-------------------------Display-----------                                                                                                                                                                                                                      ----------
 
@@ -23,7 +25,8 @@ LiquidCrystal_I2C lcd(0x3f, 16, 2);
 //Crear la nueva interfaz serial para la impresora
 //NewSoftSerial mySerial(14, 13);// Rx  Tx  por ahora no sirve
 SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
-Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
+//Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
+Epson TM88 = Epson(rxPin, txPin); // init the Printer with Output-Pin
 
 
 // El numero de los pines (constantes siempre):
@@ -39,6 +42,7 @@ int boton2 = 0;
 void setup()
 { //----------------------FUNCIONES  QUE DEBEN SER DECLARADAS-------------------------
   Serial.begin(9600);
+  delay(1000);
   Serial.println(F("\n[webClient]"));
   Serial.print("MAC: ");
   for (byte i = 0; i < 6; ++i) {
@@ -84,6 +88,8 @@ void setup()
   Serial.println("Pantalla inicializada");
   mySerial.begin(9600);
   delay(4000);    //Esperar que se setee el pto serial y se prenda el dispositivo
+  TM88.start();
+
 }
 //Las señales provenientes de los pines se leen y se les hace un and
 //De tal manera que si ambos pulsadores estan bajos, se activa el relé
@@ -186,17 +192,36 @@ void Imprimir(String printed) {
     String Imprime = printed.substring(5);
     //IMPRIMIENDO----------------------------------------------------------------------
     digitalWrite(LED,HIGH);
-    printer.begin();        // Init printer (same regardless of serial type)
+    TM88.start();
+    printStatus = TM88.getStatus();     // get the current status of the TM88 printer
+  if (printStatus == 22) {            // if status is 22 then we are good
+    Serial.println("printer online");     // debug that we are online
+  } else {
+    Serial.print("printer offline: ");    // debug that we are offline
+    Serial.println(printStatus);          // debug the returned status code  
+  }
+
+    TM88.justifyCenter();
+    TM88.println(Imprime);
+    String codificado = Imprime.substring(38);
+    TM88.barcodeHeight(127);
+    TM88.barcodeWidth(4);
+    TM88.barcodeNumberPosition(2);
+    TM88.printBarcode(70,6);
+    TM88.println(codificado);
+    //delay(2000);
+    TM88.feed(2);
+  //TM88.cut();
     /*printer.justify('L');
     printer.println("***  MY ENGINEERING STUFFS  ***\n");
     printer.justify('C');
     printer.setSize('S');        // Set type size, accepts 'S', 'M', 'L'*/
-    printer.println(Imprime);
-    String codificado = Imprime.substring(38);
-    printer.println(codificado);
+    //printer.println(Imprime);
+    //String codificado = Imprime.substring(38);
+    //printer.println(codificado);
     // ITF: 2-254 digits (# digits always multiple of 2)
-    printer.print(F("ITF:"));
-    printer.printBarcode("1234567890", ITF);
+    //printer.print(F("ITF:"));
+    //printer.printBarcode("1234567890", ITF);
     /*printer.boldOn();
     printer.setSize('L');
     printer.boldOff();
@@ -204,7 +229,7 @@ void Imprimir(String printed) {
     printer.setSize('S');
     printer.println("***  HAVE A NICE DAY  ***");
     printer.justify('C');*/
-    printer.write(10);
+    //printer.write(10);
     delay(3000);
     digitalWrite(LED,LOW);
 }
