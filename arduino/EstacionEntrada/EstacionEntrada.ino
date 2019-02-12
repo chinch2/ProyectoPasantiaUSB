@@ -87,8 +87,8 @@ void setup()
   lcd.clear();
   Serial.println("Pantalla inicializada");
   mySerial.begin(9600);
-  delay(4000);    //Esperar que se setee el pto serial y se prenda el dispositivo
-  TM88.start();
+  delay(1000);    //Esperar que se setee el pto serial y se prenda el dispositivo
+  //TM88.start();
 
 }
 //Las señales provenientes de los pines se leen y se les hace un and
@@ -190,27 +190,27 @@ void Pantalla(String salida1){
 void Imprimir(String printed) {
     Serial.print("\r\nImprimiendo...");
     String Imprime = printed.substring(5);
+    String codificado = Imprime.substring(38);
     //IMPRIMIENDO----------------------------------------------------------------------
     digitalWrite(LED,HIGH);
+    //delay(1000);
     TM88.start();
-    printStatus = TM88.getStatus();     // get the current status of the TM88 printer
-  if (printStatus == 22) {            // if status is 22 then we are good
+    //printStatus = TM88.getStatus();     // get the current status of the TM88 printer
+  /*if (printStatus == 22) {            // if status is 22 then we are good
     Serial.println("printer online");     // debug that we are online
   } else {
     Serial.print("printer offline: ");    // debug that we are offline
     Serial.println(printStatus);          // debug the returned status code  
-  }
+  }*/
 
     TM88.justifyCenter();
     TM88.println(Imprime);
-    String codificado = Imprime.substring(38);
-    TM88.barcodeHeight(127);
-    TM88.barcodeWidth(4);
+    TM88.barcodeHeight(50);
+    TM88.barcodeWidth(3);
     TM88.barcodeNumberPosition(2);
     TM88.printBarcode(70,6);
     TM88.println(codificado);
-    //delay(2000);
-    TM88.feed(2);
+    TM88.feed(5);
   //TM88.cut();
     /*printer.justify('L');
     printer.println("***  MY ENGINEERING STUFFS  ***\n");
@@ -230,6 +230,6 @@ void Imprimir(String printed) {
     printer.println("***  HAVE A NICE DAY  ***");
     printer.justify('C');*/
     //printer.write(10);
-    delay(3000);
+    //delay(1000);
     digitalWrite(LED,LOW);
 }
