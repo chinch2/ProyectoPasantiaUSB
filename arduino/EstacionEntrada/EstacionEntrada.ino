@@ -15,9 +15,9 @@ byte Ethernet::buffer[700];
 static uint32_t timer;
 const char website[] PROGMEM = "10.20.184.70";
 int printStatus = 0;
-//-------------Configuracion inicial---------
-ether.packetLoop(ether.packetReceive());
-ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
+//-------------Configuracion inicial---------Aqui no sirve...
+//ether.packetLoop(ether.packetReceive());
+//ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
 
 //-------------------------Display-----------                                                                                                                                                                                                                      ----------
 
@@ -44,6 +44,8 @@ int boton2 = 0;
 
 void setup()
 { //----------------------FUNCIONES  QUE DEBEN SER DECLARADAS-------------------------
+  ether.packetLoop(ether.packetReceive());
+  ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
   Serial.begin(9600);
   delay(1000);
   Serial.println(F("\n[webClient]"));
