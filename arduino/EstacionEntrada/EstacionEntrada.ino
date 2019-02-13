@@ -15,6 +15,9 @@ byte Ethernet::buffer[700];
 static uint32_t timer;
 const char website[] PROGMEM = "10.20.184.70";
 int printStatus = 0;
+//-------------Configuracion inicial---------
+ether.packetLoop(ether.packetReceive());
+ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
 
 //-------------------------Display-----------                                                                                                                                                                                                                      ----------
 
@@ -166,6 +169,7 @@ void comando(String cmd){
   if (cmd1 == "-disp") Pantalla(cmd);
   if(cmd1 == "-barr") Serial.print("\r\nHabriendo barrera");
   if(cmd1 == "-prin") Imprimir(cmd);
+  if(cmd1 == "-conf") Config(cmd);
 }
 //---------Imprimir en Display-----------------
 void Pantalla(String salida1){
@@ -208,7 +212,7 @@ void Imprimir(String printed) {
     TM88.barcodeHeight(50);
     TM88.barcodeWidth(3);
     TM88.barcodeNumberPosition(2);
-    TM88.printBarcode(70,6);
+    TM88.printBarcode(70,8);
     TM88.println(codificado);
     TM88.feed(5);
   //TM88.cut();
@@ -232,4 +236,10 @@ void Imprimir(String printed) {
     //printer.write(10);
     //delay(1000);
     digitalWrite(LED,LOW);
+}
+void Config(String cnf){
+  Serial.print("\r\nCargando configuracion inicial...");
+  String confi = cnf.substring(5);
+  
+
 }
