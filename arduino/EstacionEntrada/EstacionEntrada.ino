@@ -83,7 +83,7 @@ void setup()
   ether.printIp("Server: ", ether.hisip);
   Serial.println("Solicitando configuracion inicial...");
   ether.packetLoop(ether.packetReceive());
-  //ether.browseUrl(PSTR("/setup.php"), NULL, websiteIP, my_callback);
+  ether.browseUrl(PSTR("/setup.php"), NULL, websiteIP, my_callback);
   //Inicializando los pines de entrada y salida
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
@@ -106,7 +106,7 @@ void setup()
 
 void loop()
 {   
-  char websiteIP[] PROGMEM = "10.20.184.70"; //Es la que recibo de Setup.php
+  char websiteIP[] = "10.20.184.70"; //Es la que recibo de Setup.php
   boton1 = digitalRead(button_1);
   boton2 = digitalRead(button_2);
   //delay(1000);
