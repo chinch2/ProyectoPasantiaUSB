@@ -1,3 +1,4 @@
+#include <EEPROM.h>
 #include <EtherCard.h>
 //#include <Adafruit_Thermal.h>
 #include "thermalprinter.h"
@@ -7,18 +8,18 @@
 #define LED 11 //led del teensy 2.0
 #define rxPin 14  //serial que va a la impresora
 #define txPin 13 //serial que va a la impresora
+//-------Escribo IP default en la EEPROM----
+void updateString(char add,String data);
+//-------Busco IP default en la EEPROM------
+String read_String(char add);
+//const char website[] PROGMEM = "10.20.184.70";
 //-----------Ethernet-------------------------
 // ethernet interface mac address, must be unique on the LAN
 static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
 
 byte Ethernet::buffer[700];
 static uint32_t timer;
-const char website[] PROGMEM = "10.20.184.70";
 int printStatus = 0;
-//-------------Configuracion inicial---------Aqui no sirve...
-//ether.packetLoop(ether.packetReceive());
-//ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
-
 //-------------------------Display-----------                                                                                                                                                                                                                      ----------
 
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
@@ -43,10 +44,9 @@ int boton1 = 0; //Variables para leer el estatus de los botones
 int boton2 = 0;
 
 void setup()
-{ //----------------------FUNCIONES  QUE DEBEN SER DECLARADAS-------------------------
-  ether.packetLoop(ether.packetReceive());
-  ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
+{ 
   Serial.begin(9600);
+  mySerial.begin(9600);
   delay(1000);
   Serial.println(F("\n[webClient]"));
   Serial.print("MAC: ");
@@ -66,17 +66,24 @@ void setup()
 
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
-  
+  String IPdef = "10.20.184.70\0";
+  //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
+  if(EEPROM.read(0) == 255){//EEPROM vacia
+  //ESCRIBO EN MI EEPROM LA IP DEL SERVIDOR, SOLO EJECUTAR UNA SOLA VEZ
+  updateString(0,IPdef); // Si IPdef es diferente a la que esta guardada la escribe sino no
+  delay(1000);
+  }
+  String recivedData; 
+  recivedData = read_String(0);
 
-  // or provide a numeric IP address instead of a string
-  //byte hisip[] = { 10,20,184,70 };
-  ether.hisip[0] = 10;
-  ether.hisip[1] = 20;
-  ether.hisip[2] = 184;
-  ether.hisip[3] = 70;
 
+  const char *websiteIP = recivedData.c_str();
+  ether.parseIp(ether.hisip, websiteIP);
+  Serial.println(websiteIP);
   ether.printIp("Server: ", ether.hisip);
-
+  Serial.println("Solicitando configuracion inicial...");
+  ether.packetLoop(ether.packetReceive());
+  //ether.browseUrl(PSTR("/setup.php"), NULL, websiteIP, my_callback);
   //Inicializando los pines de entrada y salida
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
@@ -91,16 +98,15 @@ void setup()
   //Limpiar la pantalla
   lcd.clear();
   Serial.println("Pantalla inicializada");
-  mySerial.begin(9600);
   delay(1000);    //Esperar que se setee el pto serial y se prenda el dispositivo
   //TM88.start();
-
 }
 //Las señales provenientes de los pines se leen y se les hace un and
 //De tal manera que si ambos pulsadores estan bajos, se activa el relé
 
 void loop()
-{
+{   
+  char websiteIP[] PROGMEM = "10.20.184.70"; //Es la que recibo de Setup.php
   boton1 = digitalRead(button_1);
   boton2 = digitalRead(button_2);
   //delay(1000);
@@ -115,7 +121,7 @@ void loop()
     timer = millis() + 1000;
     Serial.println();
     Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/standby.php"), "?carro=1", website, my_callback);
+    ether.browseUrl(PSTR("/standby.php"), "?carro=1", websiteIP, my_callback);
   }
 
   } if (boton1 == LOW && boton2 == LOW) {
@@ -127,7 +133,7 @@ void loop()
     timer = millis() + 1000;
     Serial.println();
     Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/ticket.php"), "?estacion=1", website, my_callback);
+    ether.browseUrl(PSTR("/ticket.php"), "?estacion=1", websiteIP, my_callback);
   }
     
   } if (boton1 == HIGH && boton2 == HIGH) {  //No hay nadie...
@@ -138,7 +144,7 @@ void loop()
     timer = millis() + 1000;
     Serial.println();
     Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/standby.php"), "?carro=0&estacion=1", website, my_callback);
+    ether.browseUrl(PSTR("/standby.php"), "?carro=0&estacion=1", websiteIP, my_callback);
   }
   
 }
@@ -244,4 +250,30 @@ void Config(String cnf){
   String confi = cnf.substring(5);
   
 
+}
+void updateString(char add,String data)
+{
+  int _size = data.length();
+  int i;
+  for(i=0;i<_size;i++)
+  {
+    EEPROM.update(add+i,data[i]);
+  }
+  EEPROM.update(add+_size,'\0');   //Add termination null character for String Data
+}
+String read_String(char add)
+{
+  int i;
+  char data[100]; //Max 100 Bytes
+  int len=0;
+  unsigned char k;
+  k=EEPROM.read(add);
+  while(k != '\0' && len<500)   //Read until null character
+  {    
+    k=EEPROM.read(add+len);
+    data[len]=k;
+    len++;
+  }
+  data[len]='\0';
+  return String(data);
 }
