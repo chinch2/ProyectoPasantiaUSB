@@ -56,12 +56,13 @@ void setup()
 
   Serial.println("\nProceding to access Ethernet Controller\r\n");
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
-  if (ether.begin(sizeof Ethernet::buffer, mymac, 8) == 0)
+  if (ether.begin(sizeof Ethernet::buffer, mymac, 8) == 0){
     Serial.println(F("Failed to access Ethernet controller"));
       Serial.println("\r\nDHCP...\r\n\r\n");
-  if (!ether.dhcpSetup())
+  }
+  if (!ether.dhcpSetup()){
     Serial.println(F("DHCP failed"));
-
+  }
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
   String IPdef[] = {"10","20","184","70"};
@@ -77,17 +78,13 @@ void setup()
   Serial.println("Solicitando configuracion inicial desde la EEPROM...");
   }else{
   int ip[4];
-  ip[0] = IPdef[0].toInt();
-  ip[1] = IPdef[1].toInt();
-  ip[2] = IPdef[2].toInt();
-  ip[3] = IPdef[3].toInt();
-  ether.hisip[0] = ip[0];//IPdef[0].toInt();
-  ether.hisip[1] = ip[1];//IPdef[1].toInt();
-  ether.hisip[2] = ip[2];//IPdef[2].toInt();
-  ether.hisip[3] = ip[3];//IPdef[3].toInt();
+  for(int i=0;i<4;i++){
+  ip[i] = IPdef[i].toInt();
+  ether.hisip[i] = ip[i];//IPdef[i].toInt();
+  }
   ether.printIp("Server: ", ether.hisip);
   Serial.println("Solicitando configuracion inicial...");
-        }
+}
   /*String recivedData; 
   recivedData = read_String(0);
 
@@ -194,11 +191,16 @@ void comando(String cmd){
   String cmd1 = cmd.substring(0,5);
   Serial.print("\r\ncmd1: ");
   Serial.println(cmd1);
-  //if(cmd1 == "-conf") Config(cmd);
-  if (cmd1 == "-disp") Pantalla(cmd);
-  if(cmd1 == "-barr") Serial.print("\r\nHabriendo barrera");
-  if(cmd1 == "-prin") Imprimir(cmd);
-}
+  if (cmd1 == "-disp") {
+    Pantalla(cmd);
+  }
+  if(cmd1 == "-barr") {
+    Serial.print("\r\nHabriendo barrera");
+  }
+  if(cmd1 == "-prin") {
+    Imprimir(cmd);
+  }
+}  //if(cmd1 == "-conf") Config(cmd);
 //---------Imprimir en Display-----------------
 void Pantalla(String salida1){
 //----------------LCD DISPLAY--------------------------
@@ -227,50 +229,31 @@ void Imprimir(String printed) {
     digitalWrite(LED,HIGH);
     //delay(1000);
     TM88.start();
-    //printStatus = TM88.getStatus();     // get the current status of the TM88 printer
-  /*if (printStatus == 22) {            // if status is 22 then we are good
+    printStatus = TM88.getStatus();     // get the current status of the TM88 printer
+  if (printStatus == 22) {            // if status is 22 then we are good
     Serial.println("printer online");     // debug that we are online
   } else {
     Serial.print("printer offline: ");    // debug that we are offline
     Serial.println(printStatus);          // debug the returned status code  
-  }*/
+  }
 
     TM88.justifyCenter();
     TM88.println(Imprime);
     TM88.barcodeHeight(50);
     TM88.barcodeWidth(3);
     TM88.barcodeNumberPosition(2);
-    TM88.printBarcode(70,8);
-    TM88.println(codificado);
+    TM88.printBarcode(70,6);
+    TM88.println("100000");
     TM88.feed(5);
   //TM88.cut();
-    /*printer.justify('L');
-    printer.println("***  MY ENGINEERING STUFFS  ***\n");
-    printer.justify('C');
-    printer.setSize('S');        // Set type size, accepts 'S', 'M', 'L'*/
-    //printer.println(Imprime);
-    //String codificado = Imprime.substring(38);
-    //printer.println(codificado);
-    // ITF: 2-254 digits (# digits always multiple of 2)
-    //printer.print(F("ITF:"));
-    //printer.printBarcode("1234567890", ITF);
-    /*printer.boldOn();
-    printer.setSize('L');
-    printer.boldOff();
-    printer.justify('C');
-    printer.setSize('S');
-    printer.println("***  HAVE A NICE DAY  ***");
-    printer.justify('C');*/
-    //printer.write(10);
-    //delay(1000);
     digitalWrite(LED,LOW);
 }
-void Config(String cnf){
+/*void Config(String cnf){
   Serial.print("\r\nCargando configuracion inicial...");
   String confi = cnf.substring(5);
   Serial.println(confi); 
 
-}
+}*/
 void updateIP(String inString[4])
 {
   int ip[4];
