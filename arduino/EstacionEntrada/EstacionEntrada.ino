@@ -1,6 +1,5 @@
 #include <EEPROM.h>
 #include <EtherCard.h>
-//#include <Adafruit_Thermal.h>
 #include "thermalprinter.h"
 #include <SoftwareSerial.h>
 #include <Wire.h>
@@ -9,14 +8,13 @@
 #define rxPin 14  //serial que va a la impresora
 #define txPin 13 //serial que va a la impresora
 //-------Escribo IP default en la EEPROM----
-void updateString(char add,String data);
+void updateIP(String inString[4]);
 //-------Busco IP default en la EEPROM------
 String read_String(char add);
-//const char website[] PROGMEM = "10.20.184.70";
 //-----------Ethernet-------------------------
 // ethernet interface mac address, must be unique on the LAN
 static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
-
+const char website[] PROGMEM = "10.20.184.70";
 byte Ethernet::buffer[700];
 static uint32_t timer;
 int printStatus = 0;
@@ -66,24 +64,38 @@ void setup()
 
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
-  String IPdef = "10.20.184.70\0";
+  String IPdef[] = {"10","20","184","70"};
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
   if(EEPROM.read(0) == 255){//EEPROM vacia
   //ESCRIBO EN MI EEPROM LA IP DEL SERVIDOR, SOLO EJECUTAR UNA SOLA VEZ
-  updateString(0,IPdef); // Si IPdef es diferente a la que esta guardada la escribe sino no
+  updateIP(IPdef); // Si IPdef es diferente a la que esta guardada la escribe sino no
   delay(1000);
-  }
-  String recivedData; 
-  recivedData = read_String(0);
-
-
-  const char *websiteIP = recivedData.c_str();
-  ether.parseIp(ether.hisip, websiteIP);
-  Serial.println(websiteIP);
+    for(int j=0; j<4; j++){
+      ether.hisip[j] = EEPROM.read(j);
+    }
+  ether.printIp("Server: ", ether.hisip);
+  Serial.println("Solicitando configuracion inicial desde la EEPROM...");
+  }else{
+  int ip[4];
+  ip[0] = IPdef[0].toInt();
+  ip[1] = IPdef[1].toInt();
+  ip[2] = IPdef[2].toInt();
+  ip[3] = IPdef[3].toInt();
+  ether.hisip[0] = ip[0];//IPdef[0].toInt();
+  ether.hisip[1] = ip[1];//IPdef[1].toInt();
+  ether.hisip[2] = ip[2];//IPdef[2].toInt();
+  ether.hisip[3] = ip[3];//IPdef[3].toInt();
   ether.printIp("Server: ", ether.hisip);
   Serial.println("Solicitando configuracion inicial...");
-  ether.packetLoop(ether.packetReceive());
-  ether.browseUrl(PSTR("/setup.php"), NULL, websiteIP, my_callback);
+        }
+  /*String recivedData; 
+  recivedData = read_String(0);
+
+  Serial.print("recivedData:");
+  Serial.println(recivedData);
+  //const char *websiteIP = recivedData.c_str(); 
+  Serial.println(websiteIP);*/
+  
   //Inicializando los pines de entrada y salida
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
@@ -105,8 +117,16 @@ void setup()
 //De tal manera que si ambos pulsadores estan bajos, se activa el relé
 
 void loop()
-{   
-  char websiteIP[] = "10.20.184.70"; //Es la que recibo de Setup.php
+{  /*//----Configuracion inicial-----------
+   ether.packetLoop(ether.packetReceive());
+
+  if (millis() > timer) {
+    timer = millis() + 3000;
+    Serial.println();
+    Serial.print("<<< REQ ");
+    ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
+  }
+//----Configuracion inicial--------------*/
   boton1 = digitalRead(button_1);
   boton2 = digitalRead(button_2);
   //delay(1000);
@@ -121,7 +141,7 @@ void loop()
     timer = millis() + 1000;
     Serial.println();
     Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/standby.php"), "?carro=1", websiteIP, my_callback);
+    ether.browseUrl(PSTR("/standby.php"), "?carro=1", website, my_callback);
   }
 
   } if (boton1 == LOW && boton2 == LOW) {
@@ -133,7 +153,7 @@ void loop()
     timer = millis() + 1000;
     Serial.println();
     Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/ticket.php"), "?estacion=1", websiteIP, my_callback);
+    ether.browseUrl(PSTR("/ticket.php"), "?estacion=1", website, my_callback);
   }
     
   } if (boton1 == HIGH && boton2 == HIGH) {  //No hay nadie...
@@ -144,7 +164,7 @@ void loop()
     timer = millis() + 1000;
     Serial.println();
     Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/standby.php"), "?carro=0&estacion=1", websiteIP, my_callback);
+    ether.browseUrl(PSTR("/standby.php"), "?carro=0&estacion=1", website, my_callback);
   }
   
 }
@@ -174,10 +194,10 @@ void comando(String cmd){
   String cmd1 = cmd.substring(0,5);
   Serial.print("\r\ncmd1: ");
   Serial.println(cmd1);
+  //if(cmd1 == "-conf") Config(cmd);
   if (cmd1 == "-disp") Pantalla(cmd);
   if(cmd1 == "-barr") Serial.print("\r\nHabriendo barrera");
   if(cmd1 == "-prin") Imprimir(cmd);
-  if(cmd1 == "-conf") Config(cmd);
 }
 //---------Imprimir en Display-----------------
 void Pantalla(String salida1){
@@ -248,32 +268,31 @@ void Imprimir(String printed) {
 void Config(String cnf){
   Serial.print("\r\nCargando configuracion inicial...");
   String confi = cnf.substring(5);
-  
+  Serial.println(confi); 
 
 }
-void updateString(char add,String data)
+void updateIP(String inString[4])
 {
-  int _size = data.length();
+  int ip[4];
+  int m;
   int i;
-  for(i=0;i<_size;i++)
-  {
-    EEPROM.update(add+i,data[i]);
+  int n;
+  Serial.print("Guardando IP en la EEPROM: ");
+  for(m=0; m<3; m++) {
+    Serial.print(inString[m]);
+    Serial.print(".");
   }
-  EEPROM.update(add+_size,'\0');   //Add termination null character for String Data
-}
-String read_String(char add)
-{
-  int i;
-  char data[100]; //Max 100 Bytes
-  int len=0;
-  unsigned char k;
-  k=EEPROM.read(add);
-  while(k != '\0' && len<500)   //Read until null character
-  {    
-    k=EEPROM.read(add+len);
-    data[len]=k;
-    len++;
+  Serial.print(inString[3]);
+  Serial.print("\r\n");
+  
+  for (i=0; i<4; i++) {
+  ip[i] = inString[i].toInt();
+  EEPROM.update(i,ip[i]);
   }
-  data[len]='\0';
-  return String(data);
+  Serial.print("Guardada en EEPROM IP: ");
+  for(n=0; n<3; n++){
+  Serial.print(EEPROM.read(n));
+  Serial.print(".");
+  }
+  Serial.print(EEPROM.read(3));
 }
