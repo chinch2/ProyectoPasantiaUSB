@@ -261,11 +261,12 @@ void updateIP(String inString[4])
   int i;
   int n;
   Serial.print("Guardando IP en la EEPROM: ");
-  for(m=0; m<3; m++) {
+  for(m=0; m<4; m++) {
     Serial.print(inString[m]);
+    if(m<3){
     Serial.print(".");
+    }
   }
-  Serial.print(inString[3]);
   Serial.print("\r\n");
   
   for (i=0; i<4; i++) {
@@ -273,9 +274,10 @@ void updateIP(String inString[4])
   EEPROM.update(i,ip[i]);
   }
   Serial.print("Guardada en EEPROM IP: ");
-  for(n=0; n<3; n++){
+  for(n=0; n<4; n++){
   Serial.print(EEPROM.read(n));
-  Serial.print(".");
+    if(n<3){
+      Serial.print(".");
+    }
   }
-  Serial.print(EEPROM.read(3));
 }
