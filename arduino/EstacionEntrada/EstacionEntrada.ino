@@ -202,8 +202,11 @@ void comando(String cmd){
   if(cmd1 == "-barr") {
     Serial.print("Habriendo barrera");
   }
+  /*if(cmd1 == "-conf") {
+    Config(cmd);
+  }*/
 
-}  //if(cmd1 == "-conf") Config(cmd);
+}
 //---------Imprimir en Display-----------------
 void Pantalla(String salida1){
 //----------------LCD DISPLAY--------------------------
