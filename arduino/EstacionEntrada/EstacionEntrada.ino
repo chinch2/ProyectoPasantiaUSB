@@ -67,7 +67,7 @@ void setup()
   ether.printIp("GW:  ", ether.gwip);
   String IPdef[] = {"10","20","184","70"};
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
-  if(EEPROM.read(0) == 255){//EEPROM vacia
+  /*if(EEPROM.read(0) == 255){//EEPROM vacia
   //ESCRIBO EN MI EEPROM LA IP DEL SERVIDOR, SOLO EJECUTAR UNA SOLA VEZ
   updateIP(IPdef); // Si IPdef es diferente a la que esta guardada la escribe sino no
   delay(1000);
@@ -76,7 +76,7 @@ void setup()
     }
   ether.printIp("Server: ", ether.hisip);
   Serial.println("Solicitando configuracion inicial desde la EEPROM...");
-  }else{
+  }*///else{
   int ip[4];
   for(int i=0;i<4;i++){
   ip[i] = IPdef[i].toInt();
@@ -84,7 +84,7 @@ void setup()
   }
   ether.printIp("Server: ", ether.hisip);
   Serial.println("Solicitando configuracion inicial...");
-}
+//}
   /*String recivedData; 
   recivedData = read_String(0);
 
@@ -108,7 +108,6 @@ void setup()
   lcd.clear();
   Serial.println("Pantalla inicializada");
   delay(1000);    //Esperar que se setee el pto serial y se prenda el dispositivo
-  //TM88.start();
 }
 //Las señales provenientes de los pines se leen y se les hace un and
 //De tal manera que si ambos pulsadores estan bajos, se activa el relé
@@ -179,10 +178,13 @@ static void my_callback (byte status, word off, word len) {
   while(salida1.length() > 0){
     int fin=salida1.indexOf("-end");
     if (fin==0) salida1="";
-    comando(salida1.substring(0,fin));
-    Serial.println();
-    Serial.print(salida1);
+    String action = salida1.substring(0,fin);
+    Serial.print(action);
+    comando(action);
+    //Serial.println();
+    //Serial.print(salida1);
     salida1 = salida1.substring(fin+4);
+    //Serial.print(salida1);
     }
     
   }
@@ -194,12 +196,13 @@ void comando(String cmd){
   if (cmd1 == "-disp") {
     Pantalla(cmd);
   }
+    if(cmd1 == "-prin") {
+    Imprimir(cmd);
+  }
   if(cmd1 == "-barr") {
     Serial.print("\r\nHabriendo barrera");
   }
-  if(cmd1 == "-prin") {
-    Imprimir(cmd);
-  }
+
 }  //if(cmd1 == "-conf") Config(cmd);
 //---------Imprimir en Display-----------------
 void Pantalla(String salida1){
@@ -222,28 +225,21 @@ void Pantalla(String salida1){
 }
 
 void Imprimir(String printed) {
-    Serial.print("\r\nImprimiendo...");
+    Serial.print("Imprimiendo...");
     String Imprime = printed.substring(5);
-    String codificado = Imprime.substring(38);
+    String codificado = Imprime.substring(21);
+    Serial.print(Imprime);
+    Serial.println(codificado);
     //IMPRIMIENDO----------------------------------------------------------------------
     digitalWrite(LED,HIGH);
-    //delay(1000);
     TM88.start();
-    printStatus = TM88.getStatus();     // get the current status of the TM88 printer
-  if (printStatus == 22) {            // if status is 22 then we are good
-    Serial.println("printer online");     // debug that we are online
-  } else {
-    Serial.print("printer offline: ");    // debug that we are offline
-    Serial.println(printStatus);          // debug the returned status code  
-  }
-
     TM88.justifyCenter();
     TM88.println(Imprime);
     TM88.barcodeHeight(50);
     TM88.barcodeWidth(3);
     TM88.barcodeNumberPosition(2);
-    TM88.printBarcode(70,6);
-    TM88.println("100000");
+    TM88.printBarcode(70,8);
+    TM88.println(codificado);
     TM88.feed(5);
   //TM88.cut();
     digitalWrite(LED,LOW);
