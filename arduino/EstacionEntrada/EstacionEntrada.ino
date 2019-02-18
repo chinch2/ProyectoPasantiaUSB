@@ -1,6 +1,6 @@
 #include <EEPROM.h>
 #include <EtherCard.h>
-#include "thermalprinter.h"
+//#include "thermalprinter.h"
 #include <SoftwareSerial.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
@@ -28,7 +28,7 @@ LiquidCrystal_I2C lcd(0x3f, 16, 2);
 //NewSoftSerial mySerial(14, 13);// Rx  Tx  por ahora no sirve
 SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
 //Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
-Epson TM88 = Epson(rxPin, txPin); // init the Printer with Output-Pin
+//Epson TM88 = Epson(rxPin, txPin); // init the Printer with Output-Pin
 
 
 // El numero de los pines (constantes siempre):
@@ -76,7 +76,7 @@ void setup()
     }
   ether.printIp("Server: ", ether.hisip);
   Serial.println("Solicitando configuracion inicial desde la EEPROM...");
-  }*///else{
+  }else{*/
   int ip[4];
   for(int i=0;i<4;i++){
   ip[i] = IPdef[i].toInt();
@@ -200,7 +200,7 @@ void comando(String cmd){
     Imprimir(cmd);
   }
   if(cmd1 == "-barr") {
-    Serial.print("\r\nHabriendo barrera");
+    Serial.print("Habriendo barrera");
   }
 
 }  //if(cmd1 == "-conf") Config(cmd);
@@ -232,16 +232,26 @@ void Imprimir(String printed) {
     Serial.println(codificado);
     //IMPRIMIENDO----------------------------------------------------------------------
     digitalWrite(LED,HIGH);
-    TM88.start();
-    TM88.justifyCenter();
-    TM88.println(Imprime);
-    TM88.barcodeHeight(50);
-    TM88.barcodeWidth(3);
-    TM88.barcodeNumberPosition(2);
-    TM88.printBarcode(70,8);
-    TM88.println(codificado);
-    TM88.feed(5);
-  //TM88.cut();
+    //TM88.start();
+    //TM88.justifyCenter();
+    mySerial.write("\x1B\x61\x01"); 
+    //TM88.println(Imprime);
+    mySerial.println(Imprime);
+    //TM88.barcodeHeight(50);
+    mySerial.write("\x1D\x68\x32");
+    //TM88.barcodeWidth(3);
+    mySerial.write("\x1D\x77\x03");  
+    //TM88.barcodeNumberPosition(2);
+    mySerial.write("\x1D\x48\x02");  
+
+    //TM88.printBarcode(70,8);
+    mySerial.write("\x1d\x6b\x46\x08");
+    //TM88.println(codificado);
+    mySerial.println(codificado);
+    //TM88.feed(5);
+    mySerial.write("\n\n\n\n\n\n");
+    //TM88.cut();
+    //mySerial.write("\x1D\x56\x42\x0A");
     digitalWrite(LED,LOW);
 }
 /*void Config(String cnf){
