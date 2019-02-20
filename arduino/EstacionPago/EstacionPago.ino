@@ -1,6 +1,5 @@
 #include <EEPROM.h>
 #include <EtherCard.h>
-//#include "thermalprinter.h"
 #include <SoftwareSerial.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
@@ -9,43 +8,29 @@
 #define txPin 13 //serial que va a la impresora
 //-------Escribo IP default en la EEPROM----
 void updateIP(String inString[4]);
-//-------Busco IP default en la EEPROM------
-String read_String(char add);
 //-----------Ethernet-------------------------
 // ethernet interface mac address, must be unique on the LAN
 static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
 const char website[] PROGMEM = "10.20.184.70";
+String request;//char request[30];
 byte Ethernet::buffer[700];
 static uint32_t timer;
 int printStatus = 0;
+int j=0; //contador de llenado del buff del escaner
 //-------------------------Display-----------                                                                                                                                                                                                                      ----------
 
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
-
-//----------------------Impresora------------------------
-//Crear la nueva interfaz serial para la impresora
-//NewSoftSerial mySerial(14, 13);// Rx  Tx  por ahora no sirve
 SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
-//Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
-//Epson TM88 = Epson(rxPin, txPin); // init the Printer with Output-Pin
-
-
-// El numero de los pines (constantes siempre):
-
-const int button_1 = 21;
-const int button_2 = 20;
-const int RESET = 12; //Hardware reset para el ESP8266
-
-//Variables que cambian:
-int boton1 = 0; //Variables para leer el estatus de los botones
-int boton2 = 0;
-
-void setup()
-{ 
+char c; 
+String buff;//char buff[8];//char buff[8];
+const int dispara = 18;
+void setup() {
+  // put your setup code here, to run once:
   Serial.begin(9600);
   mySerial.begin(9600);
-  delay(1000);
+  buff = "";//buff[0] = '\0';
+  Serial.print("Codigo de barra: \r\n");
   Serial.println(F("\n[webClient]"));
   Serial.print("MAC: ");
   for (byte i = 0; i < 6; ++i) {
@@ -94,9 +79,7 @@ void setup()
   Serial.println(websiteIP);*/
   
   //Inicializando los pines de entrada y salida
-  pinMode(button_1, INPUT_PULLUP);
-  pinMode(button_2, INPUT_PULLUP);
-  pinMode(RESET,OUTPUT); //Teensy con ESP8266
+  pinMode(dispara,OUTPUT); //Trigger del escaner
   pinMode(LED,OUTPUT);   //Teensy
   pinMode(rxPin, INPUT);
   pinMode(txPin, OUTPUT);
@@ -108,65 +91,45 @@ void setup()
   lcd.clear();
   Serial.println("Pantalla inicializada");
   delay(1000);    //Esperar que se setee el pto serial y se prenda el dispositivo
+
 }
-//Las señales provenientes de los pines se leen y se les hace un and
-//De tal manera que si ambos pulsadores estan bajos, se activa el relé
 
-void loop()
-{  /*//----Configuracion inicial-----------
-   ether.packetLoop(ether.packetReceive());
-
-  if (millis() > timer) {
-    timer = millis() + 3000;
-    Serial.println();
-    Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
-  }
-//----Configuracion inicial--------------*/
-  boton1 = digitalRead(button_1);
-  boton2 = digitalRead(button_2);
-  //delay(1000);
-  //Serial.print(boton1);
-  //Serial.print(boton2);
-  //delay(1000);
-  if (boton1 == LOW && boton2 == HIGH) { //Está el carro, no se ha presionado el botón
-    //-----------------------------------GET REQUEST 1-------------------------------------------------------------    
-    ether.packetLoop(ether.packetReceive());
-
-  if (millis() > timer) {
-    timer = millis() + 1000;
-    Serial.println();
-    Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/standby.php"), "?carro=1", website, my_callback);
-  }
-
-  } if (boton1 == LOW && boton2 == LOW) {
-    //ENTRÓ ALGUIEN!
-    //-----------------------------------GET REQUEST 2-------------------------------------------------------------    
+void loop() {
+  request = "?id="+buff;// put your main code here, to run repeatedly:
+  int datacombinationLEN = request.length() + 1;//?id=10000000\0
+  char requestc[datacombinationLEN];
+  request.toCharArray(requestc,datacombinationLEN);
+  //const char *req = "?id=";
+  //strcpy(request,req);
+  //strcat(request,(const char*)buff);
   ether.packetLoop(ether.packetReceive());
-
-  if (millis() > timer) {
-    timer = millis() + 1000;
-    Serial.println();
-    Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/ticket.php"), "?estacion=1", website, my_callback);
-  }
-    
-  } if (boton1 == HIGH && boton2 == HIGH) {  //No hay nadie...
-    //-----------------------------------GET REQUEST 3-------------------------------------------------------------    
-  ether.packetLoop(ether.packetReceive());
-
-  if (millis() > timer) {
-    timer = millis() + 1000;
-    Serial.println();
-    Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/standby.php"), "?carro=0&estacion=1", website, my_callback);
-  }
   
+    if (millis() > timer) {
+        timer = millis() + 1000;
+        //Serial.println();
+        //Serial.print("<<< REQ ");
+        ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
+      }
+  if (mySerial.available()) {
+   c = mySerial.read();
+ //   Serial.print(c);
+ // if( c == 10) Serial.print("hubo r"); 
+ // if( c == 13) Serial.print("hubo n");
+   if( c == 13){
+    Serial.println(requestc);
+    Serial.println();
+    Serial.print("<<< REQ ");
+    ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
+
+      //j=0;
+    buff = "";//buff[j] = '\0';
+   }//else strcat(buff,(const char*)c);//buff=buff+c;
+      buff = buff + c;//buff[j] = c;
+      //buff[j+1] = '\0';
+      //j++;
 }
 
 }
-
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
   Serial.println(">>>");
@@ -187,7 +150,7 @@ static void my_callback (byte status, word off, word len) {
     //Serial.print(salida1);
     }
     
-  }
+}
 
 void comando(String cmd){
   String cmd1 = cmd.substring(0,5);
@@ -196,7 +159,7 @@ void comando(String cmd){
   if (cmd1 == "-disp") {
     Pantalla(cmd);
   }
-    if(cmd1 == "-prin") {
+/*    if(cmd1 == "-prin") {
     Imprimir(cmd);
   }
   if(cmd1 == "-barr") {
@@ -207,6 +170,7 @@ void comando(String cmd){
   }*/
 
 }
+
 //---------Imprimir en Display-----------------
 void Pantalla(String salida1){
 //----------------LCD DISPLAY--------------------------
@@ -227,42 +191,6 @@ void Pantalla(String salida1){
     delay(1500);
 }
 
-void Imprimir(String printed) {
-    Serial.print("Imprimiendo...");
-    String Imprime = printed.substring(5);
-    String codificado = Imprime.substring(21);
-    Serial.print(Imprime);
-    Serial.println(codificado);
-    //IMPRIMIENDO----------------------------------------------------------------------
-    digitalWrite(LED,HIGH);
-    //TM88.start();
-    //TM88.justifyCenter();
-    mySerial.write("\x1B\x61\x01"); 
-    //TM88.println(Imprime);
-    mySerial.println(Imprime);
-    //TM88.barcodeHeight(50);
-    mySerial.write("\x1D\x68\x32");
-    //TM88.barcodeWidth(3);
-    mySerial.write("\x1D\x77\x03");  
-    //TM88.barcodeNumberPosition(2);
-    mySerial.write("\x1D\x48\x02");  
-
-    //TM88.printBarcode(70,8);
-    mySerial.write("\x1d\x6b\x46\x08");
-    //TM88.println(codificado);
-    mySerial.println(codificado);
-    //TM88.feed(5);
-    mySerial.write("\n\n\n\n\n\n");
-    //TM88.cut();
-    //mySerial.write("\x1D\x56\x42\x0A");
-    digitalWrite(LED,LOW);
-}
-/*void Config(String cnf){
-  Serial.print("\r\nCargando configuracion inicial...");
-  String confi = cnf.substring(5);
-  Serial.println(confi); 
-
-}*/
 void updateIP(String inString[4])
 {
   int ip[4];
