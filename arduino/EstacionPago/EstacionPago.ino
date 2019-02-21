@@ -13,10 +13,13 @@ void updateIP(String inString[4]);
 static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
 const char website[] PROGMEM = "10.20.184.70";
 String request;//char request[30];
+String prequest;
 byte Ethernet::buffer[700];
 static uint32_t timer;
 bool onrequest = false;
+bool ticketleido = false;
 char requestc[15];
+char prequestc[30];
 int printStatus = 0;
 int j=0; //contador de llenado del buff del escaner
 //-------------------------Display-----------                                                                                                                                                                                                                      ----------
@@ -27,6 +30,9 @@ SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
 char c; 
 String buff;//char buff[8];
 const int dispara = 18;
+const int button_pay = 21;
+int botonpago = 0; //Variables para leer el estatus de los botones
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -82,6 +88,7 @@ void setup() {
   
   //Inicializando los pines de entrada y salida
   pinMode(dispara,OUTPUT); //Trigger del escaner
+  pinMode(button_pay, INPUT_PULLUP);
   pinMode(LED,OUTPUT);   //Teensy
   pinMode(rxPin, INPUT);
   pinMode(txPin, OUTPUT);
@@ -97,6 +104,8 @@ void setup() {
 }
 
 void loop() {
+  botonpago = digitalRead(button_pay);
+  
   ether.packetLoop(ether.packetReceive());
   
     if (millis() > timer && onrequest) {
@@ -120,6 +129,7 @@ void loop() {
     Serial.println(requestc);
     timer = millis() + 5000;
     onrequest = true;
+    ticketleido = true;
     Serial.println();
     Serial.print("<<< REQ ");
     ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
@@ -130,7 +140,31 @@ void loop() {
       //buff[j+1] = '\0';
       //j++;
    }
+
+       if (botonpago == LOW && ticketleido){
+      ether.packetLoop(ether.packetReceive());
+      if (millis() > timer && onrequest) {
+        timer = millis() + 5000;
+        Serial.println();
+        Serial.print("<<< REQ ");
+        ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
+    }
+  
+      prequest = "?estacion=1&id="+buff;// put your main code here, to run repeatedly:
+      prequest.toCharArray(prequestc,prequest.length() + 1);
+      Serial.println(prequest);
+      Serial.println(prequestc);
+      timer = millis() + 5000;
+      onrequest = true;
+      ticketleido = false;
+      Serial.println();
+      Serial.print("<<< REQ ");
+      ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
+
+
+  }
 }
+
 
 }
 // called when the client request is complete
@@ -172,6 +206,9 @@ void comando(String cmd){
   /*if(cmd1 == "-conf") {
     Config(cmd);
   }*/
+    if (cmd1 == "-pago") {
+    //modoPago(cmd);
+  }
 
 }
 

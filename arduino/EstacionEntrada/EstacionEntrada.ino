@@ -17,6 +17,8 @@ static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
 const char website[] PROGMEM = "10.20.184.70";
 byte Ethernet::buffer[700];
 static uint32_t timer;
+//bool confonreq = true;
+//bool onrequest = false;
 int printStatus = 0;
 //-------------------------Display-----------                                                                                                                                                                                                                      ----------
 
@@ -58,11 +60,11 @@ void setup()
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
   if (ether.begin(sizeof Ethernet::buffer, mymac, 8) == 0){
     Serial.println(F("Failed to access Ethernet controller"));
+  }else Serial.println(F("Ethernet controller access success"));
       Serial.println("\r\nDHCP...\r\n\r\n");
-  }
   if (!ether.dhcpSetup()){
     Serial.println(F("DHCP failed"));
-  }
+  }else Serial.println(F("DHCP success"));
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
   String IPdef[] = {"10","20","184","70"};
@@ -76,6 +78,16 @@ void setup()
     }
   ether.printIp("Server: ", ether.hisip);
   Serial.println("Solicitando configuracion inicial desde la EEPROM...");
+//----Configuracion inicial-----------
+   ether.packetLoop(ether.packetReceive());
+
+  if (millis() > timer) {
+    timer = millis() + 3000;
+    Serial.println();
+    Serial.print("<<< REQ ");
+    ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
+  }
+//----Configuracion inicial--------------
   }else{*/
   int ip[4];
   for(int i=0;i<4;i++){
@@ -83,7 +95,6 @@ void setup()
   ether.hisip[i] = ip[i];//IPdef[i].toInt();
   }
   ether.printIp("Server: ", ether.hisip);
-  Serial.println("Solicitando configuracion inicial...");
 //}
   /*String recivedData; 
   recivedData = read_String(0);
@@ -92,7 +103,6 @@ void setup()
   Serial.println(recivedData);
   //const char *websiteIP = recivedData.c_str(); 
   Serial.println(websiteIP);*/
-  
   //Inicializando los pines de entrada y salida
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
@@ -107,68 +117,73 @@ void setup()
   //Limpiar la pantalla
   lcd.clear();
   Serial.println("Pantalla inicializada");
-  delay(1000);    //Esperar que se setee el pto serial y se prenda el dispositivo
 }
 //Las señales provenientes de los pines se leen y se les hace un and
 //De tal manera que si ambos pulsadores estan bajos, se activa el relé
 
 void loop()
-{  /*//----Configuracion inicial-----------
-   ether.packetLoop(ether.packetReceive());
-
+{
+  //----Configuracion inicial-----------
+  /*if(confonreq){
+    while(confonreq){
+  ether.packetLoop(ether.packetReceive());
   if (millis() > timer) {
-    timer = millis() + 3000;
+    timer = millis() + 4000;
+    Serial.println("Solicitando configuracion inicial...");
     Serial.println();
     Serial.print("<<< REQ ");
     ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
+    }
   }
-//----Configuracion inicial--------------*/
+}*/
+//----Configuracion inicial--------------
   boton1 = digitalRead(button_1);
   boton2 = digitalRead(button_2);
   //delay(1000);
   //Serial.print(boton1);
   //Serial.print(boton2);
   //delay(1000);
-  if (boton1 == LOW && boton2 == HIGH) { //Está el carro, no se ha presionado el botón
-    //-----------------------------------GET REQUEST 1-------------------------------------------------------------    
-    ether.packetLoop(ether.packetReceive());
-
+  if (boton1 == HIGH && boton2 == HIGH) {  //No hay nadie
+    //-----------------------------------GET REQUEST 3-------------------------------------------------------------        
+  ether.packetLoop(ether.packetReceive());
   if (millis() > timer) {
-    timer = millis() + 1000;
+    timer = millis() + 4000;
     Serial.println();
     Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/standby.php"), "?carro=1", website, my_callback);
+    ether.browseUrl(PSTR("/standby.php"), "?carro=0&estacion=1", website, my_callback);
   }
-
-  } if (boton1 == LOW && boton2 == LOW) {
-    //ENTRÓ ALGUIEN!
-    //-----------------------------------GET REQUEST 2-------------------------------------------------------------    
+  
+} 
+  
+  if (boton1 == LOW && boton2 == HIGH) {  //Hay alguien
+    //-----------------------------------GET REQUEST 3-------------------------------------------------------------    
   ether.packetLoop(ether.packetReceive());
+  if (millis() > timer) {
+    timer = millis() + 2000;
+    Serial.println();
+    Serial.print("<<< REQ ");
+    ether.browseUrl(PSTR("/standby.php"), "?carro=1&estacion=1", website, my_callback);
+  }
+  
+}
 
+  if (boton1 == LOW && boton2 == LOW) {  //Entro alguien
+    //-----------------------------------GET REQUEST 3-------------------------------------------------------------        
+    ether.packetLoop(ether.packetReceive());
   if (millis() > timer) {
     timer = millis() + 1000;
     Serial.println();
     Serial.print("<<< REQ ");
     ether.browseUrl(PSTR("/ticket.php"), "?estacion=1", website, my_callback);
   }
-    
-  } if (boton1 == HIGH && boton2 == HIGH) {  //No hay nadie...
-    //-----------------------------------GET REQUEST 3-------------------------------------------------------------    
-  ether.packetLoop(ether.packetReceive());
-
-  if (millis() > timer) {
-    timer = millis() + 1000;
-    Serial.println();
-    Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/standby.php"), "?carro=0&estacion=1", website, my_callback);
-  }
   
 }
 
 }
-
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
+  //onrequest = false;
+  //confonreq = false;
   Serial.println(">>>");
   Ethernet::buffer[off+len] = 0;
   Serial.print((const char*) Ethernet::buffer + off);
