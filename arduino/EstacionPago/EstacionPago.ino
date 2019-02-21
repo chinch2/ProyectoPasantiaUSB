@@ -15,6 +15,8 @@ const char website[] PROGMEM = "10.20.184.70";
 String request;//char request[30];
 byte Ethernet::buffer[700];
 static uint32_t timer;
+bool onrequest = false;
+char requestc[15];
 int printStatus = 0;
 int j=0; //contador de llenado del buff del escaner
 //-------------------------Display-----------                                                                                                                                                                                                                      ----------
@@ -95,19 +97,15 @@ void setup() {
 }
 
 void loop() {
-  request = "?id="+buff;// put your main code here, to run repeatedly:
-  int datacombinationLEN = request.length() + 1;//?id=10000000\0
-  char requestc[datacombinationLEN];
-  request.toCharArray(requestc,datacombinationLEN);
   //const char *req = "?id=";
   //strcpy(request,req);
   //strcat(request,(const char*)buff);
   ether.packetLoop(ether.packetReceive());
   
-    if (millis() > timer) {
-        timer = millis() + 1000;
-        //Serial.println();
-        //Serial.print("<<< REQ ");
+    if (millis() > timer && onrequest) {
+        timer = millis() + 5000;
+        Serial.println();
+        Serial.print("<<< REQ ");
         ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
       }
   if (mySerial.available()) {
@@ -116,11 +114,14 @@ void loop() {
  // if( c == 10) Serial.print("hubo r"); 
  // if( c == 13) Serial.print("hubo n");
    if( c == 13){
+    request = "?id="+buff;// put your main code here, to run repeatedly:
+    request.toCharArray(requestc,request.length());//+ 1);
     Serial.println(requestc);
     Serial.println();
     Serial.print("<<< REQ ");
     ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
-
+    onrequest = true;
+    timer = millis() + 5000;
       //j=0;
     buff = "";//buff[j] = '\0';
    }//else strcat(buff,(const char*)c);//buff=buff+c;
@@ -132,6 +133,7 @@ void loop() {
 }
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
+  onrequest = false;
   Serial.println(">>>");
   Ethernet::buffer[off+len] = 0;
   Serial.print((const char*) Ethernet::buffer + off);
