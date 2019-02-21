@@ -25,7 +25,7 @@ int j=0; //contador de llenado del buff del escaner
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
 SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
 char c; 
-String buff;//char buff[8];//char buff[8];
+String buff;//char buff[8];
 const int dispara = 18;
 void setup() {
   // put your setup code here, to run once:
@@ -97,9 +97,6 @@ void setup() {
 }
 
 void loop() {
-  //const char *req = "?id=";
-  //strcpy(request,req);
-  //strcat(request,(const char*)buff);
   ether.packetLoop(ether.packetReceive());
   
     if (millis() > timer && onrequest) {
@@ -114,20 +111,25 @@ void loop() {
  // if( c == 10) Serial.print("hubo r"); 
  // if( c == 13) Serial.print("hubo n");
    if( c == 13){
+    //const char *req = "?id=";
+    //strcpy(request,req);
+    //strcat(request,buff);
     request = "?id="+buff;// put your main code here, to run repeatedly:
-    request.toCharArray(requestc,request.length());//+ 1);
+    request.toCharArray(requestc,request.length() + 1);
+    Serial.println(request);
     Serial.println(requestc);
+    timer = millis() + 5000;
+    onrequest = true;
     Serial.println();
     Serial.print("<<< REQ ");
     ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
-    onrequest = true;
-    timer = millis() + 5000;
-      //j=0;
+    //j=0;
     buff = "";//buff[j] = '\0';
-   }//else strcat(buff,(const char*)c);//buff=buff+c;
+   }else {//strcat(buff,c);//buff=buff+c;
       buff = buff + c;//buff[j] = c;
       //buff[j+1] = '\0';
       //j++;
+   }
 }
 
 }
@@ -187,9 +189,9 @@ void Pantalla(String salida1){
     delay(1500);
     lcd.clear();
     lcd.setCursor(0,0);
-    lcd.print(salida1.substring(21, 29));
+    lcd.print(salida1.substring(5, 13));
     lcd.setCursor(0, 1);
-    lcd.print(salida1.substring(29, 37));
+    lcd.print(salida1.substring(13, 21));
     delay(1500);
 }
 
