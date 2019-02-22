@@ -133,35 +133,13 @@ void loop() {
     Serial.println();
     Serial.print("<<< REQ ");
     ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
-    //j=0;
    }else {//strcat(buff,c);//buff=buff+c;
       buff = buff + c;//buff[j] = c;
       //buff[j+1] = '\0';
       //j++;
    }
 }
-if (botonpago == LOW && ticketleido){
-      ether.packetLoop(ether.packetReceive());
-      if (millis() > timer && onrequest) {
-        timer = millis() + 5000;
-        Serial.println();
-        Serial.print("<<< REQ ");
-        ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
-    }
-  
-      prequest = "?estacion=1&id="+buff;// put your main code here, to run repeatedly:
-      prequest.toCharArray(prequestc,prequest.length() + 1);
-      Serial.println(prequest);
-      Serial.println(prequestc);
-      timer = millis() + 5000;
-      onrequest = true;
-      ticketleido = false;
-      Serial.println();
-      Serial.print("<<< REQ ");
-      ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
-       buff = "";//buff[j] = '\0';
-  }
-
+   modopago();
 
 }
 // called when the client request is complete
@@ -254,5 +232,28 @@ void updateIP(String inString[4])
     if(n<3){
       Serial.print(".");
     }
+  }
+}
+void modopago(){
+  if (botonpago == LOW && ticketleido){
+      ether.packetLoop(ether.packetReceive());
+      if (millis() > timer && onrequest) {
+        timer = millis() + 5000;
+        Serial.println();
+        Serial.print("<<< REQ ");
+        ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
+    }
+  
+      prequest = "?estacion=1&id="+buff;// put your main code here, to run repeatedly:
+      prequest.toCharArray(prequestc,prequest.length() + 1);
+      Serial.println(prequest);
+      Serial.println(prequestc);
+      timer = millis() + 5000;
+      onrequest = true;
+      ticketleido = false;
+      Serial.println();
+      Serial.print("<<< REQ ");
+      ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
+       buff = "";//buff[j] = '\0';
   }
 }
