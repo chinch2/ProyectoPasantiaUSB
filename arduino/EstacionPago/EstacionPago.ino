@@ -47,15 +47,15 @@ void setup() {
       Serial.print(':');
   }
 
-  Serial.println("\nProceding to access Ethernet Controller\r\n");
+Serial.println("\nProceding to access Ethernet Controller\r\n");
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
   if (ether.begin(sizeof Ethernet::buffer, mymac, 8) == 0){
     Serial.println(F("Failed to access Ethernet controller"));
+  }else Serial.println(F("Ethernet controller access success"));
       Serial.println("\r\nDHCP...\r\n\r\n");
-  }
   if (!ether.dhcpSetup()){
     Serial.println(F("DHCP failed"));
-  }
+  }else Serial.println(F("DHCP success"));
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
   String IPdef[] = {"10","20","184","70"};
@@ -134,14 +134,13 @@ void loop() {
     Serial.print("<<< REQ ");
     ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
     //j=0;
-    buff = "";//buff[j] = '\0';
    }else {//strcat(buff,c);//buff=buff+c;
       buff = buff + c;//buff[j] = c;
       //buff[j+1] = '\0';
       //j++;
    }
-
-       if (botonpago == LOW && ticketleido){
+}
+if (botonpago == LOW && ticketleido){
       ether.packetLoop(ether.packetReceive());
       if (millis() > timer && onrequest) {
         timer = millis() + 5000;
@@ -160,10 +159,8 @@ void loop() {
       Serial.println();
       Serial.print("<<< REQ ");
       ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
-
-
+       buff = "";//buff[j] = '\0';
   }
-}
 
 
 }
