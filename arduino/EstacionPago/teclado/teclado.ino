@@ -1,6 +1,6 @@
 #include <Key.h>
 #include <Keypad.h>
-
+#include <ctype.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
@@ -18,7 +18,6 @@ byte colPins[COLS] = {15, 16, 17, 19}; //connect to the column pinouts of the ke
 
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 String teclado = "";
-bool Resp = true;
 void setup() {
   // put your setup code here, to run once:
 lcd.init();
@@ -29,8 +28,35 @@ Serial.begin(9600);
 void loop() {
   char key = keypad.getKey();
   
-  if (key){
-    Serial.println(key);
+  if (isDigit(key)){
+    teclado = teclado + key;
+    Pantalla(teclado);
+  }else{
+    if(key == 'A') {
+      Pantalla("Pago en Tarjeta");
+      teclado = teclado + key;
+    }
+    if(key == 'B') {
+      Pantalla("Pago en Efectivo");
+      teclado = teclado + key;
+    }
+    if(key == 'C') {
+      Pantalla("Pago en Otros");
+      teclado = teclado + key;
+    }
+    if(key == 'D') {
+      Serial.println("Enter");
+      teclado = "";
+    }
+    if(key == '*'){
+      teclado = "";
+      Serial.print("Borrado");
+    }
+        if(key == '#'){
+      teclado = "";
+      //return
+      Serial.print("Cancelado");
+    }
   }
  }
 /*void leeteclado(){

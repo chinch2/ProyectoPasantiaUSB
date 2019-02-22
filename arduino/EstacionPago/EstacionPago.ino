@@ -3,6 +3,9 @@
 #include <SoftwareSerial.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <Key.h>
+#include <Keypad.h>
+#include <ctype.h>
 #define LED 11 //led del teensy 2.0
 #define rxPin 14  //serial que viene del escaner
 #define txPin 13 //serial que va a la impresora
@@ -18,6 +21,7 @@ byte Ethernet::buffer[700];
 static uint32_t timer;
 bool onrequest = false;
 bool ticketleido = false;
+bool respuesta = true;
 char requestc[15];
 char prequestc[30];
 int printStatus = 0;
@@ -30,9 +34,21 @@ SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
 char c; 
 String buff;//char buff[8];
 const int dispara = 18;
-const int button_pay = 21;
-int botonpago = 0; //Variables para leer el estatus de los botones
+//-------------Teclado-----------------------
+const byte ROWS = 4; //four rows
+const byte COLS = 4; //four columns
+char keys[ROWS][COLS] = {
+  {'1','2','3','A'},
+  {'4','5','6','B'},
+  {'7','8','9','C'},
+  {'*','0','#','D'}
+};
 
+byte rowPins[ROWS] = {0, 4, 9, 10}; //connect to the row pinouts of the keypad
+byte colPins[COLS] = {15, 16, 17, 19}; //connect to the column pinouts of the keypad
+
+Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
+String teclado = "";
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -88,7 +104,6 @@ Serial.println("\nProceding to access Ethernet Controller\r\n");
   
   //Inicializando los pines de entrada y salida
   pinMode(dispara,OUTPUT); //Trigger del escaner
-  pinMode(button_pay, INPUT_PULLUP);
   pinMode(LED,OUTPUT);   //Teensy
   pinMode(rxPin, INPUT);
   pinMode(txPin, OUTPUT);
@@ -104,7 +119,6 @@ Serial.println("\nProceding to access Ethernet Controller\r\n");
 }
 
 void loop() {
-  botonpago = digitalRead(button_pay);
   
   ether.packetLoop(ether.packetReceive());
   
@@ -139,8 +153,6 @@ void loop() {
       //j++;
    }
 }
-   modopago();
-
 }
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
@@ -170,7 +182,7 @@ void comando(String cmd){
   Serial.print("\r\ncmd1: ");
   Serial.println(cmd1);
   if (cmd1 == "-disp") {
-    Pantalla(cmd);
+    Pantalla(cmd.substring(5));
   }
 /*    if(cmd1 == "-prin") {
     Imprimir(cmd);
@@ -182,29 +194,22 @@ void comando(String cmd){
     Config(cmd);
   }*/
     if (cmd1 == "-pago") {
-    //modoPago(cmd);
+    modopago();
   }
 
 }
 
 //---------Imprimir en Display-----------------
-void Pantalla(String salida1){
+void Pantalla(String muestra){
 //----------------LCD DISPLAY--------------------------
 
     //Encender la luz de fondo.
     lcd.backlight();
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print(salida1.substring(5, 13));
+    lcd.print(muestra.substring(0, 8));
     lcd.setCursor(0, 1);
-    lcd.print(salida1.substring(13, 21));
-    delay(1500);
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(salida1.substring(5, 13));
-    lcd.setCursor(0, 1);
-    lcd.print(salida1.substring(13, 21));
-    delay(1500);
+    lcd.print(muestra.substring(8, 16));
 }
 
 void updateIP(String inString[4])
@@ -235,25 +240,54 @@ void updateIP(String inString[4])
   }
 }
 void modopago(){
-  if (botonpago == LOW && ticketleido){
-      ether.packetLoop(ether.packetReceive());
-      if (millis() > timer && onrequest) {
-        timer = millis() + 5000;
-        Serial.println();
-        Serial.print("<<< REQ ");
-        ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
-    }
+  Serial.println("Modo pago iniciando");
+  ticketleido = false;
+  while(respuesta){
+      char key = keypad.getKey();
   
+  if (isDigit(key)){
+    teclado = teclado + key;
+    Pantalla(teclado);
+  }else{
+    if(key == 'A') {
+      Pantalla("Pago en Tarjeta");
+      teclado = teclado + key;
+    }
+    if(key == 'B') {
+      Pantalla("Pago en Efectivo");
+      teclado = teclado + key;
+    }
+    if(key == 'C') {
+      Pantalla("Pago en Otros");
+      teclado = teclado + key;
+    }
+    if(key == 'D') {
+      Serial.println("Enter");
       prequest = "?estacion=1&id="+buff;// put your main code here, to run repeatedly:
       prequest.toCharArray(prequestc,prequest.length() + 1);
       Serial.println(prequest);
       Serial.println(prequestc);
       timer = millis() + 5000;
       onrequest = true;
-      ticketleido = false;
       Serial.println();
       Serial.print("<<< REQ ");
       ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
-       buff = "";//buff[j] = '\0';
-  }
+      teclado = "";
+      buff = "";//buff[j] = '\0';
+      respuesta = false;
+      return;
+    }
+    if(key == '*'){
+      teclado = "";
+      Serial.print("Borrado");
+    }
+        if(key == '#'){
+      Serial.print("Cancelado");
+      teclado = "";
+      buff = "";//buff[j] = '\0';
+      respuesta = false;
+      return;      
+    }
+  }  
+ }
 }
