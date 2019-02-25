@@ -20,8 +20,7 @@ String prequest;
 byte Ethernet::buffer[700];
 static uint32_t timer;
 bool onrequest = false;
-bool ticketleido = false;
-bool respuesta = true;
+bool respuesta;
 char requestc[15];
 char prequestc[30];
 int printStatus = 0;
@@ -119,15 +118,7 @@ Serial.println("\nProceding to access Ethernet Controller\r\n");
 }
 
 void loop() {
-  
-  ether.packetLoop(ether.packetReceive());
-  
-    if (millis() > timer && onrequest) {
-        timer = millis() + 5000;
-        Serial.println();
-        Serial.print("<<< REQ ");
-        ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
-      }
+    
   if (mySerial.available()) {
    c = mySerial.read();
  //   Serial.print(c);
@@ -137,16 +128,22 @@ void loop() {
     //const char *req = "?id=";
     //strcpy(request,req);
     //strcat(request,buff);
+    onrequest = true;
     request = "?id="+buff;// put your main code here, to run repeatedly:
     request.toCharArray(requestc,request.length() + 1);
     Serial.println(request);
     Serial.println(requestc);
-    timer = millis() + 5000;
-    onrequest = true;
-    ticketleido = true;
-    Serial.println();
-    Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
+    while(onrequest){
+    ether.packetLoop(ether.packetReceive());
+
+    if(millis() > timer){
+      timer = millis() + 5000;
+      Serial.println();
+      Serial.print("<<< REQ ");
+      Serial.print(requestc);
+      ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
+      }
+    }
    }else {//strcat(buff,c);//buff=buff+c;
       buff = buff + c;//buff[j] = c;
       //buff[j+1] = '\0';
@@ -156,22 +153,20 @@ void loop() {
 }
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
-  onrequest = false;
   Serial.println(">>>");
   Ethernet::buffer[off+len] = 0;
   Serial.print((const char*) Ethernet::buffer + off);
   String salida = (const char*) Ethernet::buffer + off;
   int pos =   salida.indexOf("\r\n\r\n")+4;
-  String salida1 = salida.substring(pos);
-  while(salida1.length() > 0){
-    int fin=salida1.indexOf("-end");
-    if (fin==0) salida1="";
-    String action = salida1.substring(0,fin);
-    Serial.print(action);
-    comando(action);
+  salida = salida.substring(pos);
+  while(salida.length() > 0){
+    int fin=salida.indexOf("-end");
+    if (fin==0) salida="";
+    Serial.print(salida.substring(0,fin));
+    comando(salida.substring(0,fin));
     //Serial.println();
     //Serial.print(salida1);
-    salida1 = salida1.substring(fin+4);
+    salida = salida.substring(fin+4);
     //Serial.print(salida1);
     }
     
@@ -194,6 +189,7 @@ void comando(String cmd){
     Config(cmd);
   }*/
     if (cmd1 == "-pago") {
+    respuesta = true;
     modopago();
   }
 
@@ -210,6 +206,62 @@ void Pantalla(String muestra){
     lcd.print(muestra.substring(0, 8));
     lcd.setCursor(0, 1);
     lcd.print(muestra.substring(8, 16));
+}
+
+void modopago(){
+  Serial.println("Modo pago iniciando");
+  while(respuesta){
+  char key = keypad.getKey();
+  
+  if (isDigit(key)){
+    teclado = teclado + key;
+    Pantalla(teclado);
+  }
+  if(key == 'A') {
+      teclado = teclado + key;
+      Pantalla("Pago en Tarjeta");
+  }
+  if(key == 'B') {
+      teclado = teclado + key;
+      Pantalla("Pago en Efectivo");
+  }
+  if(key == 'C') {
+      teclado = teclado + key;
+      Pantalla("Pago en Otros");
+  }
+  if(key == 'D') {
+      Serial.println("Enter");
+      prequest = "?estacion=1&id="+buff;// put your main code here, to run repeatedly:
+      prequest.toCharArray(prequestc,prequest.length() + 1);
+      Serial.println(prequest);
+      Serial.println(prequestc);
+      while(onrequest){
+      ether.packetLoop(ether.packetReceive());
+      
+        if(millis() > timer){
+      timer = millis() + 5000;
+      Serial.println("Request de pago\r\n");
+      Serial.print("<<< REQ: ");
+      Serial.print(prequestc);
+      ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
+     }
+    }
+      teclado = "";
+      buff = "";//buff[j] = '\0';
+      respuesta = false;
+  }
+  if(key == '*'){
+      teclado = "";
+      Serial.print("Borrado");
+  }
+  if(key == '#'){
+      Serial.print("Cancelado");
+      teclado = "";
+      buff = "";//buff[j] = '\0';
+      respuesta = false;      
+  } 
+ }
+ onrequest = false;
 }
 
 void updateIP(String inString[4])
@@ -238,56 +290,4 @@ void updateIP(String inString[4])
       Serial.print(".");
     }
   }
-}
-void modopago(){
-  Serial.println("Modo pago iniciando");
-  ticketleido = false;
-  while(respuesta){
-      char key = keypad.getKey();
-  
-  if (isDigit(key)){
-    teclado = teclado + key;
-    Pantalla(teclado);
-  }else{
-    if(key == 'A') {
-      Pantalla("Pago en Tarjeta");
-      teclado = teclado + key;
-    }
-    if(key == 'B') {
-      Pantalla("Pago en Efectivo");
-      teclado = teclado + key;
-    }
-    if(key == 'C') {
-      Pantalla("Pago en Otros");
-      teclado = teclado + key;
-    }
-    if(key == 'D') {
-      Serial.println("Enter");
-      prequest = "?estacion=1&id="+buff;// put your main code here, to run repeatedly:
-      prequest.toCharArray(prequestc,prequest.length() + 1);
-      Serial.println(prequest);
-      Serial.println(prequestc);
-      timer = millis() + 5000;
-      onrequest = true;
-      Serial.println();
-      Serial.print("<<< REQ ");
-      ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
-      teclado = "";
-      buff = "";//buff[j] = '\0';
-      respuesta = false;
-      return;
-    }
-    if(key == '*'){
-      teclado = "";
-      Serial.print("Borrado");
-    }
-        if(key == '#'){
-      Serial.print("Cancelado");
-      teclado = "";
-      buff = "";//buff[j] = '\0';
-      respuesta = false;
-      return;      
-    }
-  }  
- }
 }
