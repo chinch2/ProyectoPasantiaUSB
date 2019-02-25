@@ -20,7 +20,7 @@ String prequest;
 byte Ethernet::buffer[700];
 static uint32_t timer;
 bool onrequest = false;
-bool respuesta;
+bool respuesta = false;
 char requestc[15];
 char prequestc[30];
 int printStatus = 0;
