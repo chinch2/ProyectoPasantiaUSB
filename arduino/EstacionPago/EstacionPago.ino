@@ -258,6 +258,7 @@ void modopago(){
           }
         if(key == '#'){
               Serial.print("Cancelado");
+              Pantalla("Cancelado");
               respuesta = false;      
           } 
       }
