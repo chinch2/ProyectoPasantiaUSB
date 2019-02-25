@@ -113,7 +113,8 @@ Serial.println("\nProceding to access Ethernet Controller\r\n");
   //Limpiar la pantalla
   lcd.clear();
   Serial.println("Pantalla inicializada");
-  delay(1000);    //Esperar que se setee el pto serial y se prenda el dispositivo
+  delay(3000);    //Esperar que se setee el pto serial y se prenda el dispositivo
+  Serial.print("ready\r\n");
 
 }
 
@@ -153,10 +154,12 @@ void loop() {
 }
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
+  onrequest = false;
   Serial.println(">>>");
   Ethernet::buffer[off+len] = 0;
-  Serial.print((const char*) Ethernet::buffer + off);
+  //Serial.print((const char*) Ethernet::buffer + off);
   String salida = (const char*) Ethernet::buffer + off;
+  Serial.print(salida);
   int pos =   salida.indexOf("\r\n\r\n")+4;
   salida = salida.substring(pos);
   while(salida.length() > 0){
@@ -185,7 +188,7 @@ void comando(String cmd){
   if(cmd1 == "-barr") {
     Serial.print("Habriendo barrera");
   }
-  /*if(cmd1 == "-conf") {
+  if(cmd1 == "-conf") {
     Config(cmd);
   }*/
     if (cmd1 == "-pago") {
@@ -213,55 +216,55 @@ void modopago(){
   while(respuesta){
   char key = keypad.getKey();
   
-  if (isDigit(key)){
-    teclado = teclado + key;
-    Pantalla(teclado);
-  }
-  if(key == 'A') {
-      teclado = teclado + key;
-      Pantalla("Pago en Tarjeta");
-  }
-  if(key == 'B') {
-      teclado = teclado + key;
-      Pantalla("Pago en Efectivo");
-  }
-  if(key == 'C') {
-      teclado = teclado + key;
-      Pantalla("Pago en Otros");
-  }
-  if(key == 'D') {
-      Serial.println("Enter");
-      prequest = "?estacion=1&id="+buff;// put your main code here, to run repeatedly:
-      prequest.toCharArray(prequestc,prequest.length() + 1);
-      Serial.println(prequest);
-      Serial.println(prequestc);
-      while(onrequest){
-      ether.packetLoop(ether.packetReceive());
+        if (isDigit(key)){
+            teclado = teclado + key;
+            Pantalla(teclado);
+          }
+        if(key == 'A') {
+              teclado = teclado + key;
+              Pantalla("Pago en Tarjeta");
+          }
+        if(key == 'B') {
+              teclado = teclado + key;
+              Pantalla("Pago en Efectivo");
+          }
+        if(key == 'C') {
+              teclado = teclado + key;
+              Pantalla("Pago en Otros");
+          }
+        if(key == 'D') {
+              Serial.println("Enter");
+              onrequest = true;
+              prequest = "?estacion=1&id="+buff;// put your main code here, to run repeatedly:
+              prequest.toCharArray(prequestc,prequest.length() + 1);
+              Serial.println(prequest);
+              Serial.println(prequestc);
+              while(onrequest){
+              ether.packetLoop(ether.packetReceive());
       
-        if(millis() > timer){
-      timer = millis() + 5000;
-      Serial.println("Request de pago\r\n");
-      Serial.print("<<< REQ: ");
-      Serial.print(prequestc);
-      ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
-     }
-    }
-      teclado = "";
-      buff = "";//buff[j] = '\0';
+              if(millis() > timer){
+              timer = millis() + 5000;
+              Serial.println("Request de pago\r\n");
+              Serial.print("<<< REQ: ");
+              Serial.print(prequestc);
+              ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
+              }
+            }
       respuesta = false;
-  }
-  if(key == '*'){
-      teclado = "";
-      Serial.print("Borrado");
-  }
-  if(key == '#'){
-      Serial.print("Cancelado");
+          }
+        if(key == '*'){
+              teclado = "";
+              Serial.print("Borrado");
+          }
+        if(key == '#'){
+              Serial.print("Cancelado");
+              respuesta = false;      
+          } 
+      }
       teclado = "";
       buff = "";//buff[j] = '\0';
-      respuesta = false;      
-  } 
- }
- onrequest = false;
+      onrequest = false;
+      Serial.println("Modo pago finalizado\r\n");
 }
 
 void updateIP(String inString[4])
