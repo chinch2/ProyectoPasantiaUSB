@@ -51,11 +51,9 @@ String mensa[3] = {"Pago tarjeta", "Pago Efectivo", "Pago Otros"};
 unsigned int monto;
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
   mySerial.begin(9600);
-  buff = "";//buff[0] = '\0';
-  Serial.print("Codigo de barra: \r\n");
+  delay(1000);
   Serial.println(F("\n[webClient]"));
   Serial.print("MAC: ");
   for (byte i = 0; i < 6; ++i) {
@@ -115,49 +113,18 @@ void setup() {
   lcd.clear();
   Serial.println("Pantalla inicializada");
   delay(1000);
+
 }
 
 void loop() {
+  ether.packetLoop(ether.packetReceive());
 
-  if (mySerial.available()) {
-    c = mySerial.read();
-    //Serial.print(c);
-    // if( c == 10) Serial.print("hubo r");
-    // if( c == 13) Serial.print("hubo n");
-    if ( c == 13) {
-      //const char *req = "?id=";
-      //strcpy(request,req);
-      //strcat(request,buff);
-      request = "?id=" + buff; // put your main code here, to run repeatedly:
-      request.toCharArray(requestc, request.length() + 1);
-      Serial.println(request);
-      Serial.println(requestc);
-      int x = 0;
-      onrequest = true;
-      timer = 0;
-      while (onrequest) {
-        ether.packetLoop(ether.packetReceive());
-
-        if (millis() > timer) {
-          timer = millis() + 5000;
-          Serial.println("Request de consulta");
-          Serial.print("<<< REQ ");
-          Serial.print(requestc);
-          ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
-          x++;
-          if (x > 5) {
-            Serial.println("Fallo request");
-            onrequest = false;
-          }
-        }
-      }
-    } else {//strcat(buff,c);//buff=buff+c;
-      buff = buff + c;//buff[j] = c;
-      //buff[j+1] = '\0';
-      //j++;
-    }
-  }
+  String buff = "10000023";
+  Pantalla("Monto 1000");
+  modopago(1000);
+  delay(3000);
 }
+
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
   Serial.println("callback" + status);
@@ -175,7 +142,7 @@ static void my_callback (byte status, word off, word len) {
     int fin = salida.indexOf("-end");
     if (fin == 0) salida = "";
     String salcomando = salida.substring(0, fin);
-    Serial.println(salcomando);
+    Serial.println("*" + salcomando + "*");
     comando(salcomando);
     //Serial.println();
     //Serial.print(salida1);
@@ -222,12 +189,12 @@ void Pantalla(String muestra) {
   //Encender la luz de fondo.
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(muestra.substring(0, 8));
+  lcd.print(muestra.substring(0, DCOLS));
   lcd.setCursor(0, 1);
-  lcd.print(muestra.substring(8, 8));
+  lcd.print(muestra.substring(DCOLS, DCOLS * 2));
 }
 
-void modopago(int mnt) {
+void modopago(unsigned int mnt) {
   String teclado = "";
   bool respuesta = true;
   pagos[0] = 0;
@@ -280,6 +247,35 @@ void modopago(int mnt) {
   }
 }
 
+void requestpago() {
+  Serial.println("Preparando Request");
+  prequest = "?estacion=1&id=" + buff + "&pa=" + pagos[0] + "&pb=" + pagos[1] + "&pc=" + pagos[2];
+  Serial.println(prequest);
+  prequest.toCharArray(prequestc, prequest.length() + 1);
+  Serial.println(prequestc);
+  int x = 0;
+  ponrequest = true;
+  timer = 0;
+  while (ponrequest) {
+    ether.packetLoop(ether.packetReceive());
+
+    if (millis() > timer) {
+      timer = millis() + 5000;
+      Serial.println("Request de pago\r\n");
+      Serial.print("<<< REQ: ");
+      Serial.print(prequestc);
+      ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
+      x++;
+      if (x > 5) {
+        Serial.print("Fallo request");
+        ponrequest = false;
+      }
+    }
+  }
+  buff = "";//buff[j] = '\0';
+  Serial.println("Modo pago finalizado\r\n");
+}
+
 void updateIP(String inString[4])
 {
   int ip[4];
@@ -306,30 +302,4 @@ void updateIP(String inString[4])
       Serial.print(".");
     }
   }
-}
-void requestpago() {
-  prequest = "?estacion=1&id=" + buff + "&pa=" + pagos[0] + "&pb=" + pagos[1] + "&pc=" + pagos[2]; // put your main code here, to run repeatedly:
-  prequest.toCharArray(prequestc, prequest.length() + 1);
-  Serial.println(prequest);
-  Serial.println(prequestc);
-  int x = 0;
-  while (ponrequest) {
-    ether.packetLoop(ether.packetReceive());
-
-    if (millis() > timer) {
-      timer = millis() + 5000;
-      Serial.println("Request de pago\r\n");
-      Serial.print("<<< REQ: ");
-      Serial.print(prequestc);
-      ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
-      x++;
-      if (x > 5) {
-        Serial.print("Fallo request");
-        ponrequest = false;
-      }
-    }
-
-  }
-  buff = "";//buff[j] = '\0';
-  Serial.println("Modo pago finalizado\r\n");
 }
