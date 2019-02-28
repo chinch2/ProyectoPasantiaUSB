@@ -48,6 +48,8 @@ byte colPins[COLS] = {15, 16, 17, 19}; //connect to the column pinouts of the ke
 
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 String teclado = "";
+String metodo = "";
+int monto;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -143,7 +145,12 @@ void loop() {
           ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
         }
       }
-      prequest = "?estacion=1&id=" + buff; // put your main code here, to run repeatedly:
+      //--------MODO PAGO----------------
+      if (respuesta) {
+        modopago(monto);
+      }
+      //---------------------------------
+      prequest = "?estacion=1&id=" + buff + "&p=" + teclado + "&m=" + metodo; // put your main code here, to run repeatedly:
       prequest.toCharArray(prequestc, prequest.length() + 1);
       Serial.println(prequest);
       Serial.println(prequestc);
@@ -159,8 +166,9 @@ void loop() {
         }
 
       }
-      teclado = "";
       buff = "";//buff[j] = '\0';
+      teclado = "";
+      metodo = "";
       Serial.println("Modo pago finalizado\r\n");
     } else {//strcat(buff,c);//buff=buff+c;
       buff = buff + c;//buff[j] = c;
@@ -185,6 +193,8 @@ static void my_callback (byte status, word off, word len) {
     int fin = salida.indexOf("-end");
     if (fin == 0) salida = "";
     Serial.print(salida.substring(0, fin));
+    String salida1 = salida.substring(12, fin);
+    monto = salida1.toInt();
     comando(salida.substring(0, fin));
     //Serial.println();
     //Serial.print(salida1);
@@ -218,9 +228,7 @@ void comando(String cmd) {
     }*/
   if (cmd1 == "-pago") {
     respuesta = true;
-    modopago();
   }
-
 }
 
 //---------Imprimir en Display-----------------
@@ -236,54 +244,59 @@ void comando(String cmd) {
   lcd.print(muestra.substring(8, 16));
   }*/
 
-void modopago() {
-  Serial.println("Modo pago iniciando");
+void modopago(int mnt) {
+  Serial.println("Ingresar monto y metodo");
+
   while (respuesta) {
     char key = keypad.getKey();
     lcd.setCursor(0, 0);
-    if (isDigit(key)) {
-      teclado = teclado + key;
-      lcd.clear();
-      lcd.print(teclado);
-    } else {
-      if (key == 'A') {
-        teclado = teclado + key;
-        lcd.clear();
-        lcd.print("Pago Tar");
-        lcd.setCursor(0, 1);
-        lcd.print("jeta");
-      }
-      if (key == 'B') {
-        teclado = teclado + key;
-        lcd.clear();
-        lcd.print("Pago Efe");
-        lcd.setCursor(0, 1);
-        lcd.print("ctivo");
-      }
-      if (key == 'C') {
-        teclado = teclado + key;
-        lcd.clear();
-        lcd.print("Pago Otr");
-        lcd.setCursor(0, 1);
-        lcd.print("os");
-      }
-      if (key == 'D') {
-        Serial.println("Enter");
-        ponrequest = true;
-        respuesta = false;
-      }
-      if (key == '*') {
-        teclado = "";
-        //Serial.print("Borrado");
-      }
-      if (key == '#') {
-        //Serial.print("Cancelado");
-        lcd.clear();
-        lcd.print("Cancelad");
-        lcd.setCursor(0, 1);
-        lcd.print("o");
-        respuesta = false;
-      }
+    switch (key)
+    {
+      case 'A': {
+          metodo = metodo + key;
+          lcd.clear();
+          lcd.print("Pago Tar");
+          lcd.setCursor(0, 1);
+          lcd.print("jeta");
+        } break;
+      case 'B': {
+          metodo = metodo + key;
+          lcd.clear();
+          lcd.print("Pago Efe");
+          lcd.setCursor(0, 1);
+          lcd.print("ctivo");
+        } break;
+      case 'C': {
+          metodo = metodo + key;
+          lcd.clear();
+          lcd.print("Pago Otr");
+          lcd.setCursor(0, 1);
+          lcd.print("os");
+        } break;
+      case 'D': {
+          Serial.println("Enter");
+          ponrequest = true;
+          respuesta = false;
+        } break;
+      case '#': {
+          //Serial.print("Cancelado");
+          respuesta = false;
+          lcd.clear();
+          lcd.print("Cancelad");
+          lcd.setCursor(0, 1);
+          lcd.print("o");
+        } break;
+      case '*': {
+          teclado = "";
+          metodo = "";
+          //Serial.print("Borrado");
+        } break;
+      default:
+        if (isDigit(key)) {
+          teclado = teclado + key;
+          lcd.clear();
+          lcd.print(teclado);
+        } break;
     }
   }
 }
