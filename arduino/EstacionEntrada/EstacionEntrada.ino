@@ -1,12 +1,8 @@
 #include <EEPROM.h>
 #include <EtherCard.h>
-//#include "thermalprinter.h"
-#include <SoftwareSerial.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#define LED 11 //led del teensy 2.0
-#define rxPin 14  //serial que viene del escaner
-#define txPin 13 //serial que va a la impresora
+#define LED 6 //led del teensy 2.0
 //-------Escribo IP default en la EEPROM----
 void updateIP(String inString[4]);
 //-------Busco IP default en la EEPROM------
@@ -25,19 +21,10 @@ int printStatus = 0;
 //Crear el objeto lcd  dirección  0x3f y 16 columnas x 2 filas
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
 
-//----------------------Impresora------------------------
-//Crear la nueva interfaz serial para la impresora
-//NewSoftSerial mySerial(14, 13);// Rx  Tx  por ahora no sirve
-SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
-//Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
-//Epson TM88 = Epson(rxPin, txPin); // init the Printer with Output-Pin
-
-
 // El numero de los pines (constantes siempre):
 
-const int button_1 = 21;
-const int button_2 = 20;
-const int RESET = 12; //Hardware reset para el ESP8266
+const int button_1 = 8;
+const int button_2 = 9;
 
 //Variables que cambian:
 //int boton1 = 0; //Variables para leer el estatus de los botones
@@ -46,7 +33,7 @@ const int RESET = 12; //Hardware reset para el ESP8266
 void setup()
 {
   Serial.begin(9600);
-  mySerial.begin(9600);
+  Serial1.begin(9600);
   delay(1000);
   Serial.println(F("\n[webClient]"));
   Serial.print("MAC: ");
@@ -58,7 +45,7 @@ void setup()
 
   Serial.println("\nProceding to access Ethernet Controller\r\n");
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
-  if (ether.begin(sizeof Ethernet::buffer, mymac, 8) == 0) {
+  if (ether.begin(sizeof Ethernet::buffer, mymac, 20) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
   } else Serial.println(F("Ethernet controller access success"));
   Serial.println("\r\nDHCP...\r\n\r\n");
@@ -106,10 +93,7 @@ void setup()
   //Inicializando los pines de entrada y salida
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
-  pinMode(RESET, OUTPUT); //Teensy con ESP8266
   pinMode(LED, OUTPUT);  //Teensy
-  pinMode(rxPin, INPUT);
-  pinMode(txPin, OUTPUT);
   Serial.println("Botones inicializados");
   //digitalWrite(LED_BUILTIN, LOW);
   // Inicializar el LCD
@@ -253,22 +237,22 @@ void Imprimir(String printed) {
   digitalWrite(LED, HIGH);
   //TM88.start();
   //TM88.justifyCenter();
-  mySerial.write("\x1B\x61\x01");
+  Serial1.write("\x1B\x61\x01");
   //TM88.println(Imprime);
-  mySerial.println(Imprime);
+  Serial1.println(Imprime);
   //TM88.barcodeHeight(50);
-  mySerial.write("\x1D\x68\x32");
+  Serial1.write("\x1D\x68\x32");
   //TM88.barcodeWidth(3);
-  mySerial.write("\x1D\x77\x03");
+  Serial1.write("\x1D\x77\x03");
   //TM88.barcodeNumberPosition(2);
-  mySerial.write("\x1D\x48\x02");
+  Serial1.write("\x1D\x48\x02");
 
   //TM88.printBarcode(70,8);
-  mySerial.write("\x1d\x6b\x46\x08");
+  Serial1.write("\x1d\x6b\x46\x08");
   //TM88.println(codificado);
-  mySerial.println(codificado);
+  Serial1.println(codificado);
   //TM88.feed(5);
-  mySerial.write("\n\n\n\n\n\n");
+  Serial1.write("\n\n\n\n\n\n");
   //TM88.cut();
   //mySerial.write("\x1D\x56\x42\x0A");
   digitalWrite(LED, LOW);

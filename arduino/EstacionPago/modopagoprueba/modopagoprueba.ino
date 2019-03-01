@@ -64,7 +64,7 @@ void setup() {
 
   Serial.println("\nProceding to access Ethernet Controller\r\n");
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
-  if (ether.begin(sizeof Ethernet::buffer, mymac, 8) == 0) {
+  if (ether.begin(sizeof Ethernet::buffer, mymac, 20) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
   } else Serial.println(F("Ethernet controller access success"));
   Serial.println("\r\nDHCP...\r\n\r\n");
@@ -121,6 +121,11 @@ void loop() {
 
   String buff = "10000023";
   Pantalla("Monto 1000");
+  /*lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Monto 10");
+    lcd.setCursor(0, 1);
+    lcd.print("00");*/
   modopago(1000);
   delay(3000);
 }
@@ -161,9 +166,9 @@ void comando(String cmd) {
     Pantalla(cmd2);
     /*lcd.clear();
       lcd.setCursor(0, 0);
-      lcd.print(cmd.substring(0, 8));
+      lcd.print(cmd.substring(0, DCOLS));
       lcd.setCursor(0, 1);
-      lcd.print(cmd.substring(8, 16));*/
+      lcd.print(cmd.substring(DCOLS, DCOLS * 2));*/
   }
   /*    if(cmd1 == "-prin") {
       Imprimir(cmd);
@@ -213,41 +218,97 @@ void modopago(unsigned int mnt) {
           pagos[key - 65] = teclado.toInt();
           teclado = "";
           Pantalla(mensa[key - 65]);
+          /*lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print(mensa[key - 65].substring(0, DCOLS));
+            lcd.setCursor(0, 1);
+            lcd.print(mensa[key - 65].substring(DCOLS, DCOLS * 2));*/
         } break;
       case 'D': {
           teclado = "";
           Serial.println("Enter");
-          if (mnt > pagos[0] + pagos[1] + pagos[2]) {
+          if (mnt >= pagos[0] + pagos[1] + pagos[2]) {
             Pantalla("Monto incompleto");
-
+            /*lcd.clear();
+              lcd.setCursor(0, 0);
+              lcd.print("Monto in");
+              lcd.setCursor(0, 1);
+              lcd.print("completo");*/
           } else {
             Pantalla("Procesando");
+            /*lcd.clear();
+              lcd.setCursor(0, 0);
+              lcd.print("Procesan");
+              lcd.setCursor(0, 1);
+              lcd.print("do");*/
+            return;
+            Serial.println("Preparando Request");
+            prequest = "?estacion=1&id=" + buff + "&pa=" + pagos[0] + "&pb=" + pagos[1] + "&pc=" + pagos[2];
+            Serial.println(prequest);
+            prequest.toCharArray(prequestc, prequest.length() + 1);
+            Serial.println(prequestc);
+            int x = 0;
+            ponrequest = true;
+            timer = 0;
+            while (ponrequest) {
+              ether.packetLoop(ether.packetReceive());
+
+              if (millis() > timer) {
+                timer = millis() + 5000;
+                Serial.println("Request de pago\r\n");
+                Serial.print("<<< REQ: ");
+                Serial.print(prequestc);
+                ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
+                x++;
+                if (x > 5) {
+                  Serial.print("Fallo request");
+                  ponrequest = false;
+                }
+              }
+            }
+            buff = "";//buff[j] = '\0';
+            Serial.println("Modo pago finalizado\r\n");
             respuesta = false;
-            requestpago();
+            //requestpago();
 
           }
         } break;
       case '#': {
           teclado = "";
           Pantalla("Cancelado");
+          /*lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Cancelad");
+            lcd.setCursor(0, 1);
+            lcd.print("o");*/
           respuesta = false;
         } break;
       case '*': {
           teclado = "";
           Pantalla("");
+          /*lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("");
+            lcd.setCursor(0, 1);
+            lcd.print("");*/
         } break;
       default:
 
         if (isDigit(key)) {
           teclado = teclado + key;
           Pantalla(teclado);
+          /*lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print(teclado.substring(0, 8));
+            lcd.setCursor(0, 1);
+            lcd.print(teclado.substring(8, 16));*/
         }
         break;
     }
   }
 }
 
-void requestpago() {
+/*void requestpago() {
   Serial.println("Preparando Request");
   prequest = "?estacion=1&id=" + buff + "&pa=" + pagos[0] + "&pb=" + pagos[1] + "&pc=" + pagos[2];
   Serial.println(prequest);
@@ -274,7 +335,7 @@ void requestpago() {
   }
   buff = "";//buff[j] = '\0';
   Serial.println("Modo pago finalizado\r\n");
-}
+  }*/
 
 void updateIP(String inString[4])
 {
