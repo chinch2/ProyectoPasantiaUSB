@@ -2,7 +2,7 @@
 #include <EtherCard.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#define LED 6 //led del teensy 2.0
+#define LED 11 //led del teensy 2.0
 //-------Escribo IP default en la EEPROM----
 void updateIP(String inString[4]);
 //-------Busco IP default en la EEPROM------
@@ -23,8 +23,8 @@ LiquidCrystal_I2C lcd(0x3f, 16, 2);
 
 // El numero de los pines (constantes siempre):
 
-const int button_1 = 8;
-const int button_2 = 9;
+const int button_1 = 20;
+const int button_2 = 21;
 
 //Variables que cambian:
 //int boton1 = 0; //Variables para leer el estatus de los botones
@@ -45,7 +45,7 @@ void setup()
 
   Serial.println("\nProceding to access Ethernet Controller\r\n");
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
-  if (ether.begin(sizeof Ethernet::buffer, mymac, 20) == 0) {
+  if (ether.begin(sizeof Ethernet::buffer, mymac, 0) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
   } else Serial.println(F("Ethernet controller access success"));
   Serial.println("\r\nDHCP...\r\n\r\n");

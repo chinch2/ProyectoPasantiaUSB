@@ -12,13 +12,10 @@ void updateIP(String inString[4]);
 static byte mymac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, 0x31 };
 const char website[] PROGMEM = "10.20.184.70";
 String request;//char request[30];
-String prequest;
 byte Ethernet::buffer[400];
 static uint32_t timer = 0;
 bool onrequest = false;
-bool ponrequest = false;
-char requestc[15];
-char prequestc[100];
+char requestc[50];
 //int printStatus = 0;
 //------------Display---------------------
 const byte DCOLS = 20; //four columns
@@ -123,7 +120,7 @@ void loop() {
       //const char *req = "?id=";
       //strcpy(request,req);
       //strcat(request,buff);
-      request = "?id=" + buff; // put your main code here, to run repeatedly:
+      request = "?estacion=1&id=" + buff; // put your main code here, to run repeatedly:
       request.toCharArray(requestc, request.length() + 1);
       Serial.println(request);
       Serial.println(requestc);
@@ -135,10 +132,10 @@ void loop() {
 
         if (millis() > timer) {
           timer = millis() + 5000;
-          Serial.println("Request de consulta");
+          Serial.println("Request de salida");
           Serial.print("<<< REQ ");
           Serial.print(requestc);
-          ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
+          ether.browseUrl(PSTR("/salida.php"), requestc, website, my_callback);
           x++;
           if (x > 5) {
             Serial.println("Fallo request");
@@ -147,6 +144,7 @@ void loop() {
           }
         }
       }
+      buff = "";//buff[j] = '\0';
     } else {//strcat(buff,c);//buff=buff+c;
       buff = buff + c;//buff[j] = c;
       //buff[j+1] = '\0';
@@ -158,7 +156,6 @@ void loop() {
 static void my_callback (byte status, word off, word len) {
   Serial.println("callback" + status);
   onrequest = false;
-  ponrequest = false;
   Serial.print(">>>");
   Ethernet::buffer[off + len] = 0;
   //Serial.print((const char*) Ethernet::buffer + off);
@@ -178,7 +175,6 @@ static void my_callback (byte status, word off, word len) {
     salida = salida.substring(fin + 4);
     //Serial.print(salida1);
   }
-
 }
 
 void comando(String cmd) {
@@ -196,20 +192,20 @@ void comando(String cmd) {
   }
   /*    if(cmd1 == "-prin") {
       Imprimir(cmd);
-    }
-    if(cmd1 == "-barr") {
-      Serial.print("Habriendo barrera");
-    }
-    if(cmd1 == "-conf") {
-      Config(cmd);
     }*/
-  if (cmd1 == "-pago") {
+  if (cmd1 == "-barr") {
+    Serial.print("Habriendo barrera");
+  }
+  /*if (cmd1 == "-conf") {
+    Config(cmd);
+    }*/
+  /*if (cmd1 == "-pago") {
     String salida1 = cmd2;
     monto = salida1.toInt();
     Serial.print("Monto a pagar: ");
     Serial.println(monto);
     modopago(monto);
-  }
+    }*/
 }
 
 //---------Imprimir en Display-----------------
@@ -223,92 +219,6 @@ void Pantalla(String muestra) {
   lcd.print(muestra.substring(0, DCOLS));
   lcd.setCursor(0, 1);
   lcd.print(muestra.substring(DCOLS, DCOLS * 2));
-}
-
-void modopago(unsigned int mnt) {
-  Serial.println("Modo pago iniciado");
-  String teclado = "";
-  bool respuesta = true;
-  unsigned int cmb;
-  pagos[0] = 0;
-  pagos[1] = 0;
-  pagos[2] = 0;
-  while (respuesta) {
-
-    char key = keypad.getKey();
-    Serial.print(key);
-    switch (key)
-    {
-      case 'A':
-      case 'B':
-      case 'C': {
-          pagos[key - 65] = teclado.toInt();
-          teclado = "";
-          Pantalla(mensa[key - 65]);
-        } break;
-      case 'D': {
-          teclado = "";
-          Serial.println("Enter");
-          if (mnt > pagos[0] + pagos[1] + pagos[2]) {
-            Pantalla("Monto incompleto");
-
-          } else {
-            Pantalla("Procesando");
-            cmb = (pagos[0] + pagos[1] + pagos[2]) - mnt;
-            respuesta = false;
-            requestpago(cmb);
-            buff = "";//buff[j] = '\0';
-            Serial.println("Modo pago finalizado");
-
-          }
-        } break;
-      case '#': {
-          teclado = "";
-          buff = "";//buff[j] = '\0';
-          Serial.println("Modo pago finalizado");
-          Pantalla("Cancelado");
-          respuesta = false;
-        } break;
-      case '*': {
-          teclado = "";
-          Pantalla("");
-        } break;
-      default:
-
-        if (isDigit(key)) {
-          teclado = teclado + key;
-          Pantalla(teclado);
-        }
-        break;
-    }
-  }
-}
-
-void requestpago(unsigned int cambio) {
-  String change = String(cambio);
-  prequest = "?estacion=1&id=" + buff + "&pa=" + pagos[0] + "&pb=" + pagos[1] + "&pc=" + pagos[2] + "&cambio=" + change; // put your main code here, to run repeatedly:
-  prequest.toCharArray(prequestc, prequest.length() + 1);
-  Serial.println(prequest);
-  Serial.println(prequestc);
-  int x = 0;
-  ponrequest = true;
-  timer = 0;
-  while (ponrequest) {
-    ether.packetLoop(ether.packetReceive());
-
-    if (millis() > timer) {
-      timer = millis() + 5000;
-      Serial.println("Request de pago");
-      Serial.print("<<< REQ: ");
-      Serial.print(prequestc);
-      ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
-      x++;
-      if (x > 5) {
-        Serial.print("Fallo request");
-        ponrequest = false;
-      }
-    }
-  }
 }
 
 void updateIP(String inString[4])
