@@ -15,6 +15,7 @@ String request;//char request[30];
 String prequest;
 byte Ethernet::buffer[400];
 static uint32_t timer = 0;
+String configuracion[5];
 bool onrequest = false;
 bool ponrequest = false;
 char requestc[15];
@@ -65,14 +66,17 @@ void setup() {
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
   if (ether.begin(sizeof Ethernet::buffer, mymac, 20) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
-  } else Serial.println(F("Ethernet controller access success"));
+  }
+
   Serial.println("\r\nDHCP...\r\n\r\n");
   if (!ether.dhcpSetup()) {
     Serial.println(F("DHCP failed"));
-  } else Serial.println(F("DHCP success"));
+  }
+
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
   String IPdef[] = {"10", "20", "184", "70"};
+
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
   /*if(EEPROM.read(0) == 255){//EEPROM vacia
     //ESCRIBO EN MI EEPROM LA IP DEL SERVIDOR, SOLO EJECUTAR UNA SOLA VEZ
@@ -84,6 +88,7 @@ void setup() {
     ether.printIp("Server: ", ether.hisip);
     Serial.println("Solicitando configuracion inicial desde la EEPROM...");
     }else{*/
+
   int ip[4];
   for (int i = 0; i < 4; i++) {
     ip[i] = IPdef[i].toInt();
@@ -188,27 +193,37 @@ void comando(String cmd) {
   if (cmd1 == "-disp") {
     Serial.println(cmd2);
     Pantalla(cmd2);
-    /*lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print(cmd.substring(0, 8));
-      lcd.setCursor(0, 1);
-      lcd.print(cmd.substring(8, 16));*/
   }
-  /*    if(cmd1 == "-prin") {
-      Imprimir(cmd);
-    }
-    if(cmd1 == "-barr") {
-      Serial.print("Habriendo barrera");
-    }
-    if(cmd1 == "-conf") {
-      Config(cmd);
+  /*if (cmd1 == "-prin") {
+    Imprimir(cmd);
     }*/
+  if (cmd1 == "-barr") {
+    Serial.print("Habriendo barrera");
+  }
+  if (cmd1 == "-conf") {
+    Config(cmd);
+  }
   if (cmd1 == "-pago") {
     String salida1 = cmd2;
     monto = salida1.toInt();
     Serial.print("Monto a pagar: ");
     Serial.println(monto);
     modopago(monto);
+  }
+}
+
+void Config(String arg) {
+  int i = 0;
+  while (arg.length() > 0) {
+    int p =   arg.indexOf(",");
+    if (p == 0) arg = "";
+    configuracion[i] = arg.substring(0, p);
+    arg = arg.substring(p + 1);
+    i++;
+  }
+  for (int k = 0; k < 5; k++) {
+    Serial.print(k);
+    Serial.println(configuracion[k]);
   }
 }
 
@@ -335,6 +350,18 @@ void updateIP(String inString[4])
     Serial.print(EEPROM.read(n));
     if (n < 3) {
       Serial.print(".");
+    }
+  }
+}
+
+String readIP() {
+  String myipdef = "";
+  int j;
+  Serial.println("Leyendo IP de la EEPROM: ");
+  for (j = 0; j < 4; j++) {
+    myipdef = myipdef + (String)EEPROM.read(j);
+    if (j < 3) {
+      myipdef = myipdef + ".";
     }
   }
 }
