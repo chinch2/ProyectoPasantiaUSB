@@ -11,7 +11,7 @@ void readIP();
 //-----------Ethernet-------------------------
 // ethernet interface mac address, must be unique on the LAN
 static byte mymac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, 0x31 };
-const char website[] = "10.20.184.70";
+char website[] = "10.0.0.36";
 byte Ethernet::buffer[400];
 static uint32_t timer;
 bool onrequest = false;
@@ -33,7 +33,6 @@ const int button_2 = 21;
 //Variables que cambian:
 //int boton1 = 0; //Variables para leer el estatus de los botones
 //int boton2 = 0;
-static void my_callback (byte status, word off, word len);
 
 void setup() {
   //char website[12] PROGMEM;
@@ -62,24 +61,23 @@ void setup() {
 
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
-  String IPdef[] = {"10", "20", "184", "70"};
-
+  String IPdef[] = {"10", "0", "0", "36"};
+  readIP();
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
-  if (EEPROM.read(0) == 0) { //EEPROM vacia
+  if (EEPROM.read(3) != IPdef[3].toInt()) {
     //ESCRIBO EN MI EEPROM LA IP DEL SERVIDOR, SOLO EJECUTAR UNA SOLA VEZ
     Serial.println();
-    Serial.println("EEPROM vacia");
+    Serial.println("EEPROM distinta, actualizando");
     updateIP(IPdef); // Si IPdef es diferente a la que esta guardada la escribe sino no
     delay(1000);
     Serial.print("reseteando. EEPROM actualizada");
     asm("jmp 0x0000");
   }
-  readIP();
   Serial.println("IP en la EPPROM: " + IPROM);
   int ip[4];
   for (int j = 0; j < 4; j++) {
-    //ip[j] = EEPROM.read(j);
-    ip[j] = IPdef[j].toInt();
+    ip[j] = EEPROM.read(j);
+    //ip[j] = IPdef[j].toInt();
     ether.hisip[j] = ip[j];//IPdef[i].toInt();
   }
   ether.printIp("Server: ", ether.hisip);
@@ -88,7 +86,24 @@ void setup() {
   //IPROM.toCharArray(website, IPROM.length() + 1);
   //Serial.println(IPROM);
   //Serial.println(website);
-  //12345
+  int x = 0;
+  onrequest = true;
+  timer = 0;
+  while (onrequest) {
+    ether.packetLoop(ether.packetReceive());
+
+    if (millis() > timer) {
+      timer = millis() + 5000;
+      Serial.println();
+      Serial.print("<<< REQ de setup");
+      ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
+      x++;
+      if (x > 5) {
+        Serial.println("Fallo request");
+        onrequest = false;
+      }
+    }
+  }
   /*//Verifico que la IP de servidor no haya cambiado, si es asi actualizo
     //la EPPROM y reseteo
     Serial.println();
@@ -127,29 +142,12 @@ void setup() {
 }
 
 void loop() {
-  int x = 0;
-  onrequest = true;
-  timer = 0;
-  while (onrequest) {
-    ether.packetLoop(ether.packetReceive());
 
-    if (millis() > timer) {
-      timer = millis() + 5000;
-      Serial.println();
-      Serial.print("<<< REQ de setup");
-      ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
-      x++;
-      if (x > 5) {
-        Serial.println("Fallo request");
-        onrequest = false;
-      }
-    }
-  }
 }
 
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
-  //onrequest = false;
+  onrequest = false;
   //confonreq = false;
   Serial.println(">>>");
   Ethernet::buffer[off + len] = 0;
@@ -186,7 +184,7 @@ void comando(String cmd) {
     Serial.print("Habriendo barrera");
   }
   if (cmd1 == "-conf") {
-    Config(cmd2);
+    conf(cmd2);
   }
   /*if (cmd1 == "-pago") {
     String salida1 = cmd2;
@@ -197,7 +195,8 @@ void comando(String cmd) {
     }*/
 }
 
-void Config(String arg) {
+void conf(String arg) {
+  //Serial.println("Iniciando config");
   int i = 0;
   while (arg.length() > 0) {
     int p =   arg.indexOf(",");

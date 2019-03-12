@@ -11,7 +11,7 @@ String readIP();
 //-----------Ethernet-------------------------
 // ethernet interface mac address, must be unique on the LAN
 static byte mymac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, 0x31 };
-const char website[] PROGMEM = "10.20.184.70";
+const char website[] PROGMEM = "10.0.0.36"; //"10.20.184.70";
 byte Ethernet::buffer[400];
 static uint32_t timer;
 bool onrequest = false;
@@ -32,7 +32,7 @@ const int button_2 = 21;
 //Variables que cambian:
 //int boton1 = 0; //Variables para leer el estatus de los botones
 //int boton2 = 0;
-static void my_callback (byte status, word off, word len);
+//static void my_callback (byte status, word off, word len);
 
 void setup()
 { //char website[15] PROGMEM;
@@ -53,7 +53,7 @@ void setup()
 
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
 
-  if (ether.begin(sizeof Ethernet::buffer, mymac, 0) == 0) {
+  if (ether.begin(sizeof Ethernet::buffer, mymac, 20) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
   }
 
@@ -64,23 +64,23 @@ void setup()
 
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
-  String IPdef[] = {"10", "20", "184", "70"};
+  String IPdef[] = {"10", "0", "0", "36"}; //{"10", "20", "184", "70"};
 
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
   //if (EEPROM.read(0) == 255) { //EEPROM vacia
   //ESCRIBO EN MI EEPROM LA IP DEL SERVIDOR, SOLO EJECUTAR UNA SOLA VEZ
-  updateIP(IPdef); // Si IPdef es diferente a la que esta guardada la escribe sino no
-  delay(1000);
+  //updateIP(IPdef); // Si IPdef es diferente a la que esta guardada la escribe sino no
+  //delay(1000);
   int ip[4];
   for (int j = 0; j < 4; j++) {
-    ip[j] = EEPROM.read(j);
-    ether.hisip[j] = ip[j];
+    //ip[j] = EEPROM.read(j);
+    ether.hisip[j] = IPdef[j].toInt();//ip[j];
   }
   ether.printIp("Server para configuracion inicial: ", ether.hisip);
   Serial.println("Solicitando configuracion inicial desde la EEPROM...");
   String IPROM = readIP();
   //----Configuracion inicial-----------
-  // IPROM.toCharArray(website, IPROM.length() + 1);
+  //IPROM.toCharArray(website, IPROM.length() + 1);
   Serial.println(IPROM);
   Serial.println(website);
   int x = 0;
@@ -101,6 +101,7 @@ void setup()
       }
     }
   }
+  //---------------------------------------
   //Inicializando los pines de entrada y salida
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
@@ -115,7 +116,7 @@ void setup()
 }
 
 void loop()
-{ char website[15] PROGMEM;
+{ //char website[15] PROGMEM;
 
   //----Configuracion inicial-----------
   /*if(confonreq){
@@ -143,7 +144,7 @@ void loop()
     if (millis() > timer) {
       timer = millis() + 4000;
       Serial.println();
-      Serial.print("<<< REQ ");
+      Serial.print("<<< REQ de standby");
       ether.browseUrl(PSTR("/standby.php"), "?carro=0&estacion=1", website, my_callback);
     }
 
@@ -155,7 +156,7 @@ void loop()
     if (millis() > timer) {
       timer = millis() + 2000;
       Serial.println();
-      Serial.print("<<< REQ ");
+      Serial.print("<<< REQ de carro");
       ether.browseUrl(PSTR("/standby.php"), "?carro=1&estacion=1", website, my_callback);
     }
 
@@ -167,7 +168,7 @@ void loop()
     if (millis() > timer) {
       timer = millis() + 1000;
       Serial.println();
-      Serial.print("<<< REQ ");
+      Serial.print("<<< REQ de ticket");
       ether.browseUrl(PSTR("/ticket.php"), "?estacion=1", website, my_callback);
     }
 
@@ -237,6 +238,7 @@ void Config(String arg) {
     Serial.print(k);
     Serial.println(configuracion[k]);
   }
+  Serial.println("Config parse successfull");
 }
 
 //---------Imprimir en Display-----------------
@@ -321,7 +323,6 @@ void updateIP(String inString[4])
 String readIP() {
   String myipdef = "";
   int j;
-  Serial.println("Leyendo IP de la EEPROM: ");
   for (j = 0; j < 4; j++) {
     myipdef = myipdef + (String)EEPROM.read(j);
     if (j < 3) {
