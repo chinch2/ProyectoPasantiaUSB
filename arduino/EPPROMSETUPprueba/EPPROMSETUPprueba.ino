@@ -11,7 +11,7 @@ void readIP();
 //-----------Ethernet-------------------------
 // ethernet interface mac address, must be unique on the LAN
 static byte mymac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, 0x31 };
-char website[] = "10.0.0.42";
+const char website[] PROGMEM = "10.20.184.70";
 byte Ethernet::buffer[400];
 static uint32_t timer;
 bool onrequest = false;
@@ -19,11 +19,11 @@ int printStatus = 0;
 String configuracion[5];
 String IPROM = "";
 //-------------------------Display-----------                                                                                                                                                                                                                      ----------
-const byte DCOLS = 8; //four columns
+const byte DCOLS = 20; //four columns
 const byte DROWS = 2; //four columns
 
-LiquidCrystal_I2C lcd(0x3f, DCOLS, DROWS); //en caso de ser 16x2
-//LiquidCrystal_I2C lcd(0x27, DCOLS, DROWS);//en caso de ser 20x2
+//LiquidCrystal_I2C lcd(0x3f, DCOLS, DROWS); //en caso de ser 16x2
+LiquidCrystal_I2C lcd(0x27, DCOLS, DROWS);//en caso de ser 20x2
 
 // El numero de los pines (constantes siempre):
 
@@ -31,7 +31,6 @@ const int button_1 = 20;
 const int button_2 = 21;
 
 void setup() {
-  //char website[12] PROGMEM;
   Serial.begin(9600);
   delay(1000);
   Serial.println(F("\n[webClient]"));
@@ -48,19 +47,20 @@ void setup() {
 
   if (ether.begin(sizeof Ethernet::buffer, mymac, 20) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
-  } else Serial.println(F("Ethernet controller access success"));
+  }
 
   Serial.println("\r\nDHCP...\r\n\r\n");
   if (!ether.dhcpSetup()) {
     Serial.println(F("DHCP failed"));
-  } else Serial.println(F("DHCP success"));
+  }
 
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
-  String IPdef[] = {"10", "0", "0", "42"};
+  String IPdef[] = {"10", "20", "184", "70"};
   readIP();
+  String IPnative = "10.20.184.70";
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
-  if (EEPROM.read(3) != IPdef[3].toInt()) {
+  if (IPROM != IPnative) {
     //ESCRIBO EN MI EEPROM LA IP DEL SERVIDOR, SOLO EJECUTAR UNA SOLA VEZ
     Serial.println();
     Serial.println("EEPROM distinta, actualizando");
@@ -100,29 +100,24 @@ void setup() {
       }
     }
   }
-  /*//Verifico que la IP de servidor no haya cambiado, si es asi actualizo
-    //la EPPROM y reseteo
-    Serial.println();
-    Serial.println("IP en la EPPROM: " + IPROM);
-    Serial.println("IP actual: " + configuracion[0]);
-    if (configuracion[0] != IPROM) {
-    Serial.println("Actualizando EPPROM con nueva IP");
+  //Verifico que la IP de servidor no haya cambiado, si es asi actualizo
+  //la EPPROM y reseteo
+  Serial.println();
+  Serial.println("IP en la EPPROM: " + IPROM);
+  Serial.println("IP actual: " + configuracion[0]);
+  if (configuracion[0] != IPROM) {
+    Serial.print("Actualizando EPPROM con nueva IP: ");
     String IPnueva[4];
-    int i = 0;
-    while (configuracion[0].length() > 0) {
-
-      if (i < 3) {
-        int p =   configuracion[0].indexOf(".");
-        if (p == 0) configuracion[0] = "";
-        IPnueva[i] = configuracion[0].substring(0, p);
-        configuracion[0] = configuracion[0].substring(p + 1);
-
-      } else {
-        IPnueva[i] = configuracion[0].substring(0);
-        configuracion[0] = "";
+    int i = 0, r = 0, t = 0;
+    for (i = 0; i < configuracion[0].length(); i++) {
+      if (configuracion[0].charAt(i) == '.') {
+        IPnueva[t] = configuracion[0].substring(r, i);
+        r = (i + 1);
+        t++;
       }
-
-      i++;
+    }
+    for (int k = 0; k < 4; k++) {
+      Serial.println(IPnueva[k]);
     }
     Serial.println("Guardando nueva IP en la EPPROM");
     updateIP(IPnueva);
@@ -133,8 +128,14 @@ void setup() {
         Serial.print(".");
       }
     }
-    }
-    //Inicializando los pines de entrada y salida*/
+  }
+  for (int i = 0; i < 4; i++) {
+    ip[i] = EEPROM.read(i);
+    //ip[i] = IPdef[i].toInt();
+    ether.hisip[i] = ip[i];//IPdef[i].toInt();
+  }
+  ether.printIp("Server: ", ether.hisip);
+  //Inicializando los pines de entrada y salida
 }
 
 void loop() {
@@ -193,7 +194,6 @@ void comando(String cmd) {
 }
 
 void conf(String arg) {
-  Serial.println(arg.length());
   int i = 0, r = 0, t = 0;
   for (i = 0; i < arg.length(); i++) {
     if (arg.charAt(i) == ',') {

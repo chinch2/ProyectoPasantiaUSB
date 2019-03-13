@@ -8,16 +8,20 @@
 #define LED 6 //led del teensy 2.0
 //-------Escribo IP default en la EEPROM----
 void updateIP(String inString[4]);
+//-------Busco IP default en la EEPROM------
+void readIP();
+//-----------Ethernet-------------------------
 // ethernet interface mac address, must be unique on the LAN
 static byte mymac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, 0x31 };
 const char website[] PROGMEM = "10.20.184.70";
 String request;//char request[30];
 byte Ethernet::buffer[400];
 static uint32_t timer = 0;
-String configuracion[5];
 bool onrequest = false;
 char requestc[50];
 //int printStatus = 0;
+String configuracion[5];
+String IPROM = "";
 //------------Display---------------------
 const byte DCOLS = 20; //four columns
 const byte DROWS = 2; //four columns
@@ -48,9 +52,8 @@ unsigned int monto;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  Serial1.begin(9600);
+  delay(1000);
   buff = "";//buff[0] = '\0';
-  Serial.print("Codigo de barra: \r\n");
   Serial.println(F("\n[webClient]"));
   Serial.print("MAC: ");
   for (byte i = 0; i < 6; ++i) {
@@ -73,37 +76,89 @@ void setup() {
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
   String IPdef[] = {"10", "20", "184", "70"};
-
+  readIP();
+  String IPnative = "10.20.184.70";
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
-  /*if(EEPROM.read(0) == 255){//EEPROM vacia
+  if (IPROM != IPnative) { //EEPROM vacia
     //ESCRIBO EN MI EEPROM LA IP DEL SERVIDOR, SOLO EJECUTAR UNA SOLA VEZ
+    Serial.println();
+    Serial.println("EEPROM distinta, actualizando");
     updateIP(IPdef); // Si IPdef es diferente a la que esta guardada la escribe sino no
     delay(1000);
-    for(int j=0; j<4; j++){
-      ether.hisip[j] = EEPROM.read(j);
-    }
-    ether.printIp("Server: ", ether.hisip);
-    Serial.println("Solicitando configuracion inicial desde la EEPROM...");
-    }else{*/
+    Serial.print("reseteando. EEPROM actualizada");
+    asm("jmp 0x0000");
+  }
+  Serial.println("IP en la EPPROM: " + IPROM);
   int ip[4];
   for (int i = 0; i < 4; i++) {
-    ip[i] = IPdef[i].toInt();
+    ip[i] = EEPROM.read(i);
+    //ip[i] = IPdef[i].toInt();
     ether.hisip[i] = ip[i];//IPdef[i].toInt();
   }
   ether.printIp("Server: ", ether.hisip);
   Serial.println("Solicitando configuracion inicial...");
-  //}
-  /*String recivedData;
-    recivedData = read_String(0);
+  //----Configuracion inicial-----------
+  //IPROM.toCharArray(website, IPROM.length() + 1);
+  //Serial.println(IPROM);
+  //Serial.println(website);
+  int x = 0;
+  onrequest = true;
+  timer = 0;
+  while (onrequest) {
+    ether.packetLoop(ether.packetReceive());
 
-    Serial.print("recivedData:");
-    Serial.println(recivedData);
-    //const char *websiteIP = recivedData.c_str();
-    Serial.println(websiteIP);*/
+    if (millis() > timer) {
+      timer = millis() + 5000;
+      Serial.println();
+      Serial.print("<<< REQ de setup");
+      ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
+      x++;
+      if (x > 5) {
+        Serial.println("Fallo request");
+        onrequest = false;
+      }
+    }
+  }
+  //Verifico que la IP de servidor no haya cambiado, si es asi actualizo
+  //la EPPROM y reseteo
+  Serial.println();
+  Serial.println("IP en la EPPROM: " + IPROM);
+  Serial.println("IP actual: " + configuracion[0]);
+  if (configuracion[0] != IPROM) {
+    Serial.print("Actualizando EPPROM con nueva IP: ");
+    String IPnueva[4];
+    int i = 0, r = 0, t = 0;
+    for (i = 0; i < configuracion[0].length(); i++) {
+      if (configuracion[0].charAt(i) == '.') {
+        IPnueva[t] = configuracion[0].substring(r, i);
+        r = (i + 1);
+        t++;
+      }
+    }
+    for (int k = 0; k < 4; k++) {
+      Serial.println(IPnueva[k]);
+    }
+    Serial.println("Guardando nueva IP en la EPPROM");
+    updateIP(IPnueva);
+    Serial.print("Guardada nueva IP en la EPPROM: ");
+    for (int k = 0; k < 4; k++) {
+      Serial.print(IPnueva[k]);
+      if (k < 3) {
+        Serial.print(".");
+      }
+    }
+  }
+  for (int i = 0; i < 4; i++) {
+    ip[i] = EEPROM.read(i);
+    //ip[i] = IPdef[i].toInt();
+    ether.hisip[i] = ip[i];//IPdef[i].toInt();
+  }
+  ether.printIp("Server: ", ether.hisip);
   //Inicializando los pines de entrada y salida
   pinMode(dispara, OUTPUT); //Trigger del escaner
   pinMode(LED, OUTPUT);  //Teensy
   Serial.println("Botones inicializados");
+  Serial1.begin(configuracion[1].toInt());
   //digitalWrite(LED_BUILTIN, LOW);
   // Inicializar el LCD
   lcd.init();
@@ -196,7 +251,8 @@ void comando(String cmd) {
     Serial.print("Habriendo barrera");
   }
   if (cmd1 == "-conf") {
-    Config(cmd);
+    Serial.println("Empezando conf");
+    conf(cmd2);
   }
   /*if (cmd1 == "-pago") {
     String salida1 = cmd2;
@@ -207,17 +263,16 @@ void comando(String cmd) {
     }*/
 }
 
-void Config(String arg) {
-  int i = 0;
-  while (arg.length() > 0) {
-    int p =   arg.indexOf(",");
-    if (p == 0) arg = "";
-    configuracion[i] = arg.substring(0, p);
-    arg = arg.substring(p + 1);
-    i++;
+void conf(String arg) {
+  int i = 0, r = 0, t = 0;
+  for (i = 0; i < arg.length(); i++) {
+    if (arg.charAt(i) == ',') {
+      configuracion[t] = arg.substring(r, i);
+      r = (i + 1);
+      t++;
+    }
   }
   for (int k = 0; k < 5; k++) {
-    Serial.print(k);
     Serial.println(configuracion[k]);
   }
 }
@@ -259,6 +314,18 @@ void updateIP(String inString[4])
     Serial.print(EEPROM.read(n));
     if (n < 3) {
       Serial.print(".");
+    }
+  }
+  Serial.println();
+}
+
+void readIP() {
+
+  int j;
+  for (j = 0; j < 4; j++) {
+    IPROM = IPROM + (String)EEPROM.read(j);
+    if (j < 3) {
+      IPROM = IPROM + ".";
     }
   }
 }
