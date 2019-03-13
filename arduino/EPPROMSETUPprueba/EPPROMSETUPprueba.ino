@@ -11,7 +11,7 @@ void readIP();
 //-----------Ethernet-------------------------
 // ethernet interface mac address, must be unique on the LAN
 static byte mymac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, 0x31 };
-char website[] = "10.0.0.36";
+char website[] = "10.0.0.42";
 byte Ethernet::buffer[400];
 static uint32_t timer;
 bool onrequest = false;
@@ -57,7 +57,7 @@ void setup() {
 
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
-  String IPdef[] = {"10", "0", "0", "36"};
+  String IPdef[] = {"10", "0", "0", "42"};
   readIP();
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
   if (EEPROM.read(3) != IPdef[3].toInt()) {
