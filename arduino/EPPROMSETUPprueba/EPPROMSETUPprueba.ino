@@ -30,10 +30,6 @@ LiquidCrystal_I2C lcd(0x3f, DCOLS, DROWS); //en caso de ser 16x2
 const int button_1 = 20;
 const int button_2 = 21;
 
-//Variables que cambian:
-//int boton1 = 0; //Variables para leer el estatus de los botones
-//int boton2 = 0;
-
 void setup() {
   //char website[12] PROGMEM;
   Serial.begin(9600);
@@ -184,6 +180,7 @@ void comando(String cmd) {
     Serial.print("Habriendo barrera");
   }
   if (cmd1 == "-conf") {
+    Serial.println("Empezando conf");
     conf(cmd2);
   }
   /*if (cmd1 == "-pago") {
@@ -196,17 +193,16 @@ void comando(String cmd) {
 }
 
 void conf(String arg) {
-  //Serial.println("Iniciando config");
-  int i = 0;
-  while (arg.length() > 0) {
-    int p =   arg.indexOf(",");
-    if (p == 0) arg = "";
-    configuracion[i] = arg.substring(0, p);
-    arg = arg.substring(p + 1);
-    i++;
+  Serial.println(arg.length());
+  int i = 0, r = 0, t = 0;
+  for (i = 0; i < arg.length(); i++) {
+    if (arg.charAt(i) == ',') {
+      configuracion[t] = arg.substring(r, i);
+      r = (i + 1);
+      t++;
+    }
   }
   for (int k = 0; k < 5; k++) {
-    Serial.print(k);
     Serial.println(configuracion[k]);
   }
 }
