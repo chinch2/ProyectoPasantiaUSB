@@ -11,9 +11,9 @@ void readIP();
 //-----------Ethernet-------------------------
 // ethernet interface mac address, must be unique on the LAN
 static byte mymac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, 0x31 };
-const char website[] PROGMEM = "10.0.0.36"; //"10.20.184.70";
+const char website[] PROGMEM = "10.20.184.70";
 byte Ethernet::buffer[400];
-static uint32_t timer;
+static uint32_t timer = 0;
 bool onrequest = false;
 int printStatus = 0;
 String configuracion[5];
@@ -44,7 +44,7 @@ void setup()
 
   Serial.println("\nProceding to access Ethernet Controller\r\n");
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
-  if (ether.begin(sizeof Ethernet::buffer, mymac, 20) == 0) {
+  if (ether.begin(sizeof Ethernet::buffer, mymac, 0) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
   }
 
@@ -55,7 +55,7 @@ void setup()
 
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
-  String IPdef[] = {"10", "0", "0", "36"}; //{"10", "20", "184", "70"};
+  String IPdef[] = {"10", "20", "184", "70"};
   readIP();
   String IPnative = "10.20.184.70";
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
@@ -89,10 +89,10 @@ void setup()
     ether.packetLoop(ether.packetReceive());
 
     if (millis() > timer) {
-      timer = millis() + 3000;
+      timer = millis() + 5000;
       Serial.println();
-      Serial.print("<<< REQ ");
-      ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
+      Serial.print("<<< REQ de setup");
+      ether.browseUrl(PSTR("/setup.php"), "?t=1", website, my_callback);
       x++;
       if (x > 5) {
         Serial.println("Fallo request");
@@ -117,7 +117,10 @@ void setup()
       }
     }
     for (int k = 0; k < 4; k++) {
-      Serial.println(IPnueva[k]);
+      Serial.print(IPnueva[k]);
+      if ( k < 3 ) {
+        Serial.print(".");
+      }
     }
     Serial.println("Guardando nueva IP en la EPPROM");
     updateIP(IPnueva);
@@ -151,33 +154,15 @@ void setup()
 }
 
 void loop()
-{ //char website[15] PROGMEM;
-
-  //----Configuracion inicial-----------
-  /*if(confonreq){
-    while(confonreq){
-    ether.packetLoop(ether.packetReceive());
-    if (millis() > timer) {
-    timer = millis() + 4000;
-    Serial.println("Solicitando configuracion inicial...");
-    Serial.println();
-    Serial.print("<<< REQ ");
-    ether.browseUrl(PSTR("/setup.php"), "", website, my_callback);
-    }
-    }
-    }*/
-  //----Configuracion inicial--------------
-  //boton1 = digitalRead(button_1);
-  //boton2 = digitalRead(button_2);
-  //delay(1000);
-  //Serial.print(boton1);
-  //Serial.print(boton2);
-  //delay(1000);
+{
+  for (int k = 0; k < 5; k++) {
+    Serial.println(configuracion[k]);
+  }
   if (digitalRead(button_1) == HIGH && digitalRead(button_2) == HIGH) {  //No hay nadie
     //-----------------------------------GET REQUEST 3-------------------------------------------------------------
     ether.packetLoop(ether.packetReceive());
     if (millis() > timer) {
-      timer = millis() + 4000;
+      timer = millis() + 5000;
       Serial.println();
       Serial.print("<<< REQ de standby");
       ether.browseUrl(PSTR("/standby.php"), "?carro=0&estacion=1", website, my_callback);
@@ -212,23 +197,26 @@ void loop()
 }
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
-  //onrequest = false;
-  //confonreq = false;
-  Serial.println(">>>");
+  //Serial.println("callback" + status);
+  onrequest = false;
+  //ponrequest = false;
+  Serial.print(">>>");
   Ethernet::buffer[off + len] = 0;
-  Serial.print((const char*) Ethernet::buffer + off);
+  //Serial.print((const char*) Ethernet::buffer + off);
   String salida = (const char*) Ethernet::buffer + off;
+  //salida = salida.substring(0);
+  Serial.print(salida);
   int pos =   salida.indexOf("\r\n\r\n") + 4;
-  String salida1 = salida.substring(pos);
-  while (salida1.length() > 0) {
-    int fin = salida1.indexOf("-end");
-    if (fin == 0) salida1 = "";
-    String action = salida1.substring(0, fin);
-    Serial.print(action);
-    comando(action);
+  salida = salida.substring(pos);
+  while (salida.length() > 0) {
+    int fin = salida.indexOf("-end");
+    if (fin == 0) salida = "";
+    String salcomando = salida.substring(0, fin);
+    Serial.println(salcomando);
+    comando(salcomando);
     //Serial.println();
     //Serial.print(salida1);
-    salida1 = salida1.substring(fin + 4);
+    salida = salida.substring(fin + 4);
     //Serial.print(salida1);
   }
 
@@ -237,13 +225,13 @@ static void my_callback (byte status, word off, word len) {
 void comando(String cmd) {
   String cmd1 = cmd.substring(0, 5);
   String cmd2 = cmd.substring(5);
-  Serial.println("\r\ncomando:" + cmd + " modo:" + cmd1 + " argumento:" + cmd2);
+  Serial.println("comando:" + cmd + " modo:" + cmd1 + " argumento:" + cmd2);
   if (cmd1 == "-disp") {
     Serial.println(cmd2);
     Pantalla(cmd2);
   }
   if (cmd1 == "-prin") {
-    Imprimir(cmd);
+    Imprimir(cmd2);
   }
   if (cmd1 == "-barr") {
     Serial.print("Habriendo barrera");
@@ -262,6 +250,7 @@ void comando(String cmd) {
 }
 
 void conf(String arg) {
+  Serial.println(arg);
   int i = 0, r = 0, t = 0;
   for (i = 0; i < arg.length(); i++) {
     if (arg.charAt(i) == ',') {
@@ -296,10 +285,11 @@ void Pantalla(String salida1) {
 }
 
 void Imprimir(String printed) {
-  Serial.print("Imprimiendo...");
-  String Imprime = printed.substring(5);
-  String codificado = Imprime.substring(21);
-  Serial.print(Imprime);
+  Serial.println("Imprimiendo...");
+  Serial.println(printed);
+  //String Imprime = printed.substring(5);
+  String codificado = printed.substring(21);
+  //Serial.print(Imprime);
   Serial.println(codificado);
   //IMPRIMIENDO----------------------------------------------------------------------
   digitalWrite(LED, HIGH);
@@ -307,7 +297,7 @@ void Imprimir(String printed) {
   //TM88.justifyCenter();
   Serial1.write("\x1B\x61\x01");
   //TM88.println(Imprime);
-  Serial1.println(Imprime);
+  Serial1.println(printed);
   //TM88.barcodeHeight(50);
   Serial1.write("\x1D\x68\x32");
   //TM88.barcodeWidth(3);
