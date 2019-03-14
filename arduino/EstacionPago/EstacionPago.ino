@@ -13,7 +13,7 @@ void readIP();
 //-----------Ethernet-------------------------
 // ethernet interface mac address, must be unique on the LAN
 static byte mymac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, 0x31 };
-const char website[] PROGMEM = "10.20.184.70";
+const char website[] PROGMEM = "10.0.0.42";//"10.20.184.70";
 String request;//char request[30];
 String prequest;
 byte Ethernet::buffer[400];
@@ -78,9 +78,9 @@ void setup() {
 
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
-  String IPdef[] = {"10", "20", "184", "70"};
+  String IPdef[] = {"10", "0", "0", "42"};//{"10", "20", "184", "70"};
   readIP();
-  String IPnative = "10.20.184.70";
+  String IPnative = "10.0.0.42";//"10.20.184.70";
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
   if (IPROM != IPnative) { //EEPROM vacia
     //ESCRIBO EN MI EEPROM LA IP DEL SERVIDOR, SOLO EJECUTAR UNA SOLA VEZ
@@ -140,8 +140,12 @@ void setup() {
       }
     }
     for (int k = 0; k < 4; k++) {
-      Serial.println(IPnueva[k]);
+      Serial.print(IPnueva[k]);
+      if ( k < 3 ) {
+        Serial.print(".");
+      }
     }
+    Serial.println();
     Serial.println("Guardando nueva IP en la EPPROM");
     updateIP(IPnueva);
     Serial.print("Guardada nueva IP en la EPPROM: ");
