@@ -23,11 +23,12 @@ char requestc[50];
 String configuracion[5];
 String IPROM = "";
 //------------Display---------------------
-const byte DCOLS = 20; //four columns
-const byte DROWS = 2; //four columns
 
-//LiquidCrystal_I2C lcd(0x3f, DCOLS, DROWS); //en caso de ser 16x2
-LiquidCrystal_I2C lcd(0x27, DCOLS, DROWS); //en caso de ser 20x2
+// Inicializar el LCD
+int DTYPE = 0X27,//configuracion[2].toInt(),
+    DCOLS = 20,//configuracion[3].toInt(),
+    DROWS = 2;//configuracion[4].toInt();
+LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
 //-----------Escaner e impresora----------------
 char c;
 String buff = "";//char buff[8];
@@ -75,7 +76,7 @@ void setup() {
 
   ether.printIp("IP:  ", ether.myip);
   ether.printIp("GW:  ", ether.gwip);
-  String IPdef[] = {"10", "0", "0", "42"};//{"10", "20", "184", "70"};
+  String IPdef[] = {"10", "20", "184", "70"};
   readIP();
   String IPnative = "10.20.184.70";
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
@@ -159,8 +160,7 @@ void setup() {
   pinMode(LED, OUTPUT);  //Teensy
   Serial.println("Botones inicializados");
   Serial1.begin(configuracion[1].toInt());
-  //digitalWrite(LED_BUILTIN, LOW);
-  // Inicializar el LCD
+  //inicializo la pantalla
   lcd.init();
   //Limpiar la pantalla
   lcd.clear();

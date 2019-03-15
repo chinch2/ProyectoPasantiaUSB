@@ -26,11 +26,12 @@ char prequestc[100];
 String configuracion[5];
 String IPROM = "";
 //------------Display---------------------
-const byte DCOLS = 20; //four columns
-const byte DROWS = 2; //four columns
 
-//LiquidCrystal_I2C lcd(0x3f, DCOLS, DROWS); //en caso de ser 16x2
-LiquidCrystal_I2C lcd(0x27, DCOLS, DROWS); //en caso de ser 20x2
+// Inicializar el LCD
+int DTYPE = 0X27,//configuracion[2].toInt(),
+    DCOLS = 20,//configuracion[3].toInt(),
+    DROWS = 2;//configuracion[4].toInt();
+LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
 //-----------Escaner e impresora----------------
 char c;
 String buff = "";//char buff[8];
@@ -167,7 +168,6 @@ void setup() {
   pinMode(LED, OUTPUT);  //Teensy
   Serial.println("Botones inicializados");
   Serial1.begin(configuracion[1].toInt());
-  //digitalWrite(LED_BUILTIN, LOW);
   // Inicializar el LCD
   lcd.init();
   //Limpiar la pantalla

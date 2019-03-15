@@ -19,12 +19,12 @@ int printStatus = 0;
 String configuracion[5];
 String IPROM = "";
 //-------------------------Display-----------                                                                                                                                                                                                                      ----------
-const byte DCOLS = 8; //four columns
-const byte DROWS = 2; //four columns
 
-LiquidCrystal_I2C lcd(0x3f, DCOLS, DROWS); //en caso de ser 16x2
-//LiquidCrystal_I2C lcd(0x27, DCOLS, DROWS);//en caso de ser 20x2
-
+// Inicializar el LCD
+int DTYPE = 0X3f,//configuracion[2].toInt(),
+    DCOLS = 8,//configuracion[3].toInt(),
+    DROWS = 2;//configuracion[4].toInt();
+LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
 // El numero de los pines (constantes siempre):
 
 const int button_1 = 20;
@@ -143,8 +143,8 @@ void setup()
   pinMode(button_2, INPUT_PULLUP);
   pinMode(LED, OUTPUT);  //Teensy
   Serial.println("Botones inicializados");
-  Serial1.begin(configuracion[1].toInt());
-  //digitalWrite(LED_BUILTIN, LOW);
+  //Serial1.begin(configuracion[1].toInt());
+  Serial1.begin(9600);
   // Inicializar el LCD
   lcd.init();
   //Limpiar la pantalla
@@ -155,9 +155,7 @@ void setup()
 
 void loop()
 {
-  for (int k = 0; k < 5; k++) {
-    Serial.println(configuracion[k]);
-  }
+
   if (digitalRead(button_1) == HIGH && digitalRead(button_2) == HIGH) {  //No hay nadie
     //-----------------------------------GET REQUEST 3-------------------------------------------------------------
     ether.packetLoop(ether.packetReceive());
