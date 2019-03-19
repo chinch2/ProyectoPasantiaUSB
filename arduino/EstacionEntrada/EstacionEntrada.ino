@@ -21,8 +21,8 @@ String IPROM = "";
 //-------------------------Display-----------                                                                                                                                                                                                                      ----------
 
 // Inicializar el LCD
-int DTYPE = 0X3f,//configuracion[2].toInt(),
-    DCOLS = 8,//configuracion[3].toInt(),
+int DTYPE = 0x27,//configuracion[2].toInt(),
+    DCOLS = 20,//configuracion[3].toInt(),
     DROWS = 2;//configuracion[4].toInt();
 LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
 // El numero de los pines (constantes siempre):
@@ -263,23 +263,16 @@ void conf(String arg) {
 }
 
 //---------Imprimir en Display-----------------
-void Pantalla(String salida1) {
+void Pantalla(String muestra) {
   //----------------LCD DISPLAY--------------------------
 
   //Encender la luz de fondo.
   lcd.backlight();
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print(salida1.substring(0, DCOLS));
+  lcd.print(muestra.substring(0, DCOLS));
   lcd.setCursor(0, 1);
-  lcd.print(salida1.substring(DCOLS, DCOLS * 2));
-  delay(1500);
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print(salida1.substring(DCOLS * 2, DCOLS * 3));
-  lcd.setCursor(0, 1);
-  lcd.print(salida1.substring(DCOLS * 3, DCOLS * 4));
-  delay(1500);
+  lcd.print(muestra.substring(DCOLS, DCOLS * 2));
 }
 
 void Imprimir(String printed) {
