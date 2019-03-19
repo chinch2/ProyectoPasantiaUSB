@@ -12,7 +12,7 @@ void updateIP(String inString[4]);
 void readIP();
 //-----------Ethernet-------------------------
 // ethernet interface mac address, must be unique on the LAN
-static byte mymac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, 0x31 };
+static byte mymac[] = { 0x74, 0x69, 0x69, 0x2D, 0x30, 0x32 };
 const char website[] PROGMEM = "10.20.184.70";
 String request;//char request[30];
 String prequest;
