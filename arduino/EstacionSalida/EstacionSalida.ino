@@ -179,7 +179,7 @@ void loop() {
       //const char *req = "?id=";
       //strcpy(request,req);
       //strcat(request,buff);
-      request = "?estacion=1&id=" + buff; // put your main code here, to run repeatedly:
+      request = "?id=" + buff; // put your main code here, to run repeatedly:
       request.toCharArray(requestc, request.length() + 1);
       Serial.println(request);
       Serial.println(requestc);

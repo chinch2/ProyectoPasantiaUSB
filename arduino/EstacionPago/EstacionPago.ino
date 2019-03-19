@@ -359,7 +359,7 @@ void modopago(unsigned int mnt) {
 
 void requestpago(unsigned int cambio) {
   String change = String(cambio);
-  prequest = "?estacion=1&id=" + buff + "&pa=" + pagos[0] + "&pb=" + pagos[1] + "&pc=" + pagos[2] + "&cambio=" + change; // put your main code here, to run repeatedly:
+  prequest = "?id=" + buff + "&pa=" + pagos[0] + "&pb=" + pagos[1] + "&pc=" + pagos[2] + "&cambio=" + change; // put your main code here, to run repeatedly:
   prequest.toCharArray(prequestc, prequest.length() + 1);
   Serial.println(prequest);
   Serial.println(prequestc);

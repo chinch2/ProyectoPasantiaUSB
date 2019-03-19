@@ -163,7 +163,7 @@ void loop()
       timer = millis() + 5000;
       Serial.println();
       Serial.print("<<< REQ de standby");
-      ether.browseUrl(PSTR("/standby.php"), "?carro=0&estacion=1", website, my_callback);
+      ether.browseUrl(PSTR("/standby.php"), "?carro=0", website, my_callback);
     }
 
   }
@@ -175,7 +175,7 @@ void loop()
       timer = millis() + 2000;
       Serial.println();
       Serial.print("<<< REQ de carro");
-      ether.browseUrl(PSTR("/standby.php"), "?carro=1&estacion=1", website, my_callback);
+      ether.browseUrl(PSTR("/standby.php"), "?carro=1", website, my_callback);
     }
 
   }
@@ -187,7 +187,7 @@ void loop()
       timer = millis() + 1000;
       Serial.println();
       Serial.print("<<< REQ de ticket");
-      ether.browseUrl(PSTR("/ticket.php"), "?estacion=1", website, my_callback);
+      ether.browseUrl(PSTR("/ticket.php"), "", website, my_callback);
     }
 
   }
