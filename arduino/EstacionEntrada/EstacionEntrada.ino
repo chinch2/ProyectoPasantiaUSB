@@ -303,7 +303,7 @@ void Imprimir(String printed) {
   //TM88.feed(5);
   Serial1.write("\n\n\n\n\n\n");
   //TM88.cut();
-  //mySerial.write("\x1D\x56\x42\x0A");
+  Serial1.write("\x1D\x56\x42\x0A");
   digitalWrite(LED, LOW);
 }
 
