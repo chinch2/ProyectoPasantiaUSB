@@ -177,51 +177,51 @@ void setup() {
 }
 
 void loop() {
-  analogWrite(dispara, 255);
-  delay(100);
-  //if (analogRead(38) > 1022) {
-    //analogWrite(dispara, 0);
-    //delay(100);
-    if (Serial1.available()) {
-      c = Serial1.read();
-      //Serial.print(c);
-      // if( c == 10) Serial.print("hubo r");
-      // if( c == 13) Serial.print("hubo n");
-      if ( c == 13) {
-        //const char *req = "?id=";
-        //strcpy(request,req);
-        //strcat(request,buff);
-        request = "?id=" + buff; // put your main code here, to run repeatedly:
-        request.toCharArray(requestc, request.length() + 1);
-        Serial.println(request);
-        Serial.println(requestc);
-        int x = 0;
-        onrequest = true;
-        timer = 0;
-        while (onrequest) {
-          ether.packetLoop(ether.packetReceive());
+  digitalWrite(dispara, HIGH);
+  delay(300);
+  if (analogRead(38) > 50) {
+    digitalWrite(dispara, LOW);
+    delay(300);
+  }
+  if (Serial1.available()) {
+    c = Serial1.read();
+    //Serial.print(c);
+    // if( c == 10) Serial.print("hubo r");
+    // if( c == 13) Serial.print("hubo n");
+    if ( c == 13) {
+      //const char *req = "?id=";
+      //strcpy(request,req);
+      //strcat(request,buff);
+      request = "?id=" + buff; // put your main code here, to run repeatedly:
+      request.toCharArray(requestc, request.length() + 1);
+      Serial.println(request);
+      Serial.println(requestc);
+      int x = 0;
+      onrequest = true;
+      timer = 0;
+      while (onrequest) {
+        ether.packetLoop(ether.packetReceive());
 
-          if (millis() > timer) {
-            timer = millis() + 5000;
-            Serial.println("Request de consulta");
-            Serial.print("<<< REQ ");
-            Serial.print(requestc);
-            ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
-            x++;
-            if (x > 5) {
-              Serial.println("Fallo request");
-              onrequest = false;
-              buff = "";
-            }
+        if (millis() > timer) {
+          timer = millis() + 5000;
+          Serial.println("Request de consulta");
+          Serial.print("<<< REQ ");
+          Serial.print(requestc);
+          ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
+          x++;
+          if (x > 5) {
+            Serial.println("Fallo request");
+            onrequest = false;
+            buff = "";
           }
         }
-      } else {//strcat(buff,c);//buff=buff+c;
-        buff = buff + c;//buff[j] = c;
-        //buff[j+1] = '\0';
-        //j++;
       }
+    } else {//strcat(buff,c);//buff=buff+c;
+      buff = buff + c;//buff[j] = c;
+      //buff[j+1] = '\0';
+      //j++;
     }
-  //}
+  }
 }
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {

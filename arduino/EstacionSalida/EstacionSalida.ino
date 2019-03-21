@@ -32,7 +32,7 @@ LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
 //-----------Escaner e impresora----------------
 char c;
 String buff = "";//char buff[8];
-const int dispara = 18;
+const int dispara = 39;
 //-------------Teclado-----------------------
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
@@ -169,6 +169,12 @@ void setup() {
 }
 
 void loop() {
+  digitalWrite(dispara, HIGH);
+  delay(300);
+  if (analogRead(38) > 50) {
+    digitalWrite(dispara, LOW);
+    delay(300);
+  }
 
   if (Serial1.available()) {
     c = Serial1.read();
