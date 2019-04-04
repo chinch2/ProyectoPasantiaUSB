@@ -2,7 +2,7 @@
 #include <EtherCard.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#define LED 11 //led del teensy 2.0
+#define LED 6//led del teensy 2.0
 
 //-------Escribo IP default en la EEPROM----
 void updateIP(String inString[4]);
@@ -27,8 +27,8 @@ int DTYPE = 0x27,//configuracion[2].toInt(),
 LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
 // El numero de los pines (constantes siempre):
 
-const int button_1 = 20;
-const int button_2 = 21;
+const int button_1 = 8;
+const int button_2 = 9;
 
 void setup()
 {
@@ -44,7 +44,7 @@ void setup()
 
   Serial.println("\nProceding to access Ethernet Controller\r\n");
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
-  if (ether.begin(sizeof Ethernet::buffer, mymac, 0) == 0) {
+  if (ether.begin(sizeof Ethernet::buffer, mymac, 20) == 0) {
     Serial.println(F("Failed to access Ethernet controller"));
   }
 
@@ -62,10 +62,10 @@ void setup()
   if (IPROM != IPnative) { //EEPROM vacia
     //ESCRIBO EN MI EEPROM LA IP DEL SERVIDOR, SOLO EJECUTAR UNA SOLA VEZ
     Serial.println();
-    Serial.println("EEPROM distinta, actualizando");
+    Serial.println("EEPROM distinta, actualizando\r\n");
     updateIP(IPdef); // Si IPdef es diferente a la que esta guardada la escribe sino no
     delay(1000);
-    Serial.print("reseteando. EEPROM actualizada");
+    Serial.print("reseteando. EEPROM actualizada\r\n");
     asm("jmp 0x0000");
   }
 
@@ -77,7 +77,7 @@ void setup()
     ether.hisip[i] = ip[i];//IPdef[i].toInt();
   }
   ether.printIp("Server: ", ether.hisip);
-  Serial.println("Solicitando configuracion inicial...");
+  Serial.println("Solicitando configuracion inicial...\r\n");
   //----Configuracion inicial-----------
   //IPROM.toCharArray(website, IPROM.length() + 1);
   //Serial.println(IPROM);
@@ -91,11 +91,11 @@ void setup()
     if (millis() > timer) {
       timer = millis() + 5000;
       Serial.println();
-      Serial.print("<<< REQ de setup");
+      Serial.print("<<< REQ de setup\r\n");
       ether.browseUrl(PSTR("/setup.php"), "?t=1", website, my_callback);
       x++;
       if (x > 5) {
-        Serial.println("Fallo request");
+        Serial.println("Fallo request\r\n");
         onrequest = false;
       }
     }
@@ -103,8 +103,8 @@ void setup()
   //Verifico que la IP de servidor no haya cambiado, si es asi actualizo
   //la EPPROM y reseteo
   Serial.println();
-  Serial.println("IP en la EPPROM: " + IPROM);
-  Serial.println("IP actual: " + configuracion[0]);
+  Serial.println("IP en la EPPROM: " + IPROM + "\r\n");
+  Serial.println("IP actual: " + configuracion[0] + "\r\n");
   if (configuracion[0] != IPROM) {
     Serial.print("Actualizando EPPROM con nueva IP: ");
     String IPnueva[4];
@@ -122,7 +122,7 @@ void setup()
         Serial.print(".");
       }
     }
-    Serial.println("Guardando nueva IP en la EPPROM");
+    Serial.println("Guardando nueva IP en la EPPROM\r\n");
     updateIP(IPnueva);
     Serial.print("Guardada nueva IP en la EPPROM: ");
     for (int k = 0; k < 4; k++) {
@@ -143,8 +143,8 @@ void setup()
   pinMode(button_2, INPUT_PULLUP);
   pinMode(LED, OUTPUT);  //Teensy
   Serial.println("Botones inicializados");
-  //Serial1.begin(configuracion[1].toInt());
-  Serial1.begin(9600);
+  Serial1.begin(configuracion[1].toInt());
+  //Serial1.begin(9600);
   // Inicializar el LCD
   lcd.init();
   //Limpiar la pantalla
@@ -162,7 +162,7 @@ void loop()
     if (millis() > timer) {
       timer = millis() + 5000;
       Serial.println();
-      Serial.print("<<< REQ de standby");
+      Serial.print("<<< REQ de standby\r\n");
       ether.browseUrl(PSTR("/standby.php"), "?carro=0", website, my_callback);
     }
 
@@ -174,7 +174,7 @@ void loop()
     if (millis() > timer) {
       timer = millis() + 2000;
       Serial.println();
-      Serial.print("<<< REQ de carro");
+      Serial.print("<<< REQ de carro\r\n");
       ether.browseUrl(PSTR("/standby.php"), "?carro=1", website, my_callback);
     }
 
@@ -186,7 +186,7 @@ void loop()
     if (millis() > timer) {
       timer = millis() + 1000;
       Serial.println();
-      Serial.print("<<< REQ de ticket");
+      Serial.print("<<< REQ de ticket\r\n");
       ether.browseUrl(PSTR("/ticket.php"), "", website, my_callback);
     }
 
