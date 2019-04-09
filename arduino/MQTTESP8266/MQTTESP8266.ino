@@ -38,12 +38,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   memcpy(payload_str, payload, length);
   payload_str[length] = '\0';
   Serial.println(String(payload_str));
-  digitalWrite(RelayPin, HIGH);
   if ( String(topic) == "puerta/12345" ) {
     if (String(payload_str) == "on" ) {
-      digitalWrite(RelayPin, LOW);   // turn the RELAY on
+      digitalWrite(RelayPin, HIGH);   // turn the RELAY on
       delay(1000);
-      digitalWrite(RelayPin, HIGH);
+      digitalWrite(RelayPin, LOW);
       //client.publish("house/2/attic/cv/thermostat/relay_state", "on");
     } /*else if ( String(payload_str) == "off" ) {
       digitalWrite(RelayPin, LOW);    // turn the RELAY off
