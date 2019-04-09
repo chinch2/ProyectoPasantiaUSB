@@ -22,7 +22,7 @@ const char* ssid     = "PNP";
 const char* password = "PNPSISTEMAS";
 
 //change with your MQTT server IP address
-const char* mqtt_server = "10.20.184.10";
+const char* mqtt_server = "144.202.36.117";
 
 
 WiFiClient espClient;
@@ -38,7 +38,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   memcpy(payload_str, payload, length);
   payload_str[length] = '\0';
   Serial.println(String(payload_str));
-  if ( String(topic) == "puerta/12345" ) {
+  if ( String(topic) == "/devices/12345" ) {
     if (String(payload_str) == "on" ) {
       digitalWrite(RelayPin, HIGH);   // turn the RELAY on
       delay(1000);
@@ -60,9 +60,9 @@ void connect_to_MQTT() {
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 
-  if (client.connect("puerta_12345")) {
+  if (client.connect("/devices_12345")) {
     Serial.println("(re)-connected to MQTT");
-    client.subscribe("puerta/12345");
+    client.subscribe("/devices/12345");
   } else {
     Serial.println("Could not connect to MQTT");
   }
@@ -111,7 +111,7 @@ void loop() {
   // Tell the current state every 60 seconds
   if ( (millis() - tellstate) > 60000 ) {
     //  if ( digitalRead(RelayPin) ) {
-    client.publish("puerta/12345", "epale");
+    client.publish("/devices/12345", "epale");
     //  } else {
     //    client.publish("house/2/attic/cv/thermostat/relay_state", "off");
     // }
