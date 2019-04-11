@@ -37,9 +37,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
   //Serial.println(String(payload_str));
   if ( String(topic) == topic1 ) {
     if (String(payload_str) == "on" ) {
-      digitalWrite(RelayPin, HIGH);   // turn the RELAY on
+      digitalWrite(RelayPin, LOW);   // turn the RELAY on
       delay(1000);
-      digitalWrite(RelayPin, LOW);
+      digitalWrite(RelayPin, HIGH);
       //client.publish("house/2/attic/cv/thermostat/relay_state", "on");
     } /*else if ( String(payload_str) == "off" ) {
       digitalWrite(RelayPin, LOW);    // turn the RELAY off
@@ -118,6 +118,7 @@ void setup() {
 
   // initialize pin 2, where the relay is connected to.
   pinMode(RelayPin, OUTPUT);
+  digitalWrite(RelayPin, HIGH);
 }
 
 int tellstate = 0;
