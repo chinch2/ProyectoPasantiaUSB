@@ -6,8 +6,8 @@
 
 void setup()
 {
-  Serial1.begin(115200);
-  Serial.begin(115200);
+  Serial1.begin(9600);
+  Serial.begin(9600);
   //Serial1.begin(9600);
 }
 
