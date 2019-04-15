@@ -33,6 +33,7 @@ LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
 char c;
 String buff = "";//char buff[8];
 const int dispara = 39;
+const int barrera = 40;
 //-------------Teclado-----------------------
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
@@ -158,6 +159,7 @@ void setup() {
   //Inicializando los pines de entrada y salida
   pinMode(dispara, OUTPUT); //Trigger del escaner
   pinMode(LED, OUTPUT);  //Teensy
+  pinMode(barrera, OUTPUT);  //Teensy
   Serial.println("Botones inicializados");
   Serial1.begin(configuracion[1].toInt());
   //inicializo la pantalla
@@ -255,6 +257,9 @@ void comando(String cmd) {
     }*/
   if (cmd1 == "-barr") {
     Serial.print("Habriendo barrera");
+    digitalWrite(barrera, HIGH);
+    delay(3000);
+    digitalWrite(barrera, LOW);
   }
   if (cmd1 == "-conf") {
     Serial.println("Empezando conf");

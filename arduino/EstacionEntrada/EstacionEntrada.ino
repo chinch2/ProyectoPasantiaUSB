@@ -29,6 +29,7 @@ LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
 
 const int button_1 = 8;
 const int button_2 = 9;
+const int barrera = 40;
 
 void setup()
 {
@@ -142,6 +143,7 @@ void setup()
   pinMode(button_1, INPUT_PULLUP);
   pinMode(button_2, INPUT_PULLUP);
   pinMode(LED, OUTPUT);  //Teensy
+  pinMode(barrera, OUTPUT);
   Serial.println("Botones inicializados");
   Serial1.begin(configuracion[1].toInt());
   //Serial1.begin(9600);
@@ -233,6 +235,9 @@ void comando(String cmd) {
   }
   if (cmd1 == "-barr") {
     Serial.print("Habriendo barrera");
+    digitalWrite(barrera, HIGH);
+    delay(3000);
+    digitalWrite(barrera, LOW);
   }
   if (cmd1 == "-conf") {
     Serial.println("Empezando conf");
