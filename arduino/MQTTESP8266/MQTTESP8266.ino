@@ -22,7 +22,7 @@ char clientconnectc[20];
 int RelayPin = 2;    // RELAY connected to digital pin 2
 
 //change with your MQTT server IP address
-const char* mqtt_server = "144.202.36.117";
+const char* mqtt_server = "10.20.184.10";//"144.202.36.117";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
