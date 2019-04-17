@@ -1,3 +1,4 @@
+#include <SoftwareSerial.h>
 #include <EEPROM.h>
 #include <EtherCard.h>
 #include <Wire.h>
@@ -15,6 +16,8 @@ const char website[] PROGMEM = "10.20.184.123";
 byte Ethernet::buffer[400];
 static uint32_t timer = 0;
 bool onrequest = false;
+String requestF;
+char requestFc[50];
 int printStatus = 0;
 String configuracion[5];
 String IPROM = "";
@@ -26,13 +29,18 @@ int DTYPE = 0x27,//configuracion[2].toInt(),
     DROWS = 2;//configuracion[4].toInt();
 LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
 // El numero de los pines (constantes siempre):
+SoftwareSerial mySerial1(24, 25); // RXS1, TXS1
+//SoftwareSerial mySerial2(26, 27); // RXS2, TXS2
 
+char c;
+String buff;
 const int button_1 = 8;
 const int button_2 = 9;
 const int barrera = 40;
 
 void setup()
 {
+  mySerial1.begin(9600);
   Serial.begin(9600);
   delay(1000);
   Serial.println(F("\n[webClient]"));
@@ -192,6 +200,47 @@ void loop()
       ether.browseUrl(PSTR("/ticket.php"), "", website, my_callback);
     }
 
+  }
+
+  if (mySerial1.available()) {
+    c = mySerial1.read();
+    //Serial.print(c);
+    // if( c == 10) Serial.print("hubo r");
+    // if( c == 13) Serial.print("hubo n");
+    if ( c == 13) {
+      //const char *req = "?id=";
+      //strcpy(request,req);
+      //strcat(request,buff);
+      requestF = "?IDF=" + buff; // put your main code here, to run repeatedly:
+      requestF.toCharArray(requestFc, requestF.length() + 1);
+      Serial.println(requestF);
+      Serial.println(requestFc);
+      int x = 0;
+      onrequest = true;
+      timer = 0;
+      while (onrequest) {
+        ether.packetLoop(ether.packetReceive());
+
+        if (millis() > timer) {
+          timer = millis() + 5000;
+          Serial.println("Request de salida");
+          Serial.print("<<< REQ ");
+          Serial.print(requestFc);
+          ether.browseUrl(PSTR("/salida.php"), requestFc, website, my_callback);
+          x++;
+          if (x > 5) {
+            Serial.println("Fallo request");
+            onrequest = false;
+            buff = "";
+          }
+        }
+      }
+      buff = "";//buff[j] = '\0';
+    } else {//strcat(buff,c);//buff=buff+c;
+      buff = buff + c;//buff[j] = c;
+      //buff[j+1] = '\0';
+      //j++;
+    }
   }
 
 }
