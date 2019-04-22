@@ -1,3 +1,4 @@
+#include <SoftwareSerial.h>
 #include <EEPROM.h>
 #include <EtherCard.h>
 #include <Wire.h>
@@ -18,6 +19,8 @@ String request;//char request[30];
 byte Ethernet::buffer[400];
 static uint32_t timer = 0;
 bool onrequest = false;
+String requestF;
+char requestFc[50];
 char requestc[50];
 //int printStatus = 0;
 String configuracion[5];
@@ -29,6 +32,11 @@ int DTYPE = 0X27,//configuracion[2].toInt(),
     DCOLS = 20,//configuracion[3].toInt(),
     DROWS = 2;//configuracion[4].toInt();
 LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
+SoftwareSerial mySerial1(24, 25); // RXS1, TXS1
+//SoftwareSerial mySerial2(26, 27); // RXS2, TXS2
+
+char cF;
+String buffF;
 //-----------Escaner e impresora----------------
 char c;
 String buff = "";//char buff[8];
@@ -53,6 +61,7 @@ unsigned int monto;
 
 void setup() {
   // put your setup code here, to run once:
+  mySerial1.begin(9600);
   Serial.begin(9600);
   delay(1000);
   buff = "";//buff[0] = '\0';
@@ -218,6 +227,50 @@ void loop() {
       //j++;
     }
   }
+
+  if (mySerial1.available()) {
+    cF = mySerial1.read();
+    //Serial.print(c);
+    // if( c == 10) Serial.print("hubo r");
+    // if( c == 13) Serial.print("hubo n");
+    if ( cF == 13) {
+      //const char *req = "?id=";
+      //strcpy(request,req);
+      //strcat(request,buff);
+      requestF = "?IDF=" + buffF; // put your main code here, to run repeatedly:
+      requestF.toCharArray(requestFc, requestF.length() + 1);
+      Serial.println(requestF);
+      Serial.println(requestFc);
+      int x = 0;
+      onrequest = true;
+      timer = 0;
+      while (onrequest) {
+        ether.packetLoop(ether.packetReceive());
+
+        if (millis() > timer) {
+          timer = millis() + 5000;
+          Serial.println("Request de salida");
+          Serial.print("<<< REQ ");
+          Serial.print(requestFc);
+          ether.browseUrl(PSTR("/salida.php"), requestFc, website, my_callback);
+          x++;
+          if (x > 5) {
+            Serial.println("Fallo request");
+            onrequest = false;
+            buffF = "";
+          }
+        }
+      }
+      buffF = "";//buff[j] = '\0';
+    } else {//strcat(buff,c);//buff=buff+c;
+      buffF = buffF + cF;//buff[j] = c;
+      //buff[j+1] = '\0';
+      //j++;
+    }
+  }
+
+
+
 }
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {

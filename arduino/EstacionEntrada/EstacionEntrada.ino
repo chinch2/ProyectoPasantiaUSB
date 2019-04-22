@@ -43,6 +43,7 @@ void setup()
   mySerial1.begin(9600);
   Serial.begin(9600);
   delay(1000);
+  buff = "";
   Serial.println(F("\n[webClient]"));
   Serial.print("MAC: ");
   for (byte i = 0; i < 6; ++i) {
