@@ -224,10 +224,10 @@ void loop()
 
         if (millis() > timer) {
           timer = millis() + 5000;
-          Serial.println("Request de salida");
+          Serial.println("Request de Entrada fijo");
           Serial.print("<<< REQ ");
           Serial.print(requestFc);
-          ether.browseUrl(PSTR("/salida.php"), requestFc, website, my_callback);
+          ether.browseUrl(PSTR("/ticket.php"), requestFc, website, my_callback);
           x++;
           if (x > 5) {
             Serial.println("Fallo request");
