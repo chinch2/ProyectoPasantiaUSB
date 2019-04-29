@@ -17496,87 +17496,6 @@ drill 1.0 mm</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="RJ45 Jack">
-<packages>
-<package name="RJ45">
-<wire x1="0" y1="0" x2="18.65" y2="0" width="0.127" layer="21"/>
-<wire x1="18.65" y1="0" x2="18.65" y2="15.8" width="0.127" layer="21"/>
-<wire x1="0" y1="15.8" x2="18.65" y2="15.8" width="0.127" layer="21"/>
-<pad name="P$1" x="5.08" y="0.13" drill="1.6"/>
-<pad name="P$2" x="5.08" y="15.67" drill="1.6"/>
-<hole x="8.14" y="2.185" drill="3.2"/>
-<hole x="8.14" y="13.615" drill="3.2"/>
-<pad name="P$6" x="14.48" y="4.725" drill="0.9"/>
-<wire x1="0" y1="0" x2="0" y2="3.81" width="0.127" layer="21"/>
-<pad name="P$4" x="17.02" y="3.455" drill="0.9"/>
-<pad name="P$5" x="17.02" y="5.995" drill="0.9"/>
-<pad name="P$7" x="14.48" y="7.265" drill="0.9"/>
-<pad name="P$3" x="17.02" y="11.075" drill="0.9" rot="R180"/>
-<pad name="P$8" x="14.48" y="12.345" drill="0.9" rot="R180"/>
-<pad name="P$9" x="14.48" y="9.805" drill="0.9" rot="R180"/>
-<pad name="P$10" x="17.02" y="8.535" drill="0.9" rot="R180"/>
-<wire x1="0" y1="3.81" x2="0" y2="12.7" width="0.127" layer="21"/>
-<wire x1="0" y1="12.7" x2="0" y2="15.8" width="0.127" layer="21"/>
-<wire x1="0" y1="12.7" x2="6.35" y2="12.7" width="0.127" layer="21"/>
-<wire x1="6.35" y1="12.7" x2="6.35" y2="3.81" width="0.127" layer="21"/>
-<wire x1="6.35" y1="3.81" x2="0" y2="3.81" width="0.127" layer="21"/>
-</package>
-</packages>
-<symbols>
-<symbol name="RJ45">
-<pin name="PIN1" x="-10.16" y="12.7" length="middle"/>
-<pin name="PIN2" x="-10.16" y="7.62" length="middle"/>
-<pin name="PIN3" x="-10.16" y="2.54" length="middle"/>
-<pin name="PIN4" x="-10.16" y="-2.54" length="middle"/>
-<pin name="PIN5" x="-10.16" y="-7.62" length="middle"/>
-<pin name="PIN6" x="-10.16" y="-12.7" length="middle"/>
-<pin name="PIN7" x="-10.16" y="-17.78" length="middle"/>
-<pin name="PIN8" x="-10.16" y="-22.86" length="middle"/>
-<wire x1="-5.08" y1="15.24" x2="-5.08" y2="-30.48" width="0.254" layer="94"/>
-<wire x1="-5.08" y1="-30.48" x2="2.54" y2="-30.48" width="0.254" layer="94"/>
-<wire x1="2.54" y1="-30.48" x2="2.54" y2="15.24" width="0.254" layer="94"/>
-<wire x1="2.54" y1="15.24" x2="-5.08" y2="15.24" width="0.254" layer="94"/>
-<wire x1="2.54" y1="15.24" x2="10.16" y2="15.24" width="0.254" layer="94"/>
-<wire x1="10.16" y1="15.24" x2="10.16" y2="-30.48" width="0.254" layer="94"/>
-<wire x1="10.16" y1="-30.48" x2="2.54" y2="-30.48" width="0.254" layer="94"/>
-<wire x1="2.54" y1="-22.86" x2="7.62" y2="-22.86" width="0.254" layer="95"/>
-<wire x1="2.54" y1="-17.78" x2="7.62" y2="-17.78" width="0.254" layer="95"/>
-<wire x1="2.54" y1="-12.7" x2="7.62" y2="-12.7" width="0.254" layer="95"/>
-<wire x1="2.54" y1="-7.62" x2="7.62" y2="-7.62" width="0.254" layer="95"/>
-<wire x1="2.54" y1="-2.54" x2="7.62" y2="-2.54" width="0.254" layer="95"/>
-<wire x1="2.54" y1="2.54" x2="7.62" y2="2.54" width="0.254" layer="95"/>
-<wire x1="2.54" y1="7.62" x2="7.62" y2="7.62" width="0.254" layer="95"/>
-<wire x1="2.54" y1="12.7" x2="7.62" y2="12.7" width="0.254" layer="95"/>
-<text x="5.08" y="17.78" size="1.778" layer="95" rot="R180">RJ45</text>
-<pin name="SHD" x="-10.16" y="-27.94" length="middle"/>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="RJ45">
-<gates>
-<gate name="G$1" symbol="RJ45" x="-5.08" y="5.08"/>
-</gates>
-<devices>
-<device name="" package="RJ45">
-<connects>
-<connect gate="G$1" pin="PIN1" pad="P$8"/>
-<connect gate="G$1" pin="PIN2" pad="P$3"/>
-<connect gate="G$1" pin="PIN3" pad="P$9"/>
-<connect gate="G$1" pin="PIN4" pad="P$10"/>
-<connect gate="G$1" pin="PIN5" pad="P$7"/>
-<connect gate="G$1" pin="PIN6" pad="P$5"/>
-<connect gate="G$1" pin="PIN7" pad="P$6"/>
-<connect gate="G$1" pin="PIN8" pad="P$4"/>
-<connect gate="G$1" pin="SHD" pad="P$1 P$2"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 <library name="Atmel_By_element14_Batch_1-00">
 <description>Developed by element14 :&lt;br&gt;
 element14 CAD Library consolidation.ulp
@@ -19007,6 +18926,173 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 </deviceset>
 </devicesets>
 </library>
+<library name="con-tycoelectronics" urn="urn:adsk.eagle:library:193">
+<description>&lt;b&gt;Tyco Electronics Connector&lt;/b&gt;&lt;p&gt;
+http://catalog.tycoelectronics.com&lt;br&gt;
+&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
+<packages>
+<package name="RJ45-NO-SHIELD" urn="urn:adsk.eagle:footprint:10651/1" library_version="1">
+<description>&lt;b&gt;RJ45 Low Profile&lt;/b&gt; No Shield&lt;p&gt;
+For all RJ45 N and Z Series Models&lt;br&gt;
+Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</description>
+<wire x1="-7.527" y1="10.819" x2="7.527" y2="10.819" width="0.2032" layer="21"/>
+<wire x1="8.4455" y1="-5.5118" x2="-8.4455" y2="-5.5118" width="0.01" layer="20"/>
+<wire x1="7.527" y1="-7.782" x2="-7.527" y2="-7.782" width="0.2032" layer="21"/>
+<wire x1="-7.527" y1="-7.782" x2="-7.527" y2="10.819" width="0.2032" layer="21"/>
+<wire x1="7.527" y1="10.819" x2="7.527" y2="-7.782" width="0.2032" layer="21"/>
+<pad name="4" x="-0.635" y="8.89" drill="0.9" diameter="1.4"/>
+<pad name="3" x="-1.905" y="6.35" drill="0.9" diameter="1.4"/>
+<pad name="2" x="-3.175" y="8.89" drill="0.9" diameter="1.4"/>
+<pad name="5" x="0.635" y="6.35" drill="0.9" diameter="1.4"/>
+<pad name="1" x="-4.445" y="6.35" drill="0.9" diameter="1.4"/>
+<pad name="6" x="1.905" y="8.89" drill="0.9" diameter="1.4"/>
+<pad name="7" x="3.175" y="6.35" drill="0.9" diameter="1.4"/>
+<pad name="8" x="4.445" y="8.89" drill="0.9" diameter="1.4"/>
+<text x="-9.525" y="-0.635" size="1.778" layer="25" rot="R90">&gt;NAME</text>
+<text x="-5.715" y="2.54" size="1.778" layer="27">&gt;VALUE</text>
+<rectangle x1="7.6" y1="-5.485" x2="8.875" y2="-4.342" layer="21"/>
+<rectangle x1="-8.875" y1="-5.485" x2="-7.625" y2="-4.342" layer="21"/>
+<hole x="-5.715" y="0" drill="3.2512"/>
+<hole x="5.715" y="0" drill="3.2512"/>
+</package>
+</packages>
+<packages3d>
+<package3d name="RJ45-NO-SHIELD" urn="urn:adsk.eagle:package:10660/1" type="box" library_version="1">
+<description>RJ45 Low Profile No Shield
+For all RJ45 N and Z Series Models
+Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</description>
+<packageinstances>
+<packageinstance name="RJ45-NO-SHIELD"/>
+</packageinstances>
+</package3d>
+</packages3d>
+<symbols>
+<symbol name="JACK8" urn="urn:adsk.eagle:symbol:10650/1" library_version="1">
+<wire x1="1.524" y1="8.128" x2="0" y2="8.128" width="0.254" layer="94"/>
+<wire x1="0" y1="8.128" x2="0" y2="7.112" width="0.254" layer="94"/>
+<wire x1="0" y1="7.112" x2="1.524" y2="7.112" width="0.254" layer="94"/>
+<wire x1="1.524" y1="5.588" x2="0" y2="5.588" width="0.254" layer="94"/>
+<wire x1="0" y1="5.588" x2="0" y2="4.572" width="0.254" layer="94"/>
+<wire x1="0" y1="4.572" x2="1.524" y2="4.572" width="0.254" layer="94"/>
+<wire x1="1.524" y1="3.048" x2="0" y2="3.048" width="0.254" layer="94"/>
+<wire x1="0" y1="3.048" x2="0" y2="2.032" width="0.254" layer="94"/>
+<wire x1="0" y1="2.032" x2="1.524" y2="2.032" width="0.254" layer="94"/>
+<wire x1="1.524" y1="0.508" x2="0" y2="0.508" width="0.254" layer="94"/>
+<wire x1="0" y1="0.508" x2="0" y2="-0.508" width="0.254" layer="94"/>
+<wire x1="0" y1="-0.508" x2="1.524" y2="-0.508" width="0.254" layer="94"/>
+<wire x1="1.524" y1="-2.032" x2="0" y2="-2.032" width="0.254" layer="94"/>
+<wire x1="0" y1="-2.032" x2="0" y2="-3.048" width="0.254" layer="94"/>
+<wire x1="0" y1="-3.048" x2="1.524" y2="-3.048" width="0.254" layer="94"/>
+<wire x1="1.524" y1="-4.572" x2="0" y2="-4.572" width="0.254" layer="94"/>
+<wire x1="0" y1="-4.572" x2="0" y2="-5.588" width="0.254" layer="94"/>
+<wire x1="0" y1="-5.588" x2="1.524" y2="-5.588" width="0.254" layer="94"/>
+<wire x1="3.048" y1="-2.032" x2="5.588" y2="-2.032" width="0.1998" layer="94"/>
+<wire x1="5.588" y1="-2.032" x2="5.588" y2="-0.254" width="0.1998" layer="94"/>
+<wire x1="5.588" y1="-0.254" x2="6.604" y2="-0.254" width="0.1998" layer="94"/>
+<wire x1="6.604" y1="-0.254" x2="6.604" y2="1.778" width="0.1998" layer="94"/>
+<wire x1="6.604" y1="1.778" x2="5.588" y2="1.778" width="0.1998" layer="94"/>
+<wire x1="5.588" y1="1.778" x2="5.588" y2="3.556" width="0.1998" layer="94"/>
+<wire x1="5.588" y1="3.556" x2="3.048" y2="3.556" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="3.556" x2="3.048" y2="2.54" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="2.54" x2="3.048" y2="2.032" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="2.032" x2="3.048" y2="1.524" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="1.524" x2="3.048" y2="1.016" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="1.016" x2="3.048" y2="0.508" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="0.508" x2="3.048" y2="0" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="0" x2="3.048" y2="-0.508" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="-0.508" x2="3.048" y2="-1.016" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="-1.016" x2="3.048" y2="-2.032" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="2.54" x2="3.81" y2="2.54" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="2.032" x2="3.81" y2="2.032" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="1.524" x2="3.81" y2="1.524" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="1.016" x2="3.81" y2="1.016" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="0.508" x2="3.81" y2="0.508" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="0" x2="3.81" y2="0" width="0.1998" layer="94"/>
+<wire x1="1.524" y1="-7.112" x2="0" y2="-7.112" width="0.254" layer="94"/>
+<wire x1="0" y1="-7.112" x2="0" y2="-8.128" width="0.254" layer="94"/>
+<wire x1="0" y1="-8.128" x2="1.524" y2="-8.128" width="0.254" layer="94"/>
+<wire x1="1.524" y1="-9.652" x2="0" y2="-9.652" width="0.254" layer="94"/>
+<wire x1="0" y1="-9.652" x2="0" y2="-10.668" width="0.254" layer="94"/>
+<wire x1="0" y1="-10.668" x2="1.524" y2="-10.668" width="0.254" layer="94"/>
+<wire x1="3.048" y1="-0.508" x2="3.81" y2="-0.508" width="0.1998" layer="94"/>
+<wire x1="3.048" y1="-1.016" x2="3.81" y2="-1.016" width="0.1998" layer="94"/>
+<text x="-2.54" y="10.16" size="1.778" layer="95">&gt;NAME</text>
+<text x="-2.54" y="-13.208" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="1" x="-2.54" y="7.62" visible="pad" length="short" direction="pas" swaplevel="1"/>
+<pin name="2" x="-2.54" y="5.08" visible="pad" length="short" direction="pas" swaplevel="1"/>
+<pin name="3" x="-2.54" y="2.54" visible="pad" length="short" direction="pas" swaplevel="1"/>
+<pin name="4" x="-2.54" y="0" visible="pad" length="short" direction="pas" swaplevel="1"/>
+<pin name="5" x="-2.54" y="-2.54" visible="pad" length="short" direction="pas" swaplevel="1"/>
+<pin name="6" x="-2.54" y="-5.08" visible="pad" length="short" direction="pas" swaplevel="1"/>
+<pin name="7" x="-2.54" y="-7.62" visible="pad" length="short" direction="pas" swaplevel="1"/>
+<pin name="8" x="-2.54" y="-10.16" visible="pad" length="short" direction="pas" swaplevel="1"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="RJ45" urn="urn:adsk.eagle:component:10669/1" prefix="X" library_version="1">
+<description>&lt;b&gt;CORCOM Modular RJ Jacks&lt;/b&gt; No Shield&lt;p&gt;
+Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</description>
+<gates>
+<gate name="G$1" symbol="JACK8" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="RJ45-NO-SHIELD">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="3" pad="3"/>
+<connect gate="G$1" pin="4" pad="4"/>
+<connect gate="G$1" pin="5" pad="5"/>
+<connect gate="G$1" pin="6" pad="6"/>
+<connect gate="G$1" pin="7" pad="7"/>
+<connect gate="G$1" pin="8" pad="8"/>
+</connects>
+<package3dinstances>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:10660/1"/>
+</package3dinstances>
+<technologies>
+<technology name="-6L-B">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="RJ45-6L-B" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="16R6090" constant="no"/>
+</technology>
+<technology name="-6L-S">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="RJ45-6L-S" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="16R6091" constant="no"/>
+</technology>
+<technology name="-6X">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="RJ45-6X" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="01P1604" constant="no"/>
+</technology>
+<technology name="-8L-B">
+<attribute name="MF" value="TYCO ELECTRONICS" constant="no"/>
+<attribute name="MPN" value="RJ45-8L-B" constant="no"/>
+<attribute name="OC_FARNELL" value="1279843" constant="no"/>
+<attribute name="OC_NEWARK" value="52K4445" constant="no"/>
+</technology>
+<technology name="-8L-S">
+<attribute name="MF" value="TYCO ELECTRONICS" constant="no"/>
+<attribute name="MPN" value="RJ45-8L-S" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="80K9067" constant="no"/>
+</technology>
+<technology name="-8X">
+<attribute name="MF" value="" constant="no"/>
+<attribute name="MPN" value="RJ45-8X" constant="no"/>
+<attribute name="OC_FARNELL" value="unknown" constant="no"/>
+<attribute name="OC_NEWARK" value="16R6101" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -19054,14 +19140,8 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <part name="+5VP" library="solpad" library_urn="urn:adsk.eagle:library:364" deviceset="LSP10" device="" package3d_urn="urn:adsk.eagle:package:26501/1"/>
 <part name="+3V3P" library="solpad" library_urn="urn:adsk.eagle:library:364" deviceset="LSP10" device="" package3d_urn="urn:adsk.eagle:package:26501/1"/>
 <part name="GND2" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="PRINTER" library="RJ45 Jack" deviceset="RJ45" device=""/>
-<part name="BARCODESCANNER" library="RJ45 Jack" deviceset="RJ45" device=""/>
-<part name="GND23" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="GND20" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="AT90USB1286" library="Atmel_By_element14_Batch_1-00" deviceset="AT90USB1286-AU" device=""/>
 <part name="GND" library="solpad" library_urn="urn:adsk.eagle:library:364" deviceset="LSP10" device="" package3d_urn="urn:adsk.eagle:package:26501/1"/>
-<part name="PRINTER1" library="RJ45 Jack" deviceset="RJ45" device=""/>
-<part name="PRINTER2" library="RJ45 Jack" deviceset="RJ45" device=""/>
 <part name="JP1" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="PINHD-1X8" device="BIG" package3d_urn="urn:adsk.eagle:package:6240707/1"/>
 <part name="BOTON" library="con-molex" library_urn="urn:adsk.eagle:library:165" deviceset="22-23-2021" device=""/>
 <part name="X1" library="con-molex" library_urn="urn:adsk.eagle:library:165" deviceset="22-23-2041" device=""/>
@@ -19107,6 +19187,13 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <part name="VREG" library="v-reg-2" deviceset="LM1086" device="TO263"/>
 <part name="GND3" library="solpad" library_urn="urn:adsk.eagle:library:364" deviceset="LSP10" device="" package3d_urn="urn:adsk.eagle:package:26501/1"/>
 <part name="BARRERA" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="PINHD-1X1" device="" package3d_urn="urn:adsk.eagle:package:6240654/1"/>
+<part name="BARCODE" library="con-tycoelectronics" library_urn="urn:adsk.eagle:library:193" deviceset="RJ45" device="" package3d_urn="urn:adsk.eagle:package:10660/1" technology="-6L-B"/>
+<part name="PRINTER" library="con-tycoelectronics" library_urn="urn:adsk.eagle:library:193" deviceset="RJ45" device="" package3d_urn="urn:adsk.eagle:package:10660/1" technology="-6L-B"/>
+<part name="SSERIAL1" library="con-tycoelectronics" library_urn="urn:adsk.eagle:library:193" deviceset="RJ45" device="" package3d_urn="urn:adsk.eagle:package:10660/1" technology="-6L-B"/>
+<part name="SSERIAL2" library="con-tycoelectronics" library_urn="urn:adsk.eagle:library:193" deviceset="RJ45" device="" package3d_urn="urn:adsk.eagle:package:10660/1" technology="-6L-B"/>
+<part name="GND30" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
+<part name="+3V3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
+<part name="GND23" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -19242,14 +19329,6 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <instance part="GND2" gate="1" x="-106.68" y="132.08" smashed="yes" rot="R270">
 <attribute name="VALUE" x="-109.22" y="134.62" size="1.778" layer="96" rot="R270"/>
 </instance>
-<instance part="PRINTER" gate="G$1" x="-269.24" y="147.32" smashed="yes" rot="R90"/>
-<instance part="BARCODESCANNER" gate="G$1" x="-314.96" y="55.88" smashed="yes" rot="R180"/>
-<instance part="GND23" gate="1" x="-302.26" y="43.18" smashed="yes" rot="R90">
-<attribute name="VALUE" x="-299.72" y="40.64" size="1.778" layer="96" rot="R90"/>
-</instance>
-<instance part="GND20" gate="1" x="-281.94" y="134.62" smashed="yes">
-<attribute name="VALUE" x="-281.94" y="137.16" size="1.778" layer="96"/>
-</instance>
 <instance part="AT90USB1286" gate="A" x="-142.24" y="58.42" smashed="yes">
 <attribute name="NAME" x="-147.8026" y="116.967" size="2.0828" layer="95" ratio="10" rot="SR0"/>
 <attribute name="VALUE" x="-146.939" y="-9.0678" size="2.0828" layer="96" ratio="10" rot="SR0"/>
@@ -19257,8 +19336,6 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <instance part="GND" gate="1" x="-203.2" y="-20.32" smashed="yes" rot="R90">
 <attribute name="NAME" x="-206.121" y="-21.59" size="1.778" layer="95" rot="R90"/>
 </instance>
-<instance part="PRINTER1" gate="G$1" x="-83.82" y="101.6" smashed="yes" rot="R90"/>
-<instance part="PRINTER2" gate="G$1" x="-25.4" y="101.6" smashed="yes" rot="R90"/>
 <instance part="JP1" gate="G$1" x="-114.3" y="50.8" smashed="yes">
 <attribute name="NAME" x="-120.65" y="61.595" size="1.778" layer="95"/>
 <attribute name="VALUE" x="-120.65" y="35.56" size="1.778" layer="96"/>
@@ -19434,6 +19511,31 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <attribute name="NAME" x="-181.61" y="45.085" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="-181.61" y="53.34" size="1.778" layer="96" rot="R180"/>
 </instance>
+<instance part="BARCODE" gate="G$1" x="-312.42" y="58.42" smashed="yes" rot="R180">
+<attribute name="NAME" x="-309.88" y="48.26" size="1.778" layer="95" rot="R180"/>
+<attribute name="VALUE" x="-309.88" y="71.628" size="1.778" layer="96" rot="R180"/>
+</instance>
+<instance part="PRINTER" gate="G$1" x="-261.62" y="152.4" smashed="yes" rot="R90">
+<attribute name="NAME" x="-271.78" y="149.86" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="-248.412" y="149.86" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="SSERIAL1" gate="G$1" x="-81.28" y="109.22" smashed="yes" rot="R90">
+<attribute name="NAME" x="-91.44" y="106.68" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="-68.072" y="106.68" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="SSERIAL2" gate="G$1" x="-40.64" y="109.22" smashed="yes" rot="R90">
+<attribute name="NAME" x="-50.8" y="106.68" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="-27.432" y="106.68" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="GND30" gate="1" x="-307.34" y="50.8" smashed="yes" rot="R90">
+<attribute name="VALUE" x="-304.8" y="48.26" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="+3V3" gate="G$1" x="-304.8" y="58.42" smashed="yes" rot="R270">
+<attribute name="VALUE" x="-309.88" y="60.96" size="1.778" layer="96"/>
+</instance>
+<instance part="GND23" gate="1" x="-269.24" y="147.32" smashed="yes">
+<attribute name="VALUE" x="-269.24" y="149.86" size="1.778" layer="96"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -19549,14 +19651,6 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <junction x="-104.14" y="132.08"/>
 </segment>
 <segment>
-<pinref part="GND23" gate="1" pin="GND"/>
-<pinref part="BARCODESCANNER" gate="G$1" pin="PIN1"/>
-</segment>
-<segment>
-<pinref part="GND20" gate="1" pin="GND"/>
-<pinref part="PRINTER" gate="G$1" pin="PIN1"/>
-</segment>
-<segment>
 <pinref part="AT90USB1286" gate="A" pin="GND_2"/>
 <wire x1="-160.02" y1="7.62" x2="-162.56" y2="7.62" width="0.1524" layer="91"/>
 <label x="-162.56" y="7.62" size="1.778" layer="95" rot="R180" xref="yes"/>
@@ -19666,6 +19760,14 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <segment>
 <pinref part="GND6" gate="1" pin="GND"/>
 <pinref part="VREG" gate="G$1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="GND30" gate="1" pin="GND"/>
+<pinref part="BARCODE" gate="G$1" pin="1"/>
+</segment>
+<segment>
+<pinref part="GND23" gate="1" pin="GND"/>
+<pinref part="PRINTER" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="SS" class="0">
@@ -19817,11 +19919,6 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <pinref part="VREG" gate="G$1" pin="OUT"/>
 </segment>
 <segment>
-<pinref part="BARCODESCANNER" gate="G$1" pin="PIN4"/>
-<wire x1="-304.8" y1="58.42" x2="-302.26" y2="58.42" width="0.1524" layer="91"/>
-<label x="-302.26" y="58.42" size="1.778" layer="95" xref="yes"/>
-</segment>
-<segment>
 <pinref part="SENSORPAPEL" gate="A" pin="1"/>
 <wire x1="-256.54" y1="50.8" x2="-243.84" y2="50.8" width="0.1524" layer="91"/>
 <label x="-256.54" y="50.8" size="1.778" layer="95" rot="R180" xref="yes"/>
@@ -19906,6 +20003,11 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <wire x1="58.42" y1="35.56" x2="55.88" y2="35.56" width="0.1524" layer="91"/>
 <label x="55.88" y="35.56" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
+<segment>
+<pinref part="BARCODE" gate="G$1" pin="4"/>
+<wire x1="-309.88" y1="58.42" x2="-307.34" y2="58.42" width="0.1524" layer="91"/>
+<pinref part="+3V3" gate="G$1" pin="+3V3"/>
+</segment>
 </net>
 <net name="ALE" class="0">
 <segment>
@@ -19935,14 +20037,14 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 </net>
 <net name="TRIGGERBC" class="0">
 <segment>
-<pinref part="BARCODESCANNER" gate="G$1" pin="PIN3"/>
-<wire x1="-304.8" y1="53.34" x2="-302.26" y2="53.34" width="0.1524" layer="91"/>
-<label x="-302.26" y="53.34" size="1.778" layer="95" xref="yes"/>
-</segment>
-<segment>
 <pinref part="AT90USB1286" gate="A" pin="PF1"/>
 <wire x1="-160.02" y1="50.8" x2="-162.56" y2="50.8" width="0.1524" layer="91"/>
 <label x="-162.56" y="50.8" size="1.778" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<pinref part="BARCODE" gate="G$1" pin="3"/>
+<wire x1="-309.88" y1="55.88" x2="-307.34" y2="55.88" width="0.1524" layer="91"/>
+<label x="-307.34" y="55.88" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="T1IN" class="0">
@@ -19995,14 +20097,14 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 </net>
 <net name="TXBC" class="0">
 <segment>
-<pinref part="BARCODESCANNER" gate="G$1" pin="PIN2"/>
-<wire x1="-304.8" y1="48.26" x2="-302.26" y2="48.26" width="0.1524" layer="91"/>
-<label x="-302.26" y="48.26" size="1.778" layer="95" xref="yes"/>
-</segment>
-<segment>
 <pinref part="AT90USB1286" gate="A" pin="PD2"/>
 <wire x1="-160.02" y1="25.4" x2="-162.56" y2="25.4" width="0.1524" layer="91"/>
 <label x="-162.56" y="25.4" size="1.778" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<pinref part="BARCODE" gate="G$1" pin="2"/>
+<wire x1="-309.88" y1="53.34" x2="-307.34" y2="53.34" width="0.1524" layer="91"/>
+<label x="-307.34" y="53.34" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="+5V" class="0">
@@ -20049,9 +20151,9 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <label x="-248.92" y="109.22" size="1.778" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="PRINTER" gate="G$1" pin="PIN2"/>
-<wire x1="-276.86" y1="137.16" x2="-276.86" y2="134.62" width="0.1524" layer="91"/>
-<label x="-276.86" y="134.62" size="1.778" layer="95" rot="R270" xref="yes"/>
+<pinref part="PRINTER" gate="G$1" pin="2"/>
+<wire x1="-266.7" y1="149.86" x2="-266.7" y2="147.32" width="0.1524" layer="91"/>
+<label x="-266.7" y="147.32" size="1.778" layer="95" rot="R270" xref="yes"/>
 </segment>
 </net>
 <net name="N$20" class="0">
@@ -20128,9 +20230,9 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <label x="-121.92" y="71.12" size="1.778" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="PRINTER1" gate="G$1" pin="PIN1"/>
-<wire x1="-96.52" y1="91.44" x2="-96.52" y2="88.9" width="0.1524" layer="91"/>
-<label x="-96.52" y="88.9" size="1.778" layer="95" rot="R270" xref="yes"/>
+<pinref part="SSERIAL1" gate="G$1" pin="1"/>
+<wire x1="-88.9" y1="106.68" x2="-88.9" y2="104.14" width="0.1524" layer="91"/>
+<label x="-88.9" y="104.14" size="1.778" layer="95" rot="R270" xref="yes"/>
 </segment>
 </net>
 <net name="STX1" class="0">
@@ -20140,9 +20242,9 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <label x="-121.92" y="68.58" size="1.778" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="PRINTER1" gate="G$1" pin="PIN2"/>
-<wire x1="-91.44" y1="91.44" x2="-91.44" y2="88.9" width="0.1524" layer="91"/>
-<label x="-91.44" y="88.9" size="1.778" layer="95" rot="R270" xref="yes"/>
+<pinref part="SSERIAL1" gate="G$1" pin="2"/>
+<wire x1="-86.36" y1="106.68" x2="-86.36" y2="104.14" width="0.1524" layer="91"/>
+<label x="-86.36" y="104.14" size="1.778" layer="95" rot="R270" xref="yes"/>
 </segment>
 </net>
 <net name="SRX2" class="0">
@@ -20152,9 +20254,9 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <label x="-121.92" y="66.04" size="1.778" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="PRINTER2" gate="G$1" pin="PIN1"/>
-<wire x1="-38.1" y1="91.44" x2="-38.1" y2="88.9" width="0.1524" layer="91"/>
-<label x="-38.1" y="88.9" size="1.778" layer="95" rot="R270" xref="yes"/>
+<pinref part="SSERIAL2" gate="G$1" pin="1"/>
+<wire x1="-48.26" y1="106.68" x2="-48.26" y2="101.6" width="0.1524" layer="91"/>
+<label x="-48.26" y="101.6" size="1.778" layer="95" rot="R270" xref="yes"/>
 </segment>
 </net>
 <net name="STX2" class="0">
@@ -20164,9 +20266,9 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <label x="-121.92" y="63.5" size="1.778" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="PRINTER2" gate="G$1" pin="PIN2"/>
-<wire x1="-33.02" y1="91.44" x2="-33.02" y2="88.9" width="0.1524" layer="91"/>
-<label x="-33.02" y="88.9" size="1.778" layer="95" rot="R270" xref="yes"/>
+<pinref part="SSERIAL2" gate="G$1" pin="2"/>
+<wire x1="-45.72" y1="106.68" x2="-45.72" y2="101.6" width="0.1524" layer="91"/>
+<label x="-45.72" y="101.6" size="1.778" layer="95" rot="R270" xref="yes"/>
 </segment>
 </net>
 <net name="T0" class="0">

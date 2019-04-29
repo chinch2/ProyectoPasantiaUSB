@@ -20440,11 +20440,12 @@ This is a single port, RJ45 ethernet jacks with built in transformer (magnetics)
 <wire x1="137.16" y1="-2.54" x2="137.16" y2="-5.08" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$8" class="0">
+<net name="BARRERA" class="0">
 <segment>
 <pinref part="AT90USB1286" gate="A" pin="PF2"/>
 <pinref part="BARRERA" gate="G$1" pin="1"/>
 <wire x1="-185.42" y1="48.26" x2="-160.02" y2="48.26" width="0.1524" layer="91"/>
+<label x="-177.8" y="48.26" size="1.778" layer="95" rot="R270" xref="yes"/>
 </segment>
 </net>
 </nets>

@@ -6028,12 +6028,10 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <part name="U$2" library="Particle-Devices" library_urn="urn:adsk.eagle:library:5952892" deviceset="PHOTON" device="_WITH_HEADERS" package3d_urn="urn:adsk.eagle:package:5952920/1"/>
 <part name="MEMFISC" library="PNP" deviceset="53?-06" device="047"/>
 <part name="PRINTER" library="PNP" deviceset="53?-05" device="047"/>
-<part name="AUDIT" library="PNP" deviceset="53?-05" device="047"/>
 <part name="G1" library="battery" library_urn="urn:adsk.eagle:library:109" deviceset="CH23-1220LF" device="" package3d_urn="urn:adsk.eagle:package:4614/1"/>
 <part name="GND1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND2" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="GND4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="P+1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
 <part name="RSCL" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="0207/10" package3d_urn="urn:adsk.eagle:package:23491/2" value="10k"/>
@@ -6045,8 +6043,9 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <part name="X1" library="con-tycoelectronics" library_urn="urn:adsk.eagle:library:193" deviceset="RJ45" device="" package3d_urn="urn:adsk.eagle:package:10660/1" technology="-6L-B"/>
 <part name="GND6" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="RSCL1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="0207/10" package3d_urn="urn:adsk.eagle:package:23491/2" value="10k"/>
-<part name="RSCL2" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-US_" device="0207/10" package3d_urn="urn:adsk.eagle:package:23491/2" value="10k"/>
-<part name="+3V1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
+<part name="MEMAUDIT" library="PNP" deviceset="53?-06" device="047"/>
+<part name="GND7" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
+<part name="+3V5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -6089,22 +6088,6 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <instance part="PRINTER" gate="-5" x="-48.26" y="119.38" smashed="yes" rot="R90">
 <attribute name="NAME" x="-47.498" y="121.92" size="1.524" layer="95" rot="R90"/>
 </instance>
-<instance part="AUDIT" gate="-1" x="-111.76" y="104.14" smashed="yes" rot="R90">
-<attribute name="NAME" x="-110.998" y="106.68" size="1.524" layer="95" rot="R90"/>
-<attribute name="VALUE" x="-113.157" y="103.378" size="1.778" layer="96" rot="R90"/>
-</instance>
-<instance part="AUDIT" gate="-2" x="-109.22" y="104.14" smashed="yes" rot="R90">
-<attribute name="NAME" x="-108.458" y="106.68" size="1.524" layer="95" rot="R90"/>
-</instance>
-<instance part="AUDIT" gate="-3" x="-106.68" y="104.14" smashed="yes" rot="R90">
-<attribute name="NAME" x="-105.918" y="106.68" size="1.524" layer="95" rot="R90"/>
-</instance>
-<instance part="AUDIT" gate="-4" x="-104.14" y="104.14" smashed="yes" rot="R90">
-<attribute name="NAME" x="-103.378" y="106.68" size="1.524" layer="95" rot="R90"/>
-</instance>
-<instance part="AUDIT" gate="-5" x="-101.6" y="104.14" smashed="yes" rot="R90">
-<attribute name="NAME" x="-100.838" y="106.68" size="1.524" layer="95" rot="R90"/>
-</instance>
 <instance part="G1" gate="G1" x="-73.66" y="33.02" smashed="yes" rot="R90">
 <attribute name="NAME" x="-76.835" y="31.75" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="-76.2" y="16.51" size="1.778" layer="96" rot="R90"/>
@@ -6117,9 +6100,6 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 </instance>
 <instance part="GND3" gate="1" x="-48.26" y="114.3" smashed="yes">
 <attribute name="VALUE" x="-50.8" y="111.76" size="1.778" layer="96"/>
-</instance>
-<instance part="GND4" gate="1" x="-111.76" y="99.06" smashed="yes">
-<attribute name="VALUE" x="-114.3" y="96.52" size="1.778" layer="96"/>
 </instance>
 <instance part="GND5" gate="1" x="-73.66" y="22.86" smashed="yes">
 <attribute name="VALUE" x="-76.2" y="20.32" size="1.778" layer="96"/>
@@ -6148,23 +6128,41 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <instance part="+3V4" gate="G$1" x="0" y="96.52" smashed="yes" rot="R180">
 <attribute name="VALUE" x="-2.54" y="101.6" size="1.778" layer="96" rot="R270"/>
 </instance>
-<instance part="X1" gate="G$1" x="-50.8" y="96.52" smashed="yes" rot="R90">
-<attribute name="NAME" x="-60.96" y="93.98" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="-37.592" y="93.98" size="1.778" layer="96" rot="R90"/>
+<instance part="X1" gate="G$1" x="-71.12" y="101.6" smashed="yes" rot="R90">
+<attribute name="NAME" x="-81.28" y="99.06" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="-57.912" y="99.06" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="GND6" gate="1" x="-55.88" y="91.44" smashed="yes">
-<attribute name="VALUE" x="-58.42" y="88.9" size="1.778" layer="96"/>
+<instance part="GND6" gate="1" x="-76.2" y="96.52" smashed="yes">
+<attribute name="VALUE" x="-78.74" y="93.98" size="1.778" layer="96"/>
 </instance>
 <instance part="RSCL1" gate="G$1" x="-63.5" y="114.3" smashed="yes">
 <attribute name="NAME" x="-67.31" y="115.7986" size="1.778" layer="95"/>
 <attribute name="VALUE" x="-67.31" y="110.998" size="1.778" layer="96"/>
 </instance>
-<instance part="RSCL2" gate="G$1" x="-96.52" y="99.06" smashed="yes">
-<attribute name="NAME" x="-100.33" y="100.5586" size="1.778" layer="95"/>
-<attribute name="VALUE" x="-100.33" y="95.758" size="1.778" layer="96"/>
+<instance part="MEMAUDIT" gate="-1" x="-109.22" y="109.22" smashed="yes" rot="R90">
+<attribute name="NAME" x="-108.458" y="111.76" size="1.524" layer="95" rot="R90"/>
+<attribute name="VALUE" x="-110.617" y="108.458" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="+3V1" gate="G$1" x="-86.36" y="99.06" smashed="yes" rot="R270">
-<attribute name="VALUE" x="-91.44" y="101.6" size="1.778" layer="96"/>
+<instance part="MEMAUDIT" gate="-2" x="-106.68" y="109.22" smashed="yes" rot="R90">
+<attribute name="NAME" x="-105.918" y="111.76" size="1.524" layer="95" rot="R90"/>
+</instance>
+<instance part="MEMAUDIT" gate="-3" x="-104.14" y="109.22" smashed="yes" rot="R90">
+<attribute name="NAME" x="-103.378" y="111.76" size="1.524" layer="95" rot="R90"/>
+</instance>
+<instance part="MEMAUDIT" gate="-4" x="-101.6" y="109.22" smashed="yes" rot="R90">
+<attribute name="NAME" x="-100.838" y="111.76" size="1.524" layer="95" rot="R90"/>
+</instance>
+<instance part="MEMAUDIT" gate="-5" x="-99.06" y="109.22" smashed="yes" rot="R90">
+<attribute name="NAME" x="-98.298" y="111.76" size="1.524" layer="95" rot="R90"/>
+</instance>
+<instance part="MEMAUDIT" gate="-6" x="-96.52" y="109.22" smashed="yes" rot="R90">
+<attribute name="NAME" x="-95.758" y="111.76" size="1.524" layer="95" rot="R90"/>
+</instance>
+<instance part="GND7" gate="1" x="-109.22" y="101.6" smashed="yes">
+<attribute name="VALUE" x="-111.76" y="99.06" size="1.778" layer="96"/>
+</instance>
+<instance part="+3V5" gate="G$1" x="-88.9" y="104.14" smashed="yes" rot="R270">
+<attribute name="VALUE" x="-93.98" y="106.68" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -6197,36 +6195,25 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <wire x1="-73.66" y1="25.4" x2="-73.66" y2="27.94" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="AUDIT" gate="-1" pin="S"/>
-<pinref part="GND4" gate="1" pin="GND"/>
-</segment>
-<segment>
 <pinref part="GND6" gate="1" pin="GND"/>
 <pinref part="X1" gate="G$1" pin="2"/>
 </segment>
+<segment>
+<pinref part="GND7" gate="1" pin="GND"/>
+<pinref part="MEMAUDIT" gate="-1" pin="S"/>
+<wire x1="-109.22" y1="104.14" x2="-109.22" y2="106.68" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="TX" class="0">
-<segment>
-<pinref part="AUDIT" gate="-2" pin="S"/>
-<wire x1="-109.22" y1="101.6" x2="-109.22" y2="99.06" width="0.1524" layer="91"/>
-<label x="-109.22" y="99.06" size="1.778" layer="95" rot="R270" xref="yes"/>
-</segment>
 <segment>
 <pinref part="U$2" gate="G$1" pin="TX"/>
 <wire x1="-73.66" y1="81.28" x2="-73.66" y2="83.82" width="0.1524" layer="91"/>
 <label x="-73.66" y="83.82" size="1.778" layer="95" rot="R90" xref="yes"/>
 </segment>
-</net>
-<net name="BLK" class="0">
 <segment>
-<pinref part="AUDIT" gate="-4" pin="S"/>
-<wire x1="-104.14" y1="101.6" x2="-104.14" y2="99.06" width="0.1524" layer="91"/>
-<label x="-104.14" y="99.06" size="1.778" layer="95" rot="R270" xref="yes"/>
-</segment>
-<segment>
-<pinref part="U$2" gate="G$1" pin="WKP"/>
-<wire x1="-63.5" y1="81.28" x2="-63.5" y2="83.82" width="0.1524" layer="91"/>
-<label x="-63.5" y="83.82" size="1.778" layer="95" rot="R90" xref="yes"/>
+<pinref part="X1" gate="G$1" pin="3"/>
+<wire x1="-73.66" y1="99.06" x2="-73.66" y2="96.52" width="0.1524" layer="91"/>
+<label x="-73.66" y="96.52" size="1.778" layer="95" rot="R270" xref="yes"/>
 </segment>
 </net>
 <net name="RX" class="0">
@@ -6236,9 +6223,9 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <label x="-68.58" y="83.82" size="1.778" layer="95" rot="R90" xref="yes"/>
 </segment>
 <segment>
-<pinref part="AUDIT" gate="-3" pin="S"/>
-<wire x1="-106.68" y1="101.6" x2="-106.68" y2="99.06" width="0.1524" layer="91"/>
-<label x="-106.68" y="99.06" size="1.778" layer="95" rot="R270" xref="yes"/>
+<pinref part="X1" gate="G$1" pin="4"/>
+<wire x1="-71.12" y1="99.06" x2="-71.12" y2="96.52" width="0.1524" layer="91"/>
+<label x="-71.12" y="96.52" size="1.778" layer="95" rot="R270" xref="yes"/>
 </segment>
 </net>
 <net name="RXP" class="0">
@@ -6314,8 +6301,8 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 </segment>
 <segment>
 <pinref part="X1" gate="G$1" pin="1"/>
-<wire x1="-58.42" y1="93.98" x2="-58.42" y2="91.44" width="0.1524" layer="91"/>
-<label x="-58.42" y="91.44" size="1.778" layer="95" rot="R270" xref="yes"/>
+<wire x1="-78.74" y1="99.06" x2="-78.74" y2="96.52" width="0.1524" layer="91"/>
+<label x="-78.74" y="96.52" size="1.778" layer="95" rot="R270" xref="yes"/>
 </segment>
 <segment>
 <pinref part="RSCL1" gate="G$1" pin="1"/>
@@ -6348,9 +6335,10 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <label x="0" y="96.52" size="1.778" layer="95" rot="R270" xref="yes"/>
 </segment>
 <segment>
-<pinref part="RSCL2" gate="G$1" pin="2"/>
-<wire x1="-91.44" y1="99.06" x2="-88.9" y2="99.06" width="0.1524" layer="91"/>
-<pinref part="+3V1" gate="G$1" pin="+3V3"/>
+<pinref part="MEMAUDIT" gate="-6" pin="S"/>
+<wire x1="-96.52" y1="106.68" x2="-96.52" y2="104.14" width="0.1524" layer="91"/>
+<pinref part="+3V5" gate="G$1" pin="+3V3"/>
+<wire x1="-96.52" y1="104.14" x2="-91.44" y2="104.14" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="DTR" class="0">
@@ -6388,54 +6376,52 @@ Source: www.tycoelectronics.com .. ENG_DS_1654001_1099_RJ_L_0507.pdf</descriptio
 <wire x1="-58.42" y1="114.3" x2="-58.42" y2="116.84" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$2" class="0">
+<net name="SS" class="0">
 <segment>
-<pinref part="AUDIT" gate="-5" pin="S"/>
-<pinref part="RSCL2" gate="G$1" pin="1"/>
-<wire x1="-101.6" y1="99.06" x2="-101.6" y2="101.6" width="0.1524" layer="91"/>
+<pinref part="MEMAUDIT" gate="-5" pin="S"/>
+<wire x1="-99.06" y1="106.68" x2="-99.06" y2="104.14" width="0.1524" layer="91"/>
+<label x="-99.06" y="104.14" size="1.778" layer="95" rot="R270" xref="yes"/>
 </segment>
-</net>
-<net name="N$3" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="DAC"/>
-<wire x1="-58.42" y1="81.28" x2="-55.88" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="-55.88" y1="81.28" x2="-55.88" y2="86.36" width="0.1524" layer="91"/>
-<wire x1="-55.88" y1="86.36" x2="-53.34" y2="86.36" width="0.1524" layer="91"/>
-<pinref part="X1" gate="G$1" pin="3"/>
-<wire x1="-53.34" y1="86.36" x2="-53.34" y2="93.98" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$4" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="A5"/>
-<pinref part="X1" gate="G$1" pin="4"/>
-<wire x1="-53.34" y1="81.28" x2="-50.8" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="-50.8" y1="81.28" x2="-50.8" y2="93.98" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$5" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="A4"/>
-<pinref part="X1" gate="G$1" pin="5"/>
-<wire x1="-48.26" y1="81.28" x2="-48.26" y2="93.98" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$6" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="A3"/>
-<pinref part="X1" gate="G$1" pin="6"/>
-<wire x1="-43.18" y1="81.28" x2="-45.72" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="-45.72" y1="81.28" x2="-45.72" y2="93.98" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$7" class="0">
 <segment>
 <pinref part="U$2" gate="G$1" pin="A2"/>
-<wire x1="-38.1" y1="81.28" x2="-40.64" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="-40.64" y1="81.28" x2="-40.64" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="-40.64" y1="91.44" x2="-43.18" y2="91.44" width="0.1524" layer="91"/>
-<pinref part="X1" gate="G$1" pin="7"/>
-<wire x1="-43.18" y1="91.44" x2="-43.18" y2="93.98" width="0.1524" layer="91"/>
+<wire x1="-38.1" y1="81.28" x2="-38.1" y2="83.82" width="0.1524" layer="91"/>
+<label x="-38.1" y="83.82" size="1.778" layer="95" rot="R90" xref="yes"/>
+</segment>
+</net>
+<net name="SCK" class="0">
+<segment>
+<pinref part="MEMAUDIT" gate="-4" pin="S"/>
+<wire x1="-101.6" y1="106.68" x2="-101.6" y2="104.14" width="0.1524" layer="91"/>
+<label x="-101.6" y="104.14" size="1.778" layer="95" rot="R270" xref="yes"/>
+</segment>
+<segment>
+<pinref part="U$2" gate="G$1" pin="A3"/>
+<wire x1="-43.18" y1="81.28" x2="-43.18" y2="83.82" width="0.1524" layer="91"/>
+<label x="-43.18" y="83.82" size="1.778" layer="95" rot="R90" xref="yes"/>
+</segment>
+</net>
+<net name="MISO" class="0">
+<segment>
+<pinref part="MEMAUDIT" gate="-3" pin="S"/>
+<wire x1="-104.14" y1="106.68" x2="-104.14" y2="104.14" width="0.1524" layer="91"/>
+<label x="-104.14" y="104.14" size="1.778" layer="95" rot="R270" xref="yes"/>
+</segment>
+<segment>
+<pinref part="U$2" gate="G$1" pin="A4"/>
+<wire x1="-48.26" y1="81.28" x2="-48.26" y2="83.82" width="0.1524" layer="91"/>
+<label x="-48.26" y="83.82" size="1.778" layer="95" rot="R90" xref="yes"/>
+</segment>
+</net>
+<net name="MOSI" class="0">
+<segment>
+<pinref part="MEMAUDIT" gate="-2" pin="S"/>
+<wire x1="-106.68" y1="106.68" x2="-106.68" y2="104.14" width="0.1524" layer="91"/>
+<label x="-106.68" y="104.14" size="1.778" layer="95" rot="R270" xref="yes"/>
+</segment>
+<segment>
+<pinref part="U$2" gate="G$1" pin="A5"/>
+<wire x1="-53.34" y1="81.28" x2="-53.34" y2="83.82" width="0.1524" layer="91"/>
+<label x="-53.34" y="83.82" size="1.778" layer="95" rot="R90" xref="yes"/>
 </segment>
 </net>
 </nets>
