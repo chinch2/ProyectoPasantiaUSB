@@ -1,129 +1,73 @@
-int timer = 100;
-int segment[] = {0, 1, 2, 3, 4, 5, 6};
-int anode[] = {7, 8, 9, 10};
+static uint32_t timer = 0;
+//int segment[] = {0, 1, 2, 3, 4, 5, 6};
+int n[10] = {B01000000, B01001111, B00010010, B00000110, B00001101, B00100100, B00100000, B01001110, B00000000, B00001100}; // 0-9
+int a[4] = {B00001110, B00001101, B00001011, B00000111};
+int h[4] = {0, 0, 0, 0};
+int mins = (h[2] * 10) + h[3];
+int horas = (h[0] * 10) + h[1];
 void setup() {
   // put your setup code here, to run once:
-  for (int thisPin = 0; thisPin < 7; thisPin++) {
+  //Serial.begin(9600);
+  DDRD = B11111111; //PINS 0-7 OUTPUT
+  DDRB = B11111111; //PINS 8-13 OUTPUT
+  PORTD = B11111111;
+  PORTB = B00001111;
+  /*for (int thisPin = 0; thisPin < 7; thisPin++) {
     digitalWrite(segment[thisPin], HIGH);
     pinMode(segment[thisPin], OUTPUT);
-  }
+    }
 
-  for (int thisPin = 0; thisPin < 4; thisPin++) {
+    for (int thisPin = 0; thisPin < 4; thisPin++) {
     digitalWrite(anode[thisPin], HIGH);
     pinMode(anode[thisPin], OUTPUT);
-  }
+    }*/
 }
 void loop() {
-  // put your main code here, to run repeatedly:
 
-  digitalWrite(anode[0], LOW);
+  //-------CLOCK-------
+  if (millis() - timer > 60000) {//pasó un minuto
 
-  digitalWrite(segment[0], HIGH);
-  digitalWrite(segment[1], HIGH);
-  digitalWrite(segment[2], HIGH);
-  digitalWrite(segment[3], HIGH);
-  digitalWrite(segment[4], LOW);
-  digitalWrite(segment[5], LOW);
-  digitalWrite(segment[6], HIGH);
+    mins = (h[2] * 10) + h[3];
 
-  delay(5);
+    horas = (h[0] * 10) + h[1];
 
-  digitalWrite(segment[0], HIGH);
-  digitalWrite(segment[1], HIGH);
-  digitalWrite(segment[2], HIGH);
-  digitalWrite(segment[3], HIGH);
-  digitalWrite(segment[4], HIGH);
-  digitalWrite(segment[5], HIGH);
-  digitalWrite(segment[6], HIGH);
+    mins++;
+    timer = millis();
 
-  digitalWrite(anode[0], HIGH);
+    if (mins > 59) {
 
-  digitalWrite(anode[1], LOW);
+      mins = 0;
+      horas++;
 
-  digitalWrite(segment[0], LOW);
-  digitalWrite(segment[1], LOW);
-  digitalWrite(segment[2], HIGH);
-  digitalWrite(segment[3], LOW);
-  digitalWrite(segment[4], LOW);
-  digitalWrite(segment[5], HIGH);
-  digitalWrite(segment[6], LOW);
+    }
 
-  delay(5);
+    if (horas > 23) horas = 0;
 
-  digitalWrite(segment[0], HIGH);
-  digitalWrite(segment[1], HIGH);
-  digitalWrite(segment[2], HIGH);
-  digitalWrite(segment[3], HIGH);
-  digitalWrite(segment[4], HIGH);
-  digitalWrite(segment[5], HIGH);
-  digitalWrite(segment[6], HIGH);
 
-  digitalWrite(anode[1], HIGH);
+    h[0] = horas / 10;
+    h[1] = horas % 10;
+    h[2] = mins / 10;
+    h[3] = mins % 10;
+  }
+  disp(h);
+  //Serial.println(timer);
+  //Serial.println(millis());
+}
 
-  digitalWrite(anode[2], LOW);
+void disp (int o[4]) {
 
-  digitalWrite(segment[0], HIGH);
-  digitalWrite(segment[1], HIGH);
-  digitalWrite(segment[2], HIGH);
-  digitalWrite(segment[3], HIGH);
-  digitalWrite(segment[4], LOW);
-  digitalWrite(segment[5], LOW);
-  digitalWrite(segment[6], HIGH);
+  for (int i = 0; i < 4; i++) {
 
-  delay(5);
+    PORTB = a[i];
 
-  digitalWrite(segment[0], HIGH);
-  digitalWrite(segment[1], HIGH);
-  digitalWrite(segment[2], HIGH);
-  digitalWrite(segment[3], HIGH);
-  digitalWrite(segment[4], HIGH);
-  digitalWrite(segment[5], HIGH);
-  digitalWrite(segment[6], HIGH);
+    PORTD = n[o[i]];
 
-  digitalWrite(anode[2], HIGH);
+    delay(5);
 
-  digitalWrite(anode[3], LOW);
+    PORTD = B11111111;
 
-  digitalWrite(segment[0], HIGH);
-  digitalWrite(segment[1], HIGH);
-  digitalWrite(segment[2], HIGH);
-  digitalWrite(segment[3], HIGH);
-  digitalWrite(segment[4], LOW);
-  digitalWrite(segment[5], LOW);
-  digitalWrite(segment[6], HIGH);
+    PORTB = 00001111;
 
-  delay(5);
-
-  digitalWrite(segment[0], HIGH);
-  digitalWrite(segment[1], HIGH);
-  digitalWrite(segment[2], HIGH);
-  digitalWrite(segment[3], HIGH);
-  digitalWrite(segment[4], HIGH);
-  digitalWrite(segment[5], HIGH);
-  digitalWrite(segment[6], HIGH);
-
-  digitalWrite(anode[3], HIGH);
-
-  digitalWrite(anode[4], LOW);
-
-  digitalWrite(segment[0], HIGH);
-  digitalWrite(segment[1], HIGH);
-  digitalWrite(segment[2], HIGH);
-  digitalWrite(segment[3], HIGH);
-  digitalWrite(segment[4], LOW);
-  digitalWrite(segment[5], LOW);
-  digitalWrite(segment[6], HIGH);
-
-  delay(5);
-
-  digitalWrite(segment[0], HIGH);
-  digitalWrite(segment[1], HIGH);
-  digitalWrite(segment[2], HIGH);
-  digitalWrite(segment[3], HIGH);
-  digitalWrite(segment[4], HIGH);
-  digitalWrite(segment[5], HIGH);
-  digitalWrite(segment[6], HIGH);
-
-  digitalWrite(anode[4], HIGH);
+  }
 
 }
