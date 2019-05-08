@@ -28,7 +28,7 @@
 #define TXS1 23
 #define RXS2 27
 #define TXS2 28
-#define ss 4
+#define ss 3
 
 #else //Para teensy++ 2.0
 
