@@ -1,21 +1,21 @@
 /* Serial pass through for teensy */
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 //#define rxPin 14  //serial que va a la impresora
 //#define txPin 13 //serial que va a la impresora
 //  SoftwareSerial mySerial =  SoftwareSerial(rxPin, txPin);
 
 void setup()
 {
+  //Serial1.begin(9600);
   Serial1.begin(9600);
-  Serial.begin(9600);
   //Serial1.begin(9600);
 }
 
 void loop()
 {
   /* send everything received from the hardware uart to usb serial & vv */
-  if (Serial.available() > 0) {
-    char ch = Serial.read();
+  if (Serial1.available() > 0) {
+    char ch = Serial1.read();
     //if (ch == '*'){
     //Serial1.print("\x1A\x1A\x1A");
     //chr(27).'@'.chr(27).'(B'.chr(16).chr(0).chr(05).chr(2).chr(0).chr(10).chr(0).chr(0).'ABCDERGHJK'); opcion 1
@@ -34,12 +34,12 @@ void loop()
   //} else {
       //Serial1.print(ch);
       Serial1.print(ch);
-  }
-  //if (Serial1.available() > 0) {
-  if (Serial1.available() > 0) {
+      Serial1.print("\r\n");
+  }  
+    /*if (Serial1.available() > 0) {
    //char ch2 = Serial1.read();
    char ch2 = Serial1.read();
     Serial.print(ch2);
   }
-
+*/
 }

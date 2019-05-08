@@ -5,7 +5,54 @@
 #include <Key.h>
 #include <Keypad.h>
 #include <ctype.h>
-#define LED 6 //led del teensy 2.0
+
+#define joseduino
+
+#ifdef joseduino
+
+#define LED 0
+#define button_1 1
+#define button_2 2
+#define tr1 12
+#define tr2 13
+#define tr3 14
+#define tr4 15
+#define tc1 18
+#define tc2 19
+#define tc3 20
+#define tc4 21
+#define papel 24
+#define dispara 25
+#define barrera 26
+#define RXS1 22
+#define TXS1 23
+#define RXS2 27
+#define TXS2 28
+#define ss 4
+
+#else //Para teensy++ 2.0
+
+#define LED 6
+#define button_1 8
+#define button_2 9
+#define tr1 10
+#define tr2 11
+#define tr3 12
+#define tr4 13
+#define tc1 14
+#define tc2 15
+#define tc3 16
+#define tc4 17
+#define papel 38
+#define dispara 39
+#define barrera 40
+#define RXS1 24
+#define TXS1 25
+#define RXS2 26
+#define TXS2 27
+#define ss 20
+
+#endif
 //-------Escribo IP default en la EEPROM----
 void updateIP(String inString[4]);
 //-------Busco IP default en la EEPROM------
@@ -35,7 +82,6 @@ LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
 //-----------Escaner e impresora----------------
 char c;
 String buff = "";//char buff[8];
-const int dispara = 39;
 //-------------Teclado-----------------------
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //four columns
@@ -46,8 +92,8 @@ char keys[ROWS][COLS] = {
   {'*', '0', '#', 'D'}
 };
 
-byte rowPins[ROWS] = {10, 11, 12, 13}; //connect to the row pinouts of the keypad
-byte colPins[COLS] = {14, 15, 16, 17}; //connect to the column pinouts of the keypad
+byte rowPins[ROWS] = {tr1, tr2, tr3, tr4}; //connect to the row pinouts of the keypad
+byte colPins[COLS] = {tc1, tc2, tc3, tc4}; //connect to the column pinouts of the keypad
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 unsigned int pagos[3] = {0, 0, 0};
 String mensa[3] = {"Pago tarjeta", "Pago Efectivo", "Pago Otros"};
@@ -55,26 +101,26 @@ unsigned int monto;
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  Serial1.begin(9600);
   delay(1000);
   buff = "";//buff[0] = '\0';
-  Serial.println(F("\n[webClient]"));
-  Serial.print("MAC: ");
+  Serial1.println(F("\n[webClient]"));
+  Serial1.print("MAC: ");
   for (byte i = 0; i < 6; ++i) {
-    Serial.print(mymac[i], HEX);
+    Serial1.print(mymac[i], HEX);
     if (i < 5)
-      Serial.print(':');
+      Serial1.print(':');
   }
 
-  Serial.println("\nProceding to access Ethernet Controller\r\n");
+  Serial1.println("\nProceding to access Ethernet Controller\r\n");
   // Change 'SS' to your Slave Select pin, if you arn't using the default pin
-  if (ether.begin(sizeof Ethernet::buffer, mymac, 20) == 0) {
-    Serial.println(F("Failed to access Ethernet controller"));
+  if (ether.begin(sizeof Ethernet::buffer, mymac, ss) == 0) {
+    Serial1.println(F("Failed to access Ethernet controller"));
   }
 
-  Serial.println("\r\nDHCP...\r\n\r\n");
+  Serial1.println("\r\nDHCP...\r\n\r\n");
   if (!ether.dhcpSetup()) {
-    Serial.println(F("DHCP failed"));
+    Serial1.println(F("DHCP failed"));
   }
 
   ether.printIp("IP:  ", ether.myip);
@@ -85,15 +131,15 @@ void setup() {
   //----Buscar en la EEPROM la ip default y compararla con la que se esta usando-----
   if (IPROM != IPnative) { //EEPROM vacia
     //ESCRIBO EN MI EEPROM LA IP DEL SERVIDOR, SOLO EJECUTAR UNA SOLA VEZ
-    Serial.println();
-    Serial.println("EEPROM distinta, actualizando");
+    Serial1.println();
+    Serial1.println("EEPROM distinta, actualizando");
     updateIP(IPdef); // Si IPdef es diferente a la que esta guardada la escribe sino no
     delay(1000);
-    Serial.print("reseteando. EEPROM actualizada");
+    Serial1.print("reseteando. EEPROM actualizada");
     asm("jmp 0x0000");
   }
 
-  Serial.println("IP en la EPPROM: " + IPROM);
+  Serial1.println("IP en la EPPROM: " + IPROM);
   int ip[4];
   for (int i = 0; i < 4; i++) {
     ip[i] = EEPROM.read(i);
@@ -101,11 +147,11 @@ void setup() {
     ether.hisip[i] = ip[i];//IPdef[i].toInt();
   }
   ether.printIp("Server: ", ether.hisip);
-  Serial.println("Solicitando configuracion inicial...");
+  Serial1.println("Solicitando configuracion inicial...");
   //----Configuracion inicial-----------
   //IPROM.toCharArray(website, IPROM.length() + 1);
-  //Serial.println(IPROM);
-  //Serial.println(website);
+  //Serial1.println(IPROM);
+  //Serial1.println(website);
   int x = 0;
   onrequest = true;
   timer = 0;
@@ -114,23 +160,23 @@ void setup() {
 
     if (millis() > timer) {
       timer = millis() + 5000;
-      Serial.println();
-      Serial.print("<<< REQ de setup");
+      Serial1.println();
+      Serial1.print("<<< REQ de setup");
       ether.browseUrl(PSTR("/setup.php"), "?t=2", website, my_callback);
       x++;
       if (x > 5) {
-        Serial.println("Fallo request");
+        Serial1.println("Fallo request");
         onrequest = false;
       }
     }
   }
   //Verifico que la IP de servidor no haya cambiado, si es asi actualizo
   //la EPPROM y reseteo
-  Serial.println();
-  Serial.println("IP en la EPPROM: " + IPROM);
-  Serial.println("IP actual: " + configuracion[0]);
+  Serial1.println();
+  Serial1.println("IP en la EPPROM: " + IPROM);
+  Serial1.println("IP actual: " + configuracion[0]);
   if (configuracion[0] != IPROM) {
-    Serial.print("Actualizando EPPROM con nueva IP: ");
+    Serial1.print("Actualizando EPPROM con nueva IP: ");
     String IPnueva[4];
     int i = 0, r = 0, t = 0;
     for (i = 0; i < configuracion[0].length(); i++) {
@@ -141,19 +187,19 @@ void setup() {
       }
     }
     for (int k = 0; k < 4; k++) {
-      Serial.print(IPnueva[k]);
+      Serial1.print(IPnueva[k]);
       if ( k < 3 ) {
-        Serial.print(".");
+        Serial1.print(".");
       }
     }
-    Serial.println();
-    Serial.println("Guardando nueva IP en la EPPROM");
+    Serial1.println();
+    Serial1.println("Guardando nueva IP en la EPPROM");
     updateIP(IPnueva);
-    Serial.print("Guardada nueva IP en la EPPROM: ");
+    Serial1.print("Guardada nueva IP en la EPPROM: ");
     for (int k = 0; k < 4; k++) {
-      Serial.print(IPnueva[k]);
+      Serial1.print(IPnueva[k]);
       if (k < 3) {
-        Serial.print(".");
+        Serial1.print(".");
       }
     }
   }
@@ -166,36 +212,36 @@ void setup() {
   //Inicializando los pines de entrada y salida
   pinMode(dispara, OUTPUT); //Trigger del escaner
   pinMode(LED, OUTPUT);  //Teensy
-  Serial.println("Botones inicializados");
-  Serial1.begin(configuracion[1].toInt());
+  Serial1.println("Botones inicializados");
+  Serial.begin(configuracion[1].toInt());
   // Inicializar el LCD
   lcd.init();
   //Limpiar la pantalla
   lcd.clear();
-  Serial.println("Pantalla inicializada");
+  Serial1.println("Pantalla inicializada");
   delay(1000);
 }
 
 void loop() {
   digitalWrite(dispara, HIGH);
   delay(300);
-  if (analogRead(38) > 50) {
+  if (analogRead(papel) > 50) {
     digitalWrite(dispara, LOW);
     delay(300);
   }
-  if (Serial1.available()) {
-    c = Serial1.read();
-    //Serial.print(c);
-    // if( c == 10) Serial.print("hubo r");
-    // if( c == 13) Serial.print("hubo n");
+  if (Serial.available()) {
+    c = Serial.read();
+    //Serial1.print(c);
+    // if( c == 10) Serial1.print("hubo r");
+    // if( c == 13) Serial1.print("hubo n");
     if ( c == 13) {
       //const char *req = "?id=";
       //strcpy(request,req);
       //strcat(request,buff);
       request = "?id=" + buff; // put your main code here, to run repeatedly:
       request.toCharArray(requestc, request.length() + 1);
-      Serial.println(request);
-      Serial.println(requestc);
+      Serial1.println(request);
+      Serial1.println(requestc);
       int x = 0;
       onrequest = true;
       timer = 0;
@@ -204,13 +250,13 @@ void loop() {
 
         if (millis() > timer) {
           timer = millis() + 5000;
-          Serial.println("Request de consulta");
-          Serial.print("<<< REQ ");
-          Serial.print(requestc);
+          Serial1.println("Request de consulta");
+          Serial1.print("<<< REQ ");
+          Serial1.print(requestc);
           ether.browseUrl(PSTR("/consulta.php"), requestc, website, my_callback);
           x++;
           if (x > 5) {
-            Serial.println("Fallo request");
+            Serial1.println("Fallo request");
             onrequest = false;
             buff = "";
           }
@@ -225,27 +271,27 @@ void loop() {
 }
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
-  //Serial.println("callback" + status);
+  //Serial1.println("callback" + status);
   onrequest = false;
   ponrequest = false;
-  Serial.print(">>>");
+  Serial1.print(">>>");
   Ethernet::buffer[off + len] = 0;
-  //Serial.print((const char*) Ethernet::buffer + off);
+  //Serial1.print((const char*) Ethernet::buffer + off);
   String salida = (const char*) Ethernet::buffer + off;
   //salida = salida.substring(0);
-  Serial.print(salida);
+  Serial1.print(salida);
   int pos =   salida.indexOf("\r\n\r\n") + 4;
   salida = salida.substring(pos);
   while (salida.length() > 0) {
     int fin = salida.indexOf("-end");
     if (fin == 0) salida = "";
     String salcomando = salida.substring(0, fin);
-    Serial.println(salcomando);
+    Serial1.println(salcomando);
     comando(salcomando);
-    //Serial.println();
-    //Serial.print(salida1);
+    //Serial1.println();
+    //Serial1.print(salida1);
     salida = salida.substring(fin + 4);
-    //Serial.print(salida1);
+    //Serial1.print(salida1);
   }
 
 }
@@ -253,26 +299,26 @@ static void my_callback (byte status, word off, word len) {
 void comando(String cmd) {
   String cmd1 = cmd.substring(0, 5);
   String cmd2 = cmd.substring(5);
-  Serial.println("\r\ncomando:" + cmd + " modo:" + cmd1 + " argumento:" + cmd2);
+  Serial1.println("\r\ncomando:" + cmd + " modo:" + cmd1 + " argumento:" + cmd2);
   if (cmd1 == "-disp") {
-    Serial.println(cmd2);
+    Serial1.println(cmd2);
     Pantalla(cmd2);
   }
   /*if (cmd1 == "-prin") {
     Imprimir(cmd);
     }*/
   if (cmd1 == "-barr") {
-    Serial.print("Habriendo barrera");
+    Serial1.print("Habriendo barrera");
   }
   if (cmd1 == "-conf") {
-    Serial.println("Empezando conf");
+    Serial1.println("Empezando conf");
     conf(cmd2);
   }
   if (cmd1 == "-pago") {
     String salida1 = cmd2;
     monto = salida1.toInt();
-    Serial.print("Monto a pagar: ");
-    Serial.println(monto);
+    Serial1.print("Monto a pagar: ");
+    Serial1.println(monto);
     modopago(monto);
   }
 }
@@ -287,7 +333,7 @@ void conf(String arg) {
     }
   }
   for (int k = 0; k < 5; k++) {
-    Serial.println(configuracion[k]);
+    Serial1.println(configuracion[k]);
   }
 }
 
@@ -305,7 +351,7 @@ void Pantalla(String muestra) {
 }
 
 void modopago(unsigned int mnt) {
-  Serial.println("Modo pago iniciado");
+  Serial1.println("Modo pago iniciado");
   String teclado = "";
   bool respuesta = true;
   unsigned int cmb;
@@ -315,7 +361,7 @@ void modopago(unsigned int mnt) {
   while (respuesta) {
 
     char key = keypad.getKey();
-    Serial.print(key);
+    Serial1.print(key);
     switch (key)
     {
       case 'A':
@@ -327,7 +373,7 @@ void modopago(unsigned int mnt) {
         } break;
       case 'D': {
           teclado = "";
-          Serial.println("Enter");
+          Serial1.println("Enter");
           if (mnt > pagos[0] + pagos[1] + pagos[2]) {
             Pantalla("Monto incompleto");
 
@@ -337,14 +383,14 @@ void modopago(unsigned int mnt) {
             respuesta = false;
             requestpago(cmb);
             buff = "";//buff[j] = '\0';
-            Serial.println("Modo pago finalizado");
+            Serial1.println("Modo pago finalizado");
 
           }
         } break;
       case '#': {
           teclado = "";
           buff = "";//buff[j] = '\0';
-          Serial.println("Modo pago finalizado");
+          Serial1.println("Modo pago finalizado");
           Pantalla("Cancelado");
           respuesta = false;
         } break;
@@ -367,8 +413,8 @@ void requestpago(unsigned int cambio) {
   String change = String(cambio);
   prequest = "?id=" + buff + "&pa=" + pagos[0] + "&pb=" + pagos[1] + "&pc=" + pagos[2] + "&cambio=" + change; // put your main code here, to run repeatedly:
   prequest.toCharArray(prequestc, prequest.length() + 1);
-  Serial.println(prequest);
-  Serial.println(prequestc);
+  Serial1.println(prequest);
+  Serial1.println(prequestc);
   int x = 0;
   ponrequest = true;
   timer = 0;
@@ -377,13 +423,13 @@ void requestpago(unsigned int cambio) {
 
     if (millis() > timer) {
       timer = millis() + 5000;
-      Serial.println("Request de pago");
-      Serial.print("<<< REQ: ");
-      Serial.print(prequestc);
+      Serial1.println("Request de pago");
+      Serial1.print("<<< REQ: ");
+      Serial1.print(prequestc);
       ether.browseUrl(PSTR("/pago.php"), prequestc, website, my_callback);
       x++;
       if (x > 5) {
-        Serial.print("Fallo request");
+        Serial1.print("Fallo request");
         ponrequest = false;
       }
     }
@@ -396,27 +442,27 @@ void updateIP(String inString[4])
   int m;
   int i;
   int n;
-  Serial.print("Guardando IP en la EEPROM: ");
+  Serial1.print("Guardando IP en la EEPROM: ");
   for (m = 0; m < 4; m++) {
-    Serial.print(inString[m]);
+    Serial1.print(inString[m]);
     if (m < 3) {
-      Serial.print(".");
+      Serial1.print(".");
     }
   }
-  Serial.print("\r\n");
+  Serial1.print("\r\n");
 
   for (i = 0; i < 4; i++) {
     ip[i] = inString[i].toInt();
     EEPROM.update(i, ip[i]);
   }
-  Serial.print("Guardada en EEPROM IP: ");
+  Serial1.print("Guardada en EEPROM IP: ");
   for (n = 0; n < 4; n++) {
-    Serial.print(EEPROM.read(n));
+    Serial1.print(EEPROM.read(n));
     if (n < 3) {
-      Serial.print(".");
+      Serial1.print(".");
     }
   }
-  Serial.println();
+  Serial1.println();
 }
 
 void readIP() {
