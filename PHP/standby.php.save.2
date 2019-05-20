@@ -1,0 +1,49 @@
+<?php
+$servername = "127.0.0.1";
+$username = "jose";
+$password = "J.2571582.j";
+$dbname = "equipos";
+$ip = $_SERVER['REMOTE_ADDR'];
+$estado = $_GET["carro"];
+
+
+if($estado == 1) {
+  echo "-dispBienvenido!     Pulse 1 segundo    -end";
+}
+else{ 
+echo "-disp" . date('    d/m/y         H:i      ') . "-end";
+}
+
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$sql = "SELECT registro,direccionIP FROM equipos WHERE registro > 0 and direccionIP = '".$_SERVER['REMOTE_ADDR']."'";
+$ipreg = $conn->query($sql);
+
+if($ipreg->num_rows > 0) {
+
+	echo "El equipo ya se encuentra registrado";
+} else { 
+
+$sql = "INSERT INTO `equipos`.`equipos` (`direccionIP`, `descripcion`) VALUES ('".$_SERVER['REMOTE_ADDR']."', 'Inserte aqui ubicacion de la estacion')";
+
+if ($conn->query($sql) === TRUE) {
+    $last_id = $conn->insert_id;
+} else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
+}
+
+$sql = "UPDATE `equipos`.`equipos` SET `estacionentrada` = '".$last_id."',`registro` = '1' WHERE (`Equipos` = '".$last_id."')";
+
+if ($conn->query($sql) === TRUE) {
+    echo "Nuevo Equipo registrado";
+} else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
+}
+}
+?>
