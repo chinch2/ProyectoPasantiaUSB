@@ -11,6 +11,8 @@
 #define LED 0
 #define button_1 1
 #define button_2 2
+#define papel 24
+#define dispara 25
 #define barrera 26
 #define RXS1 22
 #define TXS1 23
@@ -227,8 +229,8 @@ void loop()
 
   }
 
-  if (mySerial1.available()) {
-    c = mySerial1.read();
+  if (Serial.available()) {//(mySerial1.available()) {
+    c = Serial.read();//mySerial1.read();
     //Serial1.print(c);
     // if( c == 10) Serial1.print("hubo r");
     // if( c == 13) Serial1.print("hubo n");
