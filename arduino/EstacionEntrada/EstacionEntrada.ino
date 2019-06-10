@@ -60,7 +60,7 @@ LiquidCrystal_I2C lcd(DTYPE, DCOLS, DROWS); //creacion de objeto
 // El numero de los pines (constantes siempre):
 SoftwareSerial mySerial1(RXS1, TXS1); // RXS1, TXS1
 //SoftwareSerial mySerial2(RXS2, TXS2); // RXS2, TXS2
-
+char r;
 char c;
 String buff;
 
@@ -230,43 +230,41 @@ void loop()
   }
 
   if (Serial.available()) {//(mySerial1.available()) {
-    c = Serial.read();//mySerial1.read();
-    //Serial1.print(c);
-    // if( c == 10) Serial1.print("hubo r");
-    // if( c == 13) Serial1.print("hubo n");
-    if ( c == 13) {
-      //const char *req = "?id=";
-      //strcpy(request,req);
-      //strcat(request,buff);
-      requestF = "?IDF=" + buff; // put your main code here, to run repeatedly:
-      requestF.toCharArray(requestFc, requestF.length() + 1);
-      Serial1.println(requestF);
-      Serial1.println(requestFc);
-      int x = 0;
-      onrequest = true;
-      timer = 0;
-      while (onrequest) {
-        ether.packetLoop(ether.packetReceive());
+    c = Serial.read();
+    if (c == 13 || c == 10) {
+      buff = "";
+    } else {
+      buff = buff + c;
+      if (buff.length() == 12) {
+        //const char *req = "?id=";
+        //strcpy(request,req);
+        //strcat(request,buff);
+        requestF = "?IDF=" + buff; // put your main code here, to run repeatedly:
+        requestF.toCharArray(requestFc, requestF.length() + 1);
+        Serial1.println(requestF);
+        Serial1.println(requestFc);
+        int x = 0;
+        onrequest = true;
+        timer = 0;
+        while (onrequest) {
+          ether.packetLoop(ether.packetReceive());
 
-        if (millis() > timer) {
-          timer = millis() + 5000;
-          Serial1.println("Request de Entrada fijo");
-          Serial1.print("<<< REQ ");
-          Serial1.print(requestFc);
-          ether.browseUrl(PSTR("/ticket.php"), requestFc, website, my_callback);
-          x++;
-          if (x > 5) {
-            Serial1.println("Fallo request");
-            onrequest = false;
-            buff = "";
+          if (millis() > timer) {
+            timer = millis() + 5000;
+            Serial1.println("Request de Entrada fijo");
+            Serial1.print("<<< REQ ");
+            Serial1.print(requestFc);
+            ether.browseUrl(PSTR("/ticket.php"), requestFc, website, my_callback);
+            x++;
+            if (x > 5) {
+              Serial1.println("Fallo request");
+              onrequest = false;
+              buff = "";
+            }
           }
         }
+        buff = "";//buff[j] = '\0';
       }
-      buff = "";//buff[j] = '\0';
-    } else {//strcat(buff,c);//buff=buff+c;
-      buff = buff + c;//buff[j] = c;
-      //buff[j+1] = '\0';
-      //j++;
     }
   }
 
