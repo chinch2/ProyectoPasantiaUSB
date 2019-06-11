@@ -223,6 +223,8 @@ void setup() {
 }
 
 void loop() {
+  ether.packetLoop(ether.packetReceive());
+
   digitalWrite(dispara, HIGH);
   delay(300);
   if (analogRead(papel) > 50) {
