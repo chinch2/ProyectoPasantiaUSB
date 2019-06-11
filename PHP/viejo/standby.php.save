@@ -1,0 +1,8 @@
+<?php
+$estado = $_GET["carro"];
+if($estado == 1) {
+echo "-dispBienvenido! Pulse 1s    -end";
+}
+if($estado == 1) { 
+echo "-disp" . date('
+?>

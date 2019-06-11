@@ -20,7 +20,7 @@ Tabla de puestos fijos
 
         if(isset($_GET["del"])){
 
-          $sql = "DELETE FROM sistema.fijos WHERE LISTA = '".$_GET["id"]."';";
+          $sql = "DELETE FROM sistema.fijos WHERE IDF = '".$_GET["id"]."';";
 
           if ($conn->query($sql) === TRUE) {
           
@@ -37,7 +37,7 @@ Tabla de puestos fijos
 
         if(isset($_GET["insert"])){
 
-        $sql = "INSERT INTO fijos (IDF, nombre, telefono, puesto, vehiculo) VALUES ('IDF', 'nombre', 'telefono', 'puesto', 'vehiculo');";
+        $sql = "INSERT INTO fijos (nombre, telefono, puesto, vehiculo) VALUES ('nombre', 'telefono', 'puesto', 'vehiculo');";
 
           if ($conn->query($sql) === TRUE) {
           
@@ -51,7 +51,7 @@ Tabla de puestos fijos
       }
  
         if(isset($_POST["forma"])){
-            $sql = "UPDATE sistema.fijos SET IDF = '{$_POST["IDF"]}', nombre = '{$_POST["nombre"]}', telefono = '{$_POST["telefono"]}', puesto = '{$_POST["puesto"]}', vehiculo = '{$_POST["vehiculo"]}' WHERE LISTA = '{$_POST["LISTA"]}';";
+            $sql = "UPDATE sistema.fijos SET  nombre = '{$_POST["nombre"]}', telefono = '{$_POST["telefono"]}', puesto = '{$_POST["puesto"]}', vehiculo = '{$_POST["vehiculo"]}' WHERE IDF = '{$_POST["IDF"]}';";
             $result = $conn->query($sql);
             unset($_GET["id"]);
         }
@@ -73,12 +73,12 @@ if ($result->num_rows > 0) {
 	while($row = $result-> fetch_assoc()){
   		echo "<tr><td>{$row["IDF"]}</td><td>{$row["nombre"]}</td><td>{$row["telefono"]}</td><td>{$row["puesto"]}</td><td>{$row["vehiculo"]}</td><td>{$row["dentro"]}</td>";
 		if($_SESSION['Access'] <= 2){
-			echo "<td><a href=\"tabla6.php?id={$row["LISTA"]}\">Modificar</a></td><td><a href=\"tabla6.php?id={$row["LISTA"]}&del=1\">Eliminar</a></td><td><a href=\"tabla6detalles.php?id={$row["IDF"]}\">Detalles</a></td></tr>";
+			echo "<td><a href=\"tabla6.php?id={$row["IDF"]}\">Modificar</a></td><td><a href=\"tabla6.php?id={$row["IDF"]}&del=1\">Eliminar</a></td><td><a href=\"tabla6detalles.php?id={$row["IDF"]}\">Detalles</a></td></tr>";
 		}else{
 		echo "</tr>";
 		}
 
-		if($_GET["id"]==$row["LISTA"]){
+		if($_GET["id"]==$row["IDF"]){
         		$campo = $row;
     		}
 	}
@@ -96,7 +96,7 @@ if(count($campo)){
   Nombre:<br>
   <input type="text" name="nombre" value="' . $campo["nombre"] . '">
   <br>
-  <input type="hidden" name="LISTA" value="' . $campo["LISTA"] . '">
+  <input type="hidden" name="IDF" value="' . $campo["IDF"] . '">
   Telefono:<br>
   <input type="text" name="telefono" value="' . $campo["telefono"] . '">
   <br>

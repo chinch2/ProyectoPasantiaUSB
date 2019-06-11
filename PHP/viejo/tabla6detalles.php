@@ -28,7 +28,7 @@ Historial de movimientos
                        <th>estacion</th>
   		</tr>
 <?php
-$sql = "SELECT * FROM sistema.fijodetalles WHERE IDF = '{$_GET["id"]}'";
+$sql = "SELECT * FROM sistema.fijodetalles WHERE IDF = '{$_GET['id']}'";
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
 while($row = $result-> fetch_assoc()){
