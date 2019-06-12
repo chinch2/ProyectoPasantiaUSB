@@ -281,44 +281,42 @@ void loop() {
     //Serial1.print(c);
     // if( c == 10) Serial1.print("hubo r");
     // if( c == 13) Serial1.print("hubo n");
-    if ( cF == 13) {
-      //const char *req = "?id=";
-      //strcpy(request,req);
-      //strcat(request,buff);
-      requestF = "?IDF=" + buffF; // put your main code here, to run repeatedly:
-      requestF.toCharArray(requestFc, requestF.length() + 1);
-      Serial1.println(requestF);
-      Serial1.println(requestFc);
-      int x = 0;
-      onrequest = true;
-      timer = 0;
-      while (onrequest) {
-        ether.packetLoop(ether.packetReceive());
+    if ( cF == 13 || c == 10) {
+      buffF = "";
+    } else {
+      buffF = buffF + cF;
+      if (buffF.length() == 12) {
+        //const char *req = "?id=";
+        //strcpy(request,req);
+        //strcat(request,buff);
+        requestF = "?IDF=" + buffF; // put your main code here, to run repeatedly:
+        requestF.toCharArray(requestFc, requestF.length() + 1);
+        Serial1.println(requestF);
+        Serial1.println(requestFc);
+        int x = 0;
+        onrequest = true;
+        timer = 0;
+        while (onrequest) {
+          ether.packetLoop(ether.packetReceive());
 
-        if (millis() > timer) {
-          timer = millis() + 5000;
-          Serial1.println("Request de salida");
-          Serial1.print("<<< REQ ");
-          Serial1.print(requestFc);
-          ether.browseUrl(PSTR("/salida.php"), requestFc, website, my_callback);
-          x++;
-          if (x > 5) {
-            Serial1.println("Fallo request");
-            onrequest = false;
-            buffF = "";
+          if (millis() > timer) {
+            timer = millis() + 5000;
+            Serial1.println("Request de salida fijo");
+            Serial1.print("<<< REQ ");
+            Serial1.print(requestFc);
+            ether.browseUrl(PSTR("/salida.php"), requestFc, website, my_callback);
+            x++;
+            if (x > 5) {
+              Serial1.println("Fallo request");
+              onrequest = false;
+              buffF = "";
+            }
           }
         }
+        buffF = "";//buff[j] = '\0';
       }
-      buffF = "";//buff[j] = '\0';
-    } else {//strcat(buff,c);//buff=buff+c;
-      buffF = buffF + cF;//buff[j] = c;
-      //buff[j+1] = '\0';
-      //j++;
     }
   }
-
-
-
 }
 // called when the client request is complete
 static void my_callback (byte status, word off, word len) {
