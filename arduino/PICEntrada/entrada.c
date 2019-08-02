@@ -214,7 +214,7 @@ for(aux=0; aux< ciclos; aux++) DELAY_VAR();
 
 //-----------------------------------------------------------------------
 //	Rutina CONFIGURA
-//	configura el I/O, los timer y la comunicación serial
+//	configura el I/O, los timer y la comunicaciï¿½n serial
 //-----------------------------------------------------------------------
 void CONFIGURA(void){
 //configura la comunicacion serial
@@ -717,7 +717,7 @@ PRINT_DATO(2); putchar_imp(':'); PRINT_DATO(1);
 put_LF();
 #endif
 //hora y fecha del documento activo
-aa= DATOS[6];	//AÑO
+aa= DATOS[6];	//Aï¿½O
 mm= DATOS[5];	//MES
 dd= DATOS[4];	//DIA
 hh= DATOS[2];	//HORA
@@ -740,7 +740,7 @@ max= 16;
 
 //verifica si se trata de una fecha valida
 aux2=0;
-aux= cad[4]<<4; aux+= cad[5];		//año
+aux= cad[4]<<4; aux+= cad[5];		//aï¿½o
 //VALIDA_DATO(aux,0x12);
 aux= cad[6]<<4; aux+= cad[7];		//mes
 if(aux==0) aux2++;
